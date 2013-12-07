@@ -2,10 +2,13 @@
 default: build
 
 .DEFAULT:
-	cd src && $(MAKE) $@
+	cd src/ && $(MAKE) $@
+
+test:
+	cd test/ && $(MAKE) test
 
 
-.PHONY: clean
+.PHONY: clean test
 
 clean:
 	rm -f src/*.o
