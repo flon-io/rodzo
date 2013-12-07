@@ -1,22 +1,17 @@
 
-CFLAGS=-g -Wall -O3
-LDLIBS=
-CC=c99
+default: build
 
-
-rodzo: rodzo.o
-rodzo.o: rodzo.c header.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-header.c: pfize header_src.c
-	./pfize print_header src/header_src.c > src/header.c
-
-pfize: pfize.o
+.DEFAULT:
+	cd src && $(MAKE) $@
 
 
 .PHONY: clean
 
 clean:
-	rm -f src/*.o src/*.so*
-	rm -f r.c
+	rm -f src/*.o
+	rm -f src/header.c
+	rm -f src/pfize
+	rm -f rodzo
+	rm -f a.out
+	rm -f z.c
 
