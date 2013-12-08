@@ -4,11 +4,11 @@ default: build
 .DEFAULT:
 	cd tmp/ && $(MAKE) $@
 
-#test:
-#	cd test/ && $(MAKE) test
+test:
+	cd test/ && $(MAKE) test
 
 
-.PHONY: clean
+.PHONY: clean test
 
 clean:
 	rm -f src/header.c

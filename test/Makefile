@@ -1,7 +1,10 @@
 
 test: rodzo-build
-	echo "test!"
+	../bin/rodzo spec/
+
+
+.PHONY: rodzo-build
 
 rodzo-build:
-	cd .. && make
+	cd ../tmp && make
 
