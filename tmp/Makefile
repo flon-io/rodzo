@@ -11,7 +11,6 @@ build: rodzo
 
 rodzo: rodzo.o
 rodzo.o: rodzo.c header.c
-	$(CC) $(CFLAGS) -o $@ -c $<
 
 header.c: pfize header_src.c
 	./pfize print_header $(SRC)/header_src.c > $(SRC)/header.c
