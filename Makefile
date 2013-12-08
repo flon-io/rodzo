@@ -2,19 +2,16 @@
 default: build
 
 .DEFAULT:
-	cd src/ && $(MAKE) $@
+	cd tmp/ && $(MAKE) $@
 
-test:
-	cd test/ && $(MAKE) test
+#test:
+#	cd test/ && $(MAKE) test
 
 
-.PHONY: clean test
+.PHONY: clean
 
 clean:
-	rm -f src/*.o
 	rm -f src/header.c
-	rm -f src/pfize
-	rm -f rodzo
-	rm -f a.out
-	rm -f z.c
+	rm -f tmp/*.o tmp/rodzo tmp/pfize
+	rm -f bin/rodzo
 
