@@ -45,6 +45,15 @@ char *escape(char *line)
   return l;
 }
 
+int usage(char *pname)
+{
+  fprintf(stderr, "\n");
+  fprintf(stderr, "Usage: %s {func_name} {source_path}\n", pname);
+  fprintf(stderr, "Turns the source into a function (writing the source)\n");
+  fprintf(stderr, "\n");
+  return 1;
+}
+
 // arg[1] : function name
 // arg[2] : target file name
 //
@@ -52,6 +61,8 @@ int main(int argc, char *argv[])
 {
   char *func_name = argv[1];
   FILE *in = fopen(argv[2], "r");
+
+  if (func_name == NULL || in == NULL) return usage(argv[0]);
 
   char *line = NULL;
   size_t len = 0;
