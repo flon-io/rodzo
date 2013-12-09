@@ -1,6 +1,6 @@
 
 #include <string.h>
-#include "src/mnemo.h"
+#include "./mnemo.h"
 
 //describe 'mne_tos()' do
 //

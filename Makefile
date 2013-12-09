@@ -5,7 +5,7 @@ default: build
 	cd tmp/ && $(MAKE) $@
 
 test:
-	cd test/ && $(MAKE) test
+	cd test/ && $(MAKE) spec
 
 
 .PHONY: clean test

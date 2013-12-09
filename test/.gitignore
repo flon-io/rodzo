@@ -1,0 +1,6 @@
+
+tmp/*.o
+tmp/*.so
+tmp/*.h
+tmp/a.out
+
