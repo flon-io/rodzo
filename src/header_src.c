@@ -24,28 +24,28 @@
 //
 
   /*
-   * zest header
+   * rodzo header
    */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-char *ze_last_context = NULL;
+char *rdz_last_context = NULL;
 
-void ze_red() { printf("[31m"); }
-void ze_green() { printf("[32m"); }
-void ze_yellow() { printf("[33m"); }
-void ze_white() { printf("[37m"); }
-void ze_clear() { printf("[0m"); }
+void rdz_red() { printf("[31m"); }
+void rdz_green() { printf("[32m"); }
+void rdz_yellow() { printf("[33m"); }
+void rdz_white() { printf("[37m"); }
+void rdz_clear() { printf("[0m"); }
 
-void ze_result(int success, int sc, char *s[], char *fname, int lnumber)
+void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
 {
-  if (ze_last_context == NULL) ze_last_context = malloc(7 * 80 * sizeof(char));
+  if (rdz_last_context == NULL) rdz_last_context = malloc(7 * 80 * sizeof(char));
 
   char *context = s[sc - 2];
 
-  if (strcmp(ze_last_context, context) != 0)
+  if (strcmp(rdz_last_context, context) != 0)
   {
     for (int i = 0; i < sc - 1; i++)
     {
@@ -55,25 +55,25 @@ void ze_result(int success, int sc, char *s[], char *fname, int lnumber)
   }
 
   for (int ii = 0; ii < sc - 1; ii++) printf("  "); // indent
-  if (success) ze_green();
-  else ze_red();
+  if (success) rdz_green();
+  else rdz_red();
   printf("%s", s[sc - 1]);
   if ( ! success) printf(" (FAILED)");
   printf("\n");
-  ze_clear();
+  rdz_clear();
 
-  strcpy(ze_last_context, context);
-  ze_last_context[strlen(context)] = '\0';
+  strcpy(rdz_last_context, context);
+  rdz_last_context[strlen(context)] = '\0';
     // avoiding strdup and the posix_source requirement...
 }
 
-void ze_summary()
+void rdz_summary()
 {
   printf("\nTODO: print 'Failures:' summary\n");
 }
 
-void ze_free()
+void rdz_free()
 {
-  if (ze_last_context != NULL) free(ze_last_context);
+  if (rdz_last_context != NULL) free(rdz_last_context);
 }
 

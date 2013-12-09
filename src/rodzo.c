@@ -347,7 +347,7 @@ void process_lines(FILE *out, context_s *c, char *path)
         "  int r%i = %s", varcount, con);
       fprintf(
         out,
-        "    ze_result(r%i, sc_%i, s_%i, fn_%i, %d);\n",
+        "    rdz_result(r%i, sc_%i, s_%i, fn_%i, %d);\n",
         varcount, c->funcount, c->funcount, c->funcount, lnumber);
       fprintf(
         out,
@@ -390,7 +390,7 @@ void print_footer(FILE *out, int funcount)
 {
   fputs("\n", out);
   fputs("  /*\n", out);
-  fputs("   * zest footer\n", out);
+  fputs("   * rodzo footer\n", out);
   fputs("   */\n\n", out);
 
   fprintf(out, "int main(int argc, char *argv[])\n");
@@ -400,8 +400,8 @@ void print_footer(FILE *out, int funcount)
     fprintf(out, "  test_%d();\n", i);
   }
   fputs("\n", out);
-  fputs("  ze_summary();\n", out);
-  fputs("  ze_free();\n", out);
+  fputs("  rdz_summary();\n", out);
+  fputs("  rdz_free();\n", out);
   fputs("}\n", out);
   fputs("\n", out);
 }
