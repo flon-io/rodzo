@@ -22,5 +22,5 @@ spec: lib
 # this target is for the rodzo-development only
 #
 rvspec: lib
-	valgrind --leak-check=full ../../bin/rodzo -o spec2.c ../spec
+	valgrind --leak-check=full -v ../../bin/rodzo -o spec2.c ../spec
 

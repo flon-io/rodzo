@@ -489,7 +489,7 @@ void add_spec_files(int *count, char **names, char *path)
   struct dirent *ep;
   while ((ep = readdir(dir)) != NULL)
   {
-    char *fn = malloc((strlen(path) + strlen(ep->d_name) + 2) * sizeof(char));
+    char *fn = malloc((strlen(path) + strlen(ep->d_name) + 4) * sizeof(char));
     sprintf(fn, "%s/%s", path, ep->d_name);
 
     add_spec_file(count, names, fn);
