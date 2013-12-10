@@ -9,7 +9,7 @@
 [o] cat footer and header into zest.c at build time
 [o] -V run with Valgrind
 
-[ ] get rid of strcat
+[ ] get rid of strcat (sprintf?)
 
 ```
 Rufus::Scheduler
