@@ -55,6 +55,7 @@ typedef struct context_s {
   int funcount;
   int incc;
   char **includes;
+  char *out_fname;
   int valgrind;
   int run;
 } context_s;
@@ -65,6 +66,7 @@ context_s *malloc_context()
   c->funcount = -1;
   c->incc = 0;
   c->includes = malloc(147 * sizeof(char *));
+  c->out_fname = strdup("spec.c");
   c->valgrind = 0;
   c->run = 0;
   return c;
@@ -77,6 +79,7 @@ void free_context(context_s *c)
     free(c->includes[i]);
   }
   free(c->includes);
+  free(c->out_fname);
   free(c);
 }
 
@@ -425,7 +428,8 @@ int compile(context_s *c)
     free(s1);
   }
 
-  strcat(s, " z.c");
+  strcat(s, " ");
+  strcat(s, c->out_fname);
 
   printf("! %s\n", s);
 
@@ -526,6 +530,12 @@ char **list_spec_files(int argc, char *argv[])
   return r;
 }
 
+int print_usage()
+{
+  printf("rodzo usage...");
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   // deal with arguments
@@ -535,7 +545,11 @@ int main(int argc, char *argv[])
   for (int i = 1; i < argc; i++)
   {
     char *a = argv[i];
-    if (strcmp(a, "-V") == 0) {
+    if (strcmp(a, "-o") == 0) {
+      if (i + 1 >= argc) return print_usage(); // TODO: replace with die()
+      c->out_fname = strdup(argv[i + 1]);
+    }
+    else if (strcmp(a, "-V") == 0) {
       c->run = 1;
       c->valgrind = 1;
     }
@@ -546,11 +560,14 @@ int main(int argc, char *argv[])
 
   // begin work
 
-  FILE *out = fopen("z.c", "wb");
+  FILE *out = fopen(c->out_fname, "wb");
 
   if (out == NULL)
   {
-    perror("couldn't open z.c file for writing");
+    char *msg = malloc((32 + strlen(c->out_fname)) * sizeof(char));
+    sprintf(msg, "couldn't open %s file for writing", c->out_fname);
+    perror(msg); // TODO: replace with die()
+    free(msg);
     return 1;
   }
 
@@ -574,13 +591,13 @@ int main(int argc, char *argv[])
 
   fclose(out);
 
-  printf(". wrote z.c\n");
+  printf(". wrote %s\n", c->out_fname);
 
   if (c->run)
   {
     int r;
 
-    printf(". compiling z.c\n");
+    printf(". compiling %s\n", c->out_fname);
     r = compile(c);
 
     if (r == 0) {

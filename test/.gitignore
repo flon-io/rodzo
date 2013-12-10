@@ -2,5 +2,6 @@
 tmp/*.o
 tmp/*.so
 tmp/*.h
+tmp/*.c
 tmp/a.out
 
