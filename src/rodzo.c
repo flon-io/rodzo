@@ -66,7 +66,7 @@ context_s *malloc_context()
   c->funcount = -1;
   c->incc = 0;
   c->includes = malloc(147 * sizeof(char *));
-  c->out_fname = strdup("spec.c");
+  c->out_fname = NULL;
   c->valgrind = 0;
   c->run = 0;
   return c;
@@ -557,6 +557,8 @@ int main(int argc, char *argv[])
       c->run = 1;
     }
   }
+
+  if (c->out_fname == NULL) c->out_fname = strdup("spec.c");
 
   // begin work
 
