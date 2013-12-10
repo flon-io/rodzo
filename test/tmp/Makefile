@@ -17,8 +17,10 @@ lib$(NAME).so: $(NAME).o
 	$(CC) -shared -Wl,-soname,lib$(NAME).so $^ -o $@
 
 spec: lib
-    #
-	# TODO: stop using -r
-    #
-	../../bin/rodzo -r ../spec
+	../../bin/rodzo ../spec
+
+# this target is for the rodzo-development only
+#
+rvspec: lib
+	valgrind --leak-check=full ../../bin/rodzo -o spec2.c ../spec
 
