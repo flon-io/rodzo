@@ -8,16 +8,22 @@ SRC=../src
 VPATH=$(SRC)
 
 
-build: lib
+build: lib$(NAME).so
 	cp $(SRC)/$(NAME).h .
-
-lib: lib$(NAME).so
 
 lib$(NAME).so: $(NAME).o
 	$(CC) -shared -Wl,-soname,lib$(NAME).so $^ -o $@
 
-spec: lib
+spec.c:
 	../../bin/rodzo ../spec
+
+spec: spec.c build
+	$(CC) -L. -lmnemo $<
+	LD_LIBRARY_PATH=. ./a.out
+
+vspec: spec.c build
+	$(CC) -L. -lmnemo $<
+	LD_LIBRARY_PATH=. valgrind --leak-check=full -v ./a.out
 
 # this target is for the rodzo-development only
 #

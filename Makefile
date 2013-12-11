@@ -6,9 +6,11 @@ default: build
 
 test:
 	cd test/ && $(MAKE) spec
+vtest:
+	cd test/ && $(MAKE) vspec
 
 
-.PHONY: clean test
+.PHONY: clean test vtest
 
 clean:
 	rm -f src/header.c
