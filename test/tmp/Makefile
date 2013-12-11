@@ -17,12 +17,13 @@ lib$(NAME).so: $(NAME).o
 spec.c:
 	../../bin/rodzo ../spec
 
-spec: spec.c build
+build-spec: spec.c
 	$(CC) -L. -lmnemo $<
+
+spec: build build-spec
 	LD_LIBRARY_PATH=. ./a.out
 
-vspec: spec.c build
-	$(CC) -L. -lmnemo $<
+vspec: build build-spec
 	LD_LIBRARY_PATH=. valgrind --leak-check=full -v ./a.out
 
 # this target is for the rodzo-development only
