@@ -4,10 +4,14 @@ default: build
 .DEFAULT:
 	cd tmp/ && $(MAKE) $@
 
+V=0
+#
+# "make test V=1" can be used too
+#
 test:
-	cd test/ && $(MAKE) spec
+	cd test$(V)/ && $(MAKE) spec
 vtest:
-	cd test/ && $(MAKE) vspec
+	cd test$(V)/ && $(MAKE) vspec
 
 
 .PHONY: clean test vtest
