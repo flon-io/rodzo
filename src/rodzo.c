@@ -54,7 +54,7 @@ int str_ends(char *s, char *end)
 typedef struct context_s {
   int funcount;
   int incc;
-  char **includes;
+  //char **includes;
   char *out_fname;
 } context_s;
 
@@ -63,30 +63,27 @@ context_s *malloc_context()
   context_s *c = malloc(sizeof(context_s));
   c->funcount = -1;
   c->incc = 0;
-  c->includes = malloc(147 * sizeof(char *));
+  //c->includes = malloc(147 * sizeof(char *));
   c->out_fname = NULL;
   return c;
 }
 
 void free_context(context_s *c)
 {
-  for (int i = 0; i < c->incc; i++)
-  {
-    free(c->includes[i]);
-  }
-  free(c->includes);
+  //for (int i = 0; i < c->incc; i++) { free(c->includes[i]); }
+  //free(c->includes);
   free(c->out_fname);
   free(c);
 }
 
-void include(context_s *c, char *title)
-{
-  for (int i = 0; i < c->incc; i++)
-  {
-    if (strcmp(c->includes[i], title) == 0) return;
-  }
-  c->includes[c->incc++] = strdup(title);
-}
+//void include(context_s *c, char *title)
+//{
+//  for (int i = 0; i < c->incc; i++)
+//  {
+//    if (strcmp(c->includes[i], title) == 0) return;
+//  }
+//  c->includes[c->incc++] = strdup(title);
+//}
 
 //
 // the stack
@@ -367,7 +364,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else
     {
-      if (strncmp(head, "#include", 8) == 0 && title) include(c, title);
+      //if (strncmp(head, "#include", 8) == 0 && title) include(c, title);
       fprintf(out, "%s", line);
     }
 
