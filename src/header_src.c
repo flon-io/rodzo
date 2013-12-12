@@ -114,7 +114,19 @@ void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
 
 char *rdz_read_line(char *fname, int lnumber)
 {
-  return "(nada)";
+  char *l = calloc(1024, sizeof(char));
+  char *ll = l;
+  FILE *in = fopen(fname, "r");
+  while(1)
+  {
+    if (lnumber < 1) break;
+    char c = fgetc(in);
+    if (c == EOF) break;
+    if (c == '\n') { lnumber--; continue; }
+    if (lnumber == 1) *(ll++) = c;
+  }
+  fclose(in);
+  return l;
 }
 
 void rdz_summary()
@@ -123,14 +135,17 @@ void rdz_summary()
   for (int i = 0; i < rdz_fail_count; i++)
   {
     rdz_failure *f = rdz_failures[i];
+    char *line = rdz_read_line(f->fname, f->lnumber);
     printf("fail:\n");
     printf("  %s\n", f->title);
     printf("  %s:%d\n", f->fname, f->lnumber);
-    printf("  %s\n", rdz_read_line(f->fname, f->lnumber));
+    printf("  >%s<\n", line);
 
     rdz_free_failure(f);
+    free(line);
   }
   free(rdz_failures);
+  printf("\n");
 }
 
 void rdz_free()
