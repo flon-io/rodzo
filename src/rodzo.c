@@ -391,6 +391,8 @@ void print_footer(FILE *out, int funcount)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
+  fprintf(out, "  rdz_failures = calloc(%d, sizeof(rdz_failure));\n", funcount);
+  fprintf(out, "\n");
   for (int i = 0; i <= funcount; i++)
   {
     fprintf(out, "  test_%d();\n", i);

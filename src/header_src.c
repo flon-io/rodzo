@@ -31,6 +31,47 @@
 #include <string.h>
 #include <stdlib.h>
 
+// avoiding strdup and the posix_source requirement...
+char *rdz_strdup(char *s)
+{
+  int l = strlen(s);
+  char *r = calloc(l + 1, sizeof(char));
+  strcpy(r, s);
+  return r;
+}
+
+typedef struct rdz_failure {
+  char *title;
+  char *fname;
+  int lnumber;
+} rdz_failure;
+
+rdz_failure *rdz_malloc_failure(int sc, char *s[], char *fname, int lnumber)
+{
+  char *title = calloc(sc * 160, sizeof(char));
+  char *t = title;
+  for (int i = 0; i < sc; i++) {
+    strcpy(t, s[i]); t += strlen(s[i]);
+    if (i < sc - 1) *(t++) = ' ';
+  }
+
+  rdz_failure *f = malloc(sizeof(rdz_failure));
+  f->title = title;
+  f->fname = rdz_strdup(fname);
+  f->lnumber = lnumber;
+
+  return f;
+}
+
+void rdz_free_failure(rdz_failure *f)
+{
+  free(f->title);
+  free(f->fname);
+  free(f);
+}
+
+int rdz_fail_count = 0;
+rdz_failure **rdz_failures = NULL;
 char *rdz_last_context = NULL;
 
 void rdz_red() { printf("[31m"); }
@@ -41,7 +82,7 @@ void rdz_clear() { printf("[0m"); }
 
 void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
 {
-  if (rdz_last_context == NULL) rdz_last_context = malloc(7 * 80 * sizeof(char));
+  if (rdz_last_context == NULL) rdz_last_context = rdz_strdup("");
 
   char *context = s[sc - 2];
 
@@ -62,14 +103,34 @@ void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
   printf("\n");
   rdz_clear();
 
-  strcpy(rdz_last_context, context);
-  rdz_last_context[strlen(context)] = '\0';
-    // avoiding strdup and the posix_source requirement...
+  if (rdz_last_context != NULL) free(rdz_last_context);
+  rdz_last_context = rdz_strdup(context);
+
+  if ( ! success)
+  {
+    rdz_failures[rdz_fail_count++] = rdz_malloc_failure(sc, s, fname, lnumber);
+  }
+}
+
+char *rdz_read_line(char *fname, int lnumber)
+{
+  return "(nada)";
 }
 
 void rdz_summary()
 {
-  printf("\nTODO: print 'Failures:' summary\n");
+  printf("\nfail count: %d\n\n", rdz_fail_count);
+  for (int i = 0; i < rdz_fail_count; i++)
+  {
+    rdz_failure *f = rdz_failures[i];
+    printf("fail:\n");
+    printf("  %s\n", f->title);
+    printf("  %s:%d\n", f->fname, f->lnumber);
+    printf("  %s\n", rdz_read_line(f->fname, f->lnumber));
+
+    rdz_free_failure(f);
+  }
+  free(rdz_failures);
 }
 
 void rdz_free()
