@@ -56,8 +56,6 @@ typedef struct context_s {
   int incc;
   char **includes;
   char *out_fname;
-  int valgrind;
-  int run;
 } context_s;
 
 context_s *malloc_context()
@@ -67,8 +65,6 @@ context_s *malloc_context()
   c->incc = 0;
   c->includes = malloc(147 * sizeof(char *));
   c->out_fname = NULL;
-  c->valgrind = 0;
-  c->run = 0;
   return c;
 }
 
@@ -409,62 +405,6 @@ void print_footer(FILE *out, int funcount)
   fputs("\n", out);
 }
 
-int compile(context_s *c)
-{
-  char *s = calloc(1 + c->incc, 80 * 2 * sizeof(char));
-
-  strcat(s, "gcc -std=c99");
-
-  for (int i = 0; i < c->incc; i++)
-  {
-    char *s0 = strdup(c->includes[i]);
-    char *s1 = strdup(s0);
-    strcat(s, " -L");
-    strcat(s, dirname(s0));
-    s1[strlen(s1) - 2] = '\0';
-    strcat(s, " -l");
-    strcat(s, basename(s1));
-    free(s0);
-    free(s1);
-  }
-
-  strcat(s, " ");
-  strcat(s, c->out_fname);
-
-  printf("! %s\n", s);
-
-  int r = system(s);
-  free(s);
-
-  return r;
-}
-
-int run(context_s *c)
-{
-  char *s = calloc(1 + c->incc, 2 * 80 * sizeof(char));
-
-  strcat(s, "LD_LIBRARY_PATH=$LD_LIBRARY_PATH");
-
-  for (int i = 0; i < c->incc; i++)
-  {
-    char *s0 = strdup(c->includes[i]);
-    strcat(s, ":");
-    strcat(s, dirname(s0));
-    free(s0);
-  }
-  if (c->valgrind) strcat(s, " valgrind --leak-check=full");
-  strcat(s, " ./a.out");
-
-  printf("! %s\n", s);
-  printf("\n");
-
-  int r = system(s);
-
-  free(s);
-
-  return r;
-}
-
 int add_spec_file(int *count, char **names, char *fname)
 {
   if ( ! str_ends(fname, "_spec.c")) return 0;
@@ -547,14 +487,7 @@ int main(int argc, char *argv[])
     char *a = argv[i];
     if (strcmp(a, "-o") == 0) {
       if (i + 1 >= argc) return print_usage(); // TODO: replace with die()
-      c->out_fname = strdup(argv[i + 1]);
-    }
-    else if (strcmp(a, "-V") == 0) {
-      c->run = 1;
-      c->valgrind = 1;
-    }
-    else if (strcmp(a, "-r") == 0) {
-      c->run = 1;
+      c->out_fname = strdup(argv[++i]);
     }
   }
 
@@ -594,23 +527,6 @@ int main(int argc, char *argv[])
   fclose(out);
 
   printf(". wrote %s\n", c->out_fname);
-
-  if (c->run)
-  {
-    int r;
-
-    printf(". compiling %s\n", c->out_fname);
-    r = compile(c);
-
-    if (r == 0) {
-      printf(". running specs\n");
-      run(c);
-    }
-
-    printf("\n");
-    if (r == 0) printf(". success.\n");
-    else printf(". failure.\n");
-  }
 
   free_context(c);
 
