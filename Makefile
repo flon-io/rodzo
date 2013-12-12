@@ -20,5 +20,6 @@ clean:
 	rm -f src/header.c
 	rm -f tmp/*.o tmp/rodzo tmp/pfize
 	rm -f bin/rodzo
-	cd test/ && $(MAKE) clean
+	cd test0/ && $(MAKE) clean
+	cd test1/ && $(MAKE) clean
 
