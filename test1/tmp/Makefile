@@ -16,7 +16,7 @@ spec.c:
 
 build-spec: spec.c
 	#$(CC) -I. $< $(NAME).o
-	$(CC) $< $(NAME).o
+	#$(CC) $< $(NAME).o
 
 spec: build build-spec
 	./a.out
