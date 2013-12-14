@@ -140,25 +140,33 @@ char *rdz_read_line(char *fname, int lnumber)
   return l;
 }
 
-void rdz_summary()
+void rdz_summary(int itcount)
 {
-  printf("\nfail count: %d\n\n", rdz_fail_count);
-  for (int i = 0; i < rdz_fail_count; i++)
+  printf("\n");
+
+  for (int i = 0; i < rdz_count; i++)
   {
     rdz_result *r = rdz_results[i];
-    char *line = rdz_read_line(r->fname, r->lnumber);
-    printf("fail:\n");
-    printf("  %s\n", r->title);
-    printf("  %s:%d\n", r->fname, r->lnumber);
-    printf("  >%s<\n", line);
+
+    if ( ! r->success)
+    {
+      char *line = rdz_read_line(r->fname, r->lnumber);
+      printf("fail:\n");
+      printf("  %s\n", r->title);
+      printf("  %s:%d\n", r->fname, r->lnumber);
+      printf("  >%s<\n", line);
+      free(line);
+    }
 
     rdz_free_result(r);
-    free(line);
   }
   free(rdz_results);
+
   printf("\n");
   if (rdz_fail_count > 0) rdz_red(); else rdz_green();
-  printf("%d tests, %d failures\n", rdz_count, rdz_fail_count);
+  printf("%d examples, ", itcount);
+  printf("%d tests seen, ", rdz_count);
+  printf("%d failures\n", rdz_fail_count);
   rdz_clear();
   printf("\n");
 }

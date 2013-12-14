@@ -398,7 +398,7 @@ void print_footer(FILE *out, int itcount)
     fprintf(out, "  test_%d();\n", i);
   }
   fputs("\n", out);
-  fputs("  rdz_summary();\n", out);
+  fprintf(out, "  rdz_summary(%d);\n", itcount);
   fputs("}\n", out);
   fputs("\n", out);
 }
