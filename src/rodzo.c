@@ -52,7 +52,7 @@ int str_ends(char *s, char *end)
 // context
 
 typedef struct context_s {
-  int funcount;
+  int itcount;
   int incc;
   //char **includes;
   char *out_fname;
@@ -61,7 +61,7 @@ typedef struct context_s {
 context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
-  c->funcount = 0;
+  c->itcount = 0;
   c->incc = 0;
   //c->includes = malloc(147 * sizeof(char *));
   c->out_fname = NULL;
@@ -326,12 +326,12 @@ void process_lines(FILE *out, context_s *c, char *path)
       push(&stack, indent, 'i', title, lnumber);
       char *s = list_titles_as_literal(&stack);
       int sc = depth(&stack);
-      c->funcount++;
+      c->itcount++;
       fprintf(out, "\n");
-      fprintf(out, "int sc_%i = %i;\n", c->funcount, sc);
-      fprintf(out, "char *s_%i[] = %s;\n", c->funcount, s);
-      fprintf(out, "char *fn_%i = \"%s\";\n", c->funcount, path);
-      fprintf(out, "int test_%i()\n", c->funcount);
+      fprintf(out, "int sc_%i = %i;\n", c->itcount, sc);
+      fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
+      fprintf(out, "char *fn_%i = \"%s\";\n", c->itcount, path);
+      fprintf(out, "int test_%i()\n", c->itcount);
       free(s);
     }
     else if (strncmp(head, "ensure", 6) == 0)
@@ -344,7 +344,7 @@ void process_lines(FILE *out, context_s *c, char *path)
       fprintf(
         out,
         "    rdz_result(r%i, sc_%i, s_%i, fn_%i, %d);\n",
-        varcount, c->funcount, c->funcount, c->funcount, lnumber);
+        varcount, c->itcount, c->itcount, c->itcount, lnumber);
       fprintf(
         out,
         "    if ( ! r%i) return 0;\n",
@@ -382,7 +382,7 @@ void process_lines(FILE *out, context_s *c, char *path)
 
 #include "header.c"
 
-void print_footer(FILE *out, int funcount)
+void print_footer(FILE *out, int itcount)
 {
   fputs("\n", out);
   fputs("  /*\n", out);
@@ -391,10 +391,10 @@ void print_footer(FILE *out, int funcount)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
-  fprintf(out, "  rdz_count = %d;\n", funcount);
-  fprintf(out, "  rdz_failures = calloc(%d, sizeof(rdz_failure));\n", funcount);
+  fprintf(out, "  rdz_count = %d;\n", itcount);
+  fprintf(out, "  rdz_failures = calloc(%d, sizeof(rdz_failure));\n", itcount);
   fprintf(out, "\n");
-  for (int i = 1; i <= funcount; i++)
+  for (int i = 1; i <= itcount; i++)
   {
     fprintf(out, "  test_%d();\n", i);
   }
@@ -522,7 +522,7 @@ int main(int argc, char *argv[])
   }
   free(fnames);
 
-  print_footer(out, c->funcount);
+  print_footer(out, c->itcount);
 
   fclose(out);
 
