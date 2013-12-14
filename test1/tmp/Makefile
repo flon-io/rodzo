@@ -19,7 +19,7 @@ build-spec: spec.c
 	#$(CC) $< $(NAME).o
 
 spec: build build-spec
-	./a.out
+	time ./a.out
 
 vspec: build build-spec
 	valgrind --leak-check=full -v ./a.out

@@ -21,7 +21,7 @@ build-spec: spec.c
 	$(CC) -L. -lmnemo $<
 
 spec: build build-spec
-	LD_LIBRARY_PATH=. ./a.out
+	LD_LIBRARY_PATH=. time ./a.out
 
 vspec: build build-spec
 	LD_LIBRARY_PATH=. valgrind --leak-check=full -v ./a.out
