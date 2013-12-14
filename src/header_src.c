@@ -42,6 +42,7 @@ char *rdz_strdup(char *s)
 
 typedef struct rdz_result {
   int success;
+  char *context;
   char *title;
   int itnumber;
   char *fname;
@@ -52,15 +53,19 @@ rdz_result *rdz_malloc_result(
   int success, int sc, char *s[], int itnumber, char *fname, int lnumber
 )
 {
+  char *context = calloc((sc - 1) * 160, sizeof(char));
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
+
   for (int i = 0; i < sc; i++) {
     strcpy(t, s[i]); t += strlen(s[i]);
+    if (i == sc - 2) strcpy(context, title);
     if (i < sc - 1) *(t++) = ' ';
   }
 
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
+  r->context = context;
   r->title = title;
   r->itnumber = itnumber;
   r->fname = rdz_strdup(fname);
@@ -71,6 +76,7 @@ rdz_result *rdz_malloc_result(
 
 void rdz_free_result(rdz_result *r)
 {
+  free(r->context);
   free(r->title);
   free(r->fname);
   free(r);
@@ -79,7 +85,6 @@ void rdz_free_result(rdz_result *r)
 int rdz_count = 0;
 int rdz_fail_count = 0;
 rdz_result **rdz_results = NULL;
-char *rdz_last_context = NULL;
 
 void rdz_red() { printf("[31m"); }
 void rdz_green() { printf("[32m"); }
@@ -91,11 +96,13 @@ void rdz_record(
   int success, int sc, char *s[], int itnumber, char *fname, int lnumber
 )
 {
-  if (rdz_last_context == NULL) rdz_last_context = rdz_strdup("");
+  rdz_result *result =
+    rdz_malloc_result(success, sc, s, itnumber, fname, lnumber);
 
-  char *context = s[sc - 2];
+  rdz_result *last = NULL;
+  if (rdz_count > 0) last = rdz_results[rdz_count - 1];
 
-  if (strcmp(rdz_last_context, context) != 0)
+  if (last == NULL || strcmp(last->context, result->context) != 0)
   {
     for (int i = 0; i < sc - 1; i++)
     {
@@ -105,21 +112,14 @@ void rdz_record(
   }
 
   for (int ii = 0; ii < sc - 1; ii++) printf("  "); // indent
-  if (success) rdz_green();
-  else rdz_red();
+  if (success) rdz_green(); else rdz_red();
   printf("%s", s[sc - 1]);
   if ( ! success) printf(" (FAILED)");
   printf("\n");
   rdz_clear();
 
-  if (rdz_last_context != NULL) free(rdz_last_context);
-  rdz_last_context = rdz_strdup(context);
+  rdz_results[rdz_count++] = result;
 
-  if ( ! success)
-  {
-    rdz_results[rdz_count++] =
-      rdz_malloc_result(success, sc, s, itnumber, fname, lnumber);
-  }
   if ( ! success) rdz_fail_count++;
 }
 
@@ -161,10 +161,5 @@ void rdz_summary()
   printf("%d tests, %d failures\n", rdz_count, rdz_fail_count);
   rdz_clear();
   printf("\n");
-}
-
-void rdz_free()
-{
-  if (rdz_last_context != NULL) free(rdz_last_context);
 }
 

@@ -399,7 +399,6 @@ void print_footer(FILE *out, int itcount)
   }
   fputs("\n", out);
   fputs("  rdz_summary();\n", out);
-  fputs("  rdz_free();\n", out);
   fputs("}\n", out);
   fputs("\n", out);
 }
