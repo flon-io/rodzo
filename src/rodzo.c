@@ -61,7 +61,7 @@ typedef struct context_s {
 context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
-  c->funcount = -1;
+  c->funcount = 0;
   c->incc = 0;
   //c->includes = malloc(147 * sizeof(char *));
   c->out_fname = NULL;
@@ -391,9 +391,10 @@ void print_footer(FILE *out, int funcount)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
+  fprintf(out, "  rdz_count = %d;\n", funcount);
   fprintf(out, "  rdz_failures = calloc(%d, sizeof(rdz_failure));\n", funcount);
   fprintf(out, "\n");
-  for (int i = 0; i <= funcount; i++)
+  for (int i = 1; i <= funcount; i++)
   {
     fprintf(out, "  test_%d();\n", i);
   }

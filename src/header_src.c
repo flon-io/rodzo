@@ -70,6 +70,7 @@ void rdz_free_failure(rdz_failure *f)
   free(f);
 }
 
+int rdz_count = 0;
 int rdz_fail_count = 0;
 rdz_failure **rdz_failures = NULL;
 char *rdz_last_context = NULL;
@@ -145,6 +146,10 @@ void rdz_summary()
     free(line);
   }
   free(rdz_failures);
+  printf("\n");
+  if (rdz_fail_count > 0) rdz_red(); else rdz_green();
+  printf("%d tests, %d failures\n", rdz_count, rdz_fail_count);
+  rdz_clear();
   printf("\n");
 }
 
