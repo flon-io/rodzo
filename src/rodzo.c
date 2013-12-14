@@ -343,8 +343,8 @@ void process_lines(FILE *out, context_s *c, char *path)
         "  int r%i = %s", varcount, con);
       fprintf(
         out,
-        "    rdz_result(r%i, sc_%i, s_%i, fn_%i, %d);\n",
-        varcount, c->itcount, c->itcount, c->itcount, lnumber);
+        "    rdz_record(r%i, sc_%i, s_%i, %i, fn_%i, %d);\n",
+        varcount, c->itcount, c->itcount, c->itcount, c->itcount, lnumber);
       fprintf(
         out,
         "    if ( ! r%i) return 0;\n",
@@ -391,8 +391,7 @@ void print_footer(FILE *out, int itcount)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
-  fprintf(out, "  rdz_count = %d;\n", itcount);
-  fprintf(out, "  rdz_failures = calloc(%d, sizeof(rdz_failure));\n", itcount);
+  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", itcount);
   fprintf(out, "\n");
   for (int i = 1; i <= itcount; i++)
   {

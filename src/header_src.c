@@ -40,13 +40,17 @@ char *rdz_strdup(char *s)
   return r;
 }
 
-typedef struct rdz_failure {
+typedef struct rdz_result {
+  int success;
   char *title;
+  int itnumber;
   char *fname;
   int lnumber;
-} rdz_failure;
+} rdz_result;
 
-rdz_failure *rdz_malloc_failure(int sc, char *s[], char *fname, int lnumber)
+rdz_result *rdz_malloc_result(
+  int success, int sc, char *s[], int itnumber, char *fname, int lnumber
+)
 {
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
@@ -55,24 +59,26 @@ rdz_failure *rdz_malloc_failure(int sc, char *s[], char *fname, int lnumber)
     if (i < sc - 1) *(t++) = ' ';
   }
 
-  rdz_failure *f = malloc(sizeof(rdz_failure));
-  f->title = title;
-  f->fname = rdz_strdup(fname);
-  f->lnumber = lnumber;
+  rdz_result *r = malloc(sizeof(rdz_result));
+  r->success = success;
+  r->title = title;
+  r->itnumber = itnumber;
+  r->fname = rdz_strdup(fname);
+  r->lnumber = lnumber;
 
-  return f;
+  return r;
 }
 
-void rdz_free_failure(rdz_failure *f)
+void rdz_free_result(rdz_result *r)
 {
-  free(f->title);
-  free(f->fname);
-  free(f);
+  free(r->title);
+  free(r->fname);
+  free(r);
 }
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
-rdz_failure **rdz_failures = NULL;
+rdz_result **rdz_results = NULL;
 char *rdz_last_context = NULL;
 
 void rdz_red() { printf("[31m"); }
@@ -81,7 +87,9 @@ void rdz_yellow() { printf("[33m"); }
 void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
-void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
+void rdz_record(
+  int success, int sc, char *s[], int itnumber, char *fname, int lnumber
+)
 {
   if (rdz_last_context == NULL) rdz_last_context = rdz_strdup("");
 
@@ -109,8 +117,10 @@ void rdz_result(int success, int sc, char *s[], char *fname, int lnumber)
 
   if ( ! success)
   {
-    rdz_failures[rdz_fail_count++] = rdz_malloc_failure(sc, s, fname, lnumber);
+    rdz_results[rdz_count++] =
+      rdz_malloc_result(success, sc, s, itnumber, fname, lnumber);
   }
+  if ( ! success) rdz_fail_count++;
 }
 
 char *rdz_read_line(char *fname, int lnumber)
@@ -135,17 +145,17 @@ void rdz_summary()
   printf("\nfail count: %d\n\n", rdz_fail_count);
   for (int i = 0; i < rdz_fail_count; i++)
   {
-    rdz_failure *f = rdz_failures[i];
-    char *line = rdz_read_line(f->fname, f->lnumber);
+    rdz_result *r = rdz_results[i];
+    char *line = rdz_read_line(r->fname, r->lnumber);
     printf("fail:\n");
-    printf("  %s\n", f->title);
-    printf("  %s:%d\n", f->fname, f->lnumber);
+    printf("  %s\n", r->title);
+    printf("  %s:%d\n", r->fname, r->lnumber);
     printf("  >%s<\n", line);
 
-    rdz_free_failure(f);
+    rdz_free_result(r);
     free(line);
   }
-  free(rdz_failures);
+  free(rdz_results);
   printf("\n");
   if (rdz_fail_count > 0) rdz_red(); else rdz_green();
   printf("%d tests, %d failures\n", rdz_count, rdz_fail_count);
