@@ -12,6 +12,8 @@
 
 [ ] move away perror(), look for a die() ?
 [ ] cat .rspec --> ```--colour --format documentation```
+[ ] spec1 comes before spec0, why?
+[ ] ensure it's ok to define function at the head of spec files
 
 ```
 Rufus::Scheduler
