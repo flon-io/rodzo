@@ -42,6 +42,8 @@ char *rdz_strdup(char *s)
 
 typedef struct rdz_result {
   int success;
+  int stackc;
+  char **stack;
   char *context;
   char *title;
   int itnumber;
@@ -65,6 +67,8 @@ rdz_result *rdz_malloc_result(
 
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
+  r->stackc = sc;
+  r->stack = s;
   r->context = context;
   r->title = title;
   r->itnumber = itnumber;
@@ -92,6 +96,34 @@ void rdz_yellow() { printf("[33m"); }
 void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
+void rdz_print_context(rdz_result *r)
+{
+  for (int i = 0; i < r->stackc - 1; i++)
+  {
+    for (int ii = 0; ii < i; ii++) printf("  "); // indent
+    printf("%s\n", r->stack[i]);
+  }
+}
+
+void rdz_print_result(rdz_result *r)
+{
+  for (int ii = 0; ii < r->stackc - 1; ii++) printf("  "); // indent
+  if (r->success) rdz_green(); else rdz_red();
+  printf("%s", r->stack[r->stackc - 1]);
+  if ( ! r->success) printf(" (FAILED)");
+  printf("\n");
+  rdz_clear();
+}
+
+void rdz_do_record(rdz_result *r)
+{
+  rdz_result *last = NULL;
+  if (rdz_count > 0) last = rdz_results[rdz_count - 1];
+
+  if (last == NULL) return;
+  if (r == NULL || last->itnumber < r->itnumber) rdz_print_result(last);
+}
+
 void rdz_record(
   int success, int sc, char *s[], int itnumber, char *fname, int lnumber
 )
@@ -104,22 +136,12 @@ void rdz_record(
 
   if (last == NULL || strcmp(last->context, result->context) != 0)
   {
-    for (int i = 0; i < sc - 1; i++)
-    {
-      for (int ii = 0; ii < i; ii++) printf("  "); // indent
-      printf("%s\n", s[i]);
-    }
+    rdz_print_context(result);
   }
 
-  for (int ii = 0; ii < sc - 1; ii++) printf("  "); // indent
-  if (success) rdz_green(); else rdz_red();
-  printf("%s", s[sc - 1]);
-  if ( ! success) printf(" (FAILED)");
-  printf("\n");
-  rdz_clear();
+  rdz_do_record(result);
 
   rdz_results[rdz_count++] = result;
-
   if ( ! success) rdz_fail_count++;
 }
 
@@ -142,6 +164,8 @@ char *rdz_read_line(char *fname, int lnumber)
 
 void rdz_summary(int itcount)
 {
+  rdz_do_record(NULL);
+
   printf("\n");
 
   for (int i = 0; i < rdz_count; i++)
