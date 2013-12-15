@@ -92,8 +92,11 @@ rdz_result **rdz_results = NULL;
 
 void rdz_red() { printf("[31m"); }
 void rdz_green() { printf("[32m"); }
-void rdz_yellow() { printf("[33m"); }
-void rdz_white() { printf("[37m"); }
+//void rdz_yellow() { printf("[33m"); }
+//void rdz_blue() { printf("[34m"); }
+//void rdz_magenta() { printf("[35m"); }
+//void rdz_cyan() { printf("[36m"); }
+//void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
 void rdz_print_context(rdz_result *r)
@@ -178,7 +181,11 @@ void rdz_summary(int itcount)
       printf("fail:\n");
       printf("  %s\n", r->title);
       printf("  %s:%d\n", r->fname, r->lnumber);
-      printf("  >%s<\n", line);
+      printf("  >");
+      //rdz_cyan();
+      printf("%s", line);
+      //rdz_clear();
+      printf("<\n");
       free(line);
     }
 
