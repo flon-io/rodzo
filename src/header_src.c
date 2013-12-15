@@ -95,7 +95,7 @@ void rdz_green() { printf("[32m"); }
 //void rdz_yellow() { printf("[33m"); }
 //void rdz_blue() { printf("[34m"); }
 //void rdz_magenta() { printf("[35m"); }
-//void rdz_cyan() { printf("[36m"); }
+void rdz_cyan() { printf("[36m"); }
 //void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
@@ -122,6 +122,8 @@ void rdz_do_record(rdz_result *r)
 {
   rdz_result *prev = NULL;
   if (rdz_count > 0) prev = rdz_results[rdz_count - 1];
+
+  if (prev == NULL) printf("\n"); // initial blank line
 
   if (prev == NULL || (r != NULL && strcmp(prev->context, r->context) != 0))
   {
@@ -172,21 +174,23 @@ void rdz_summary(int itcount)
 
   printf("\n");
 
-  for (int i = 0; i < rdz_count; i++)
+  if (rdz_fail_count > 0)
+  {
+    printf("Failures:\n\n");
+  }
+
+  for (int i = 0, j = 0; i < rdz_count; i++)
   {
     rdz_result *r = rdz_results[i];
 
     if ( ! r->success)
     {
       char *line = rdz_read_line(r->fname, r->lnumber);
-      printf("fail:\n");
-      printf("  %s\n", r->title);
-      printf("  %s:%d\n", r->fname, r->lnumber);
-      printf("  >");
-      //rdz_cyan();
-      printf("%s", line);
-      //rdz_clear();
+      printf("  %d) %s\n", ++j, r->title);
+      printf("     >");
+      rdz_red(); printf("%s", line); rdz_clear();
       printf("<\n");
+      rdz_cyan(); printf("     # %s:%d\n", r->fname, r->lnumber); rdz_clear();
       free(line);
     }
 
@@ -201,5 +205,11 @@ void rdz_summary(int itcount)
   printf("%d failures\n", rdz_fail_count);
   rdz_clear();
   printf("\n");
+
+  if (rdz_fail_count > 0)
+  {
+    printf("Failed examples:\n\n");
+    rdz_red(); printf("TODO (maybe)\n\n"); rdz_clear();
+  }
 }
 
