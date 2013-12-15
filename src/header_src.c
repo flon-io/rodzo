@@ -120,11 +120,20 @@ void rdz_print_result(rdz_result *r)
 
 void rdz_do_record(rdz_result *r)
 {
-  rdz_result *last = NULL;
-  if (rdz_count > 0) last = rdz_results[rdz_count - 1];
+  rdz_result *prev = NULL;
+  if (rdz_count > 0) prev = rdz_results[rdz_count - 1];
 
-  if (last == NULL) return;
-  if (r == NULL || last->itnumber < r->itnumber) rdz_print_result(last);
+  if (prev == NULL || (r != NULL && strcmp(prev->context, r->context) != 0))
+  {
+    rdz_print_context(r);
+  }
+
+  if (prev == NULL) return;
+
+  if (r == NULL || prev->itnumber < r->itnumber)
+  {
+    rdz_print_result(prev);
+  }
 }
 
 void rdz_record(
@@ -133,14 +142,6 @@ void rdz_record(
 {
   rdz_result *result =
     rdz_malloc_result(success, sc, s, itnumber, fname, lnumber);
-
-  rdz_result *last = NULL;
-  if (rdz_count > 0) last = rdz_results[rdz_count - 1];
-
-  if (last == NULL || strcmp(last->context, result->context) != 0)
-  {
-    rdz_print_context(result);
-  }
 
   rdz_do_record(result);
 
