@@ -125,7 +125,7 @@ void rdz_do_record(rdz_result *r)
 
   if (prev == NULL) printf("\n"); // initial blank line
 
-  if (prev == NULL || (r != NULL && strcmp(prev->context, r->context) != 0))
+  if (r != NULL && (prev == NULL || strcmp(prev->context, r->context) != 0))
   {
     rdz_print_context(r);
   }
