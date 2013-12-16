@@ -287,6 +287,14 @@ char *extract_condition(FILE *in, char *line)
   return r;
 }
 
+int count_lines(char *s)
+{
+  int count = -1;
+  while (*(s++) != '\0') { if (*s == '\n') count++; }
+
+  return count;
+}
+
 void process_lines(FILE *out, context_s *c, char *path)
 {
   fprintf(out, "\n");
@@ -300,12 +308,14 @@ void process_lines(FILE *out, context_s *c, char *path)
   level_s *stack = NULL;
   int varcount = 0;
 
-  int lnumber = 1;
+  int lnumber = 0;
   char *line = NULL;
   size_t len = 0;
 
   while (getline(&line, &len, in) != -1)
   {
+    lnumber++;
+
     int indent = extract_indent(line);
     char *head = extract_head(line);
     char *title = extract_title(line);
@@ -338,6 +348,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     {
       char *l = strpbrk(line, "e");
       char *con = extract_condition(in, l + 6);
+      lnumber += count_lines(con);
       fprintf(
         out,
         "  int r%i = %s", varcount, con);
@@ -370,8 +381,6 @@ void process_lines(FILE *out, context_s *c, char *path)
 
     free(head);
     free(title);
-
-    ++lnumber;
   }
 
   free(line);
