@@ -4,17 +4,14 @@ default: build
 .DEFAULT:
 	cd tmp/ && $(MAKE) $@
 
-V=0
+T=0
 #
-# "make test V=1" can be used too
+# "make test T=1" can be used too
 #
 test:
-	cd test$(V)/ && $(MAKE) spec
+	cd test$(T)/ && $(MAKE) spec
 vtest:
-	cd test$(V)/ && $(MAKE) vspec
-
-
-.PHONY: clean test vtest
+	cd test$(T)/ && $(MAKE) vspec
 
 clean:
 	rm -f src/header.c
@@ -22,4 +19,6 @@ clean:
 	rm -f bin/rodzo
 	cd test0/ && $(MAKE) clean
 	cd test1/ && $(MAKE) clean
+
+.PHONY: clean test vtest
 
