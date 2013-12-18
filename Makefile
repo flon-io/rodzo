@@ -9,16 +9,17 @@ T=0
 # "make test T=1" can be used too
 #
 test:
-	cd test$(T)/ && $(MAKE) spec
+	$(MAKE) && $(MAKE) -C test$(T) spec
 vtest:
-	cd test$(T)/ && $(MAKE) vspec
+	$(MAKE) -C test$(T) vspec
 
+TS=$(shell ls -1 | grep test.)
+#
 clean:
 	rm -f src/header.c
 	rm -f tmp/*.o tmp/rodzo tmp/pfize
 	rm -f bin/rodzo
-	cd test0/ && $(MAKE) clean
-	cd test1/ && $(MAKE) clean
+	$(foreach t, $(TS), $(MAKE) -C $(t) clean;)
 
 .PHONY: clean test vtest
 
