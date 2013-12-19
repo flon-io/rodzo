@@ -330,18 +330,29 @@ void process_lines(FILE *out, context_s *c, char *path)
     int indent = extract_indent(line);
     char *head = extract_head(line);
     char *title = extract_title(line);
+
     char stype = (stack != NULL) ? stack->type : 'X';
+    int sindent = (stack != NULL) ? stack->indent : -1;
 
-    printf("head >%s< %d\n", head, indent);
-
-    if (strncmp(head, "describe", 8) == 0)
+    if (strcmp(head, "{") == 0 && stype != 'i')
     {
-      if (stype == 'i') pop(&stack);
+      // do not output
+    }
+    else if (strcmp(head, "}") == 0 && indent == sindent)
+    {
+      pop(&stack);
+      if (stype == 'i')
+      {
+        fprintf(out, "  return 1;\n");
+        fprintf(out, "%s", line);
+      }
+    }
+    else if (strncmp(head, "describe", 8) == 0)
+    {
       push(&stack, indent, 'd', title, lnumber);
     }
-    else if (strncmp(head, "context", 7) == 0)
+    else if (strncmp(head, "context", 8) == 0)
     {
-      if (stype == 'i') pop(&stack);
       push(&stack, indent, 'c', title, lnumber);
     }
     else if (strncmp(head, "it", 2) == 0)
@@ -376,19 +387,8 @@ void process_lines(FILE *out, context_s *c, char *path)
       free(con);
       ++varcount;
     }
-    else if (stype != 'i' && (head[0] == '{' || head[0] == '}'))
-    {
-      // nothing
-    }
-    else if (stype == 'i' && head[0] == '}' && indent == stack->indent)
-    {
-      pop(&stack);
-      fprintf(out, "  return 1;\n");
-      fprintf(out, "%s", line);
-    }
     else
     {
-      //if (strncmp(head, "#include", 8) == 0 && title) include(c, title);
       fprintf(out, "%s", line);
     }
 
