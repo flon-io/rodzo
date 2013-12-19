@@ -365,7 +365,7 @@ void process_lines(FILE *out, context_s *c, char *path)
       fprintf(out, "int sc_%i = %i;\n", c->itcount, sc);
       fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
       fprintf(out, "char *fn_%i = \"%s\";\n", c->itcount, path);
-      fprintf(out, "int test_%i()\n", c->itcount);
+      fprintf(out, "int it_%i()\n", c->itcount);
       free(s);
     }
     else if (strncmp(head, "ensure", 6) == 0)
@@ -417,7 +417,7 @@ void print_footer(FILE *out, int itcount)
   fprintf(out, "\n");
   for (int i = 1; i <= itcount; i++)
   {
-    fprintf(out, "  test_%d();\n", i);
+    fprintf(out, "  it_%d();\n", i);
   }
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", itcount);
