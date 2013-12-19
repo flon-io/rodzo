@@ -4,13 +4,13 @@ NAME=aabro
 default: $(NAME).o
 
 .DEFAULT:
-	cd tmp/ && $(MAKE) $@
+	$(MAKE) -C tmp/ $@
 
 spec:
-	cd tmp/ && $(MAKE) spec
+	$(MAKE) -C tmp/ spec
 
 clean:
-	cd tmp/ && $(MAKE) clean
+	$(MAKE) -C tmp/ clean
 
 .PHONY: spec clean
 

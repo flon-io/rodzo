@@ -2,10 +2,10 @@
 default: build
 
 .DEFAULT:
-	cd tmp/ && $(MAKE) $@
+	$(MAKE) -C tmp/ $@
 
 spec:
-	cd tmp/ && $(MAKE) spec
+	$(MAKE) -C tmp/ spec
 
 .PHONY: clean spec
 

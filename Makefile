@@ -2,7 +2,7 @@
 default: build
 
 .DEFAULT:
-	cd tmp/ && $(MAKE) $@
+	$(MAKE) -C tmp/ $@
 
 T=0
 #
