@@ -133,7 +133,7 @@ int pop(level_s **stack)
 
 void free_stack(level_s **stack)
 {
-  while( ! pop(stack)) {}
+  while ( ! pop(stack)) {}
 }
 
 char **list_titles(level_s **stack)
@@ -207,11 +207,22 @@ int extract_indent(char *line)
   return -1;
 }
 
+char *str_rtrim(char *s)
+{
+  char *r = strdup(s);
+  for (size_t l = strlen(r); l > 0; l--)
+  {
+    char c = r[l - 1];
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') r[l - 1] = '\0';
+  }
+  return r;
+}
+
 char *extract_head(char *line)
 {
   char *stop = strpbrk(line, "     (");
 
-  if (stop == NULL) return strdup(line);
+  if (stop == NULL) return str_rtrim(line);
   if (stop == line) return extract_head(line + 1);
   return strndup(line, stop - line);
 }
@@ -320,6 +331,8 @@ void process_lines(FILE *out, context_s *c, char *path)
     char *head = extract_head(line);
     char *title = extract_title(line);
     char stype = (stack != NULL) ? stack->type : 'X';
+
+    printf("head >%s< %d\n", head, indent);
 
     if (strncmp(head, "describe", 8) == 0)
     {
