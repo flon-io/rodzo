@@ -347,15 +347,15 @@ void process_lines(FILE *out, context_s *c, char *path)
         fprintf(out, "%s", line);
       }
     }
-    else if (strncmp(head, "describe", 8) == 0)
+    else if (strcmp(head, "describe") == 0)
     {
       push(&stack, indent, 'd', title, lnumber);
     }
-    else if (strncmp(head, "context", 8) == 0)
+    else if (strcmp(head, "context") == 0)
     {
       push(&stack, indent, 'c', title, lnumber);
     }
-    else if (strncmp(head, "it", 2) == 0)
+    else if (strcmp(head, "it") == 0)
     {
       push(&stack, indent, 'i', title, lnumber);
       char *s = list_titles_as_literal(&stack);
@@ -368,7 +368,7 @@ void process_lines(FILE *out, context_s *c, char *path)
       fprintf(out, "int it_%i()\n", c->itcount);
       free(s);
     }
-    else if (strncmp(head, "ensure", 6) == 0)
+    else if (strcmp(head, "ensure") == 0)
     {
       char *l = strpbrk(line, "e");
       char *con = extract_condition(in, l + 6);
