@@ -23,6 +23,12 @@ describe "abr_node"
     {
       //abr_node *n = abr_malloc_node("nada", 0);
       //ensure(strcmp("[ nada, 0 ]", abr_node_to_string(n)) == 0);
+      ensure(5 == 5);
+    }
+    it "returns a string representation of the node"
+    {
+      //abr_node *n = abr_malloc_node("nada", 0);
+      //ensure(strcmp("[ nada, 0 ]", abr_node_to_string(n)) == 0);
       ensure(4 == 5);
     }
   }

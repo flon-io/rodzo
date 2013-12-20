@@ -115,12 +115,9 @@ void rdz_print_context(rdz_result *p, rdz_result *r)
   }
 }
 
-void rdz_print_result(rdz_result *p, rdz_result *r)
+void rdz_do_print_result(rdz_result *r)
 {
-  if (r != NULL && r->success) return;
-  if (r != NULL && p != NULL && p->itnumber == r->itnumber) return;
-
-  if (r == NULL) r = p;
+  if (r == NULL) return;
 
   for (int ii = 0; ii < r->stackc - 1; ii++) printf("  "); // indent
   if (r->success) rdz_green(); else rdz_red();
@@ -130,6 +127,13 @@ void rdz_print_result(rdz_result *p, rdz_result *r)
   rdz_clear();
 }
 
+void rdz_print_result(rdz_result *p, rdz_result *r)
+{
+  if (r != NULL && (p == NULL || p->itnumber == r->itnumber)) return;
+
+  rdz_do_print_result(p);
+}
+
 void rdz_do_record(rdz_result *r)
 {
   rdz_result *prev = NULL;
@@ -137,8 +141,8 @@ void rdz_do_record(rdz_result *r)
 
   if (prev == NULL) printf("\n"); // initial blank line
 
-  rdz_print_context(prev, r);
   rdz_print_result(prev, r);
+  rdz_print_context(prev, r);
 }
 
 void rdz_record(
