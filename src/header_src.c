@@ -99,10 +99,17 @@ void rdz_cyan() { printf("[36m"); }
 //void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
-void rdz_print_context(rdz_result *r)
+void rdz_print_context(rdz_result *p, rdz_result *r)
 {
+  if (r == NULL) return;
+  if (p != NULL && r->itnumber == p->itnumber) return;
+
   for (int i = 0; i < r->stackc - 1; i++)
   {
+    char *pt = "";
+    if (p != NULL && p->stackc > i) pt = p->stack[i];
+    char *rt = r->stack[i];
+    if (strcmp(pt, rt) == 0) continue;
     for (int ii = 0; ii < i; ii++) printf("  "); // indent
     printf("%s\n", r->stack[i]);
   }
@@ -125,17 +132,15 @@ void rdz_do_record(rdz_result *r)
 
   if (prev == NULL) printf("\n"); // initial blank line
 
-  if (r != NULL && (prev == NULL || strcmp(prev->context, r->context) != 0))
-  {
-    rdz_print_context(r);
-  }
+  rdz_print_context(prev, r);
 
-  if (prev == NULL) return;
-
-  if (r == NULL || prev->itnumber < r->itnumber)
-  {
-    rdz_print_result(prev);
-  }
+  //if (prev == NULL) return;
+  //
+  //if (r == NULL || prev->itnumber < r->itnumber)
+  //{
+  //  rdz_print_result(prev);
+  //}
+  if (r != NULL) rdz_print_result(r);
 }
 
 void rdz_record(
