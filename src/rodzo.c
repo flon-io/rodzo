@@ -52,6 +52,7 @@ int str_ends(char *s, char *end)
 // context
 
 typedef struct context_s {
+  int nodecount;
   int itcount;
   //int incc;
   //char **includes;
@@ -61,6 +62,7 @@ typedef struct context_s {
 context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
+  c->nodecount = 0;
   c->itcount = 0;
   //c->incc = 0;
   //c->includes = malloc(147 * sizeof(char *));
@@ -90,21 +92,27 @@ void free_context(context_s *c)
 
 typedef struct level_s {
   struct level_s *parent;
+  int nodenumber;
   int indent;
   char type;
   char *title;
   int lstart;
 } level_s;
 
-void push(level_s **stack, int indent, char type, char *title, int lstart)
+void push(
+  level_s **stack, context_s *c, int ind, char type, char *title, int lstart
+)
 {
   level_s *l = malloc(sizeof(level_s));
   l->parent = *stack;
-  l->indent = indent;
+  l->nodenumber = c->nodecount++;
+  l->indent = ind;
   l->type = type;
   l->title = strdup(title);
   l->lstart = lstart;
   *stack = l;
+
+  if (type == 'i') c->itcount++;
 }
 
 int depth(level_s **stack)
@@ -121,7 +129,7 @@ void free_level(level_s *l)
   free(l);
 }
 
-int pop(level_s **stack)
+int pop(level_s **stack, context_s *c)
 {
   if (*stack == NULL) return 1;
   //printf("pop: %p -> %p -> %p\n", stack, *stack, (*stack)->parent);
@@ -131,9 +139,9 @@ int pop(level_s **stack)
   return 0;
 }
 
-void free_stack(level_s **stack)
+void free_stack(level_s **stack, context_s *c)
 {
-  while ( ! pop(stack)) {}
+  while ( ! pop(stack, c)) {}
 }
 
 char **list_titles(level_s **stack)
@@ -340,7 +348,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else if (strcmp(head, "}") == 0 && indent == sindent)
     {
-      pop(&stack);
+      pop(&stack, c);
       if (stype == 'i')
       {
         fprintf(out, "  return 1;\n");
@@ -349,18 +357,17 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else if (strcmp(head, "describe") == 0)
     {
-      push(&stack, indent, 'd', title, lnumber);
+      push(&stack, c, indent, 'd', title, lnumber);
     }
     else if (strcmp(head, "context") == 0)
     {
-      push(&stack, indent, 'c', title, lnumber);
+      push(&stack, c, indent, 'c', title, lnumber);
     }
     else if (strcmp(head, "it") == 0)
     {
-      push(&stack, indent, 'i', title, lnumber);
+      push(&stack, c, indent, 'i', title, lnumber);
       char *s = list_titles_as_literal(&stack);
       int sc = depth(&stack);
-      c->itcount++;
       fprintf(out, "\n");
       fprintf(out, "int sc_%i = %i;\n", c->itcount, sc);
       fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
@@ -399,12 +406,12 @@ void process_lines(FILE *out, context_s *c, char *path)
   free(line);
   fclose(in);
 
-  free_stack(&stack);
+  free_stack(&stack, c);
 }
 
 #include "header.c"
 
-void print_footer(FILE *out, int itcount)
+void print_footer(FILE *out, context_s *c)
 {
   fputs("\n", out);
   fputs("  /*\n", out);
@@ -413,14 +420,14 @@ void print_footer(FILE *out, int itcount)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
-  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", itcount);
+  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", c->itcount);
   fprintf(out, "\n");
-  for (int i = 1; i <= itcount; i++)
+  for (int i = 1; i <= c->itcount; i++)
   {
     fprintf(out, "  it_%d();\n", i);
   }
   fputs("\n", out);
-  fprintf(out, "  rdz_summary(%d);\n", itcount);
+  fprintf(out, "  rdz_summary(%d);\n", c->itcount);
   fputs("}\n", out);
   fputs("\n", out);
 }
@@ -542,7 +549,7 @@ int main(int argc, char *argv[])
   }
   free(fnames);
 
-  print_footer(out, c->itcount);
+  print_footer(out, c);
 
   fclose(out);
 
