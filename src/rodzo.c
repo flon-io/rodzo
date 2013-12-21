@@ -53,7 +53,7 @@ int str_ends(char *s, char *end)
 
 typedef struct context_s {
   int itcount;
-  int incc;
+  //int incc;
   //char **includes;
   char *out_fname;
 } context_s;
@@ -62,7 +62,7 @@ context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
   c->itcount = 0;
-  c->incc = 0;
+  //c->incc = 0;
   //c->includes = malloc(147 * sizeof(char *));
   c->out_fname = NULL;
   return c;
