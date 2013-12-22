@@ -7,6 +7,10 @@
 
 #include "aabro.h"
 
+globally
+{
+  char *global_string = NULL;
+}
 
 describe "abr_node"
 {
@@ -19,6 +23,10 @@ describe "abr_node"
   }
   describe "abr_node_to_string(n)"
   {
+    before each
+    {
+      do_something();
+    }
     it "returns a string representation of the node"
     {
       //abr_node *n = abr_malloc_node("nada", 0);
@@ -32,5 +40,12 @@ describe "abr_node"
       ensure(4 == 5);
     }
   }
+}
+
+finally
+{
+}
+literally
+{
 }
 

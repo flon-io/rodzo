@@ -8,9 +8,11 @@ default: $(NAME).o
 
 spec:
 	$(MAKE) -C tmp/ spec
+vspec:
+	$(MAKE) -C tmp/ vspec
 
 clean:
 	$(MAKE) -C tmp/ clean
 
-.PHONY: spec clean
+.PHONY: spec vspec clean
 

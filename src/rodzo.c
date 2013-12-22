@@ -85,12 +85,14 @@ void free_context(context_s *c)
 
 void push(context_s *c, int ind, char type, char *title, int lstart)
 {
+  if (title != NULL) title = strdup(title);
+
   level_s *l = malloc(sizeof(level_s));
   l->parent = c->stack;
   l->nodenumber = c->nodecount++;
   l->indent = ind;
   l->type = type;
-  l->title = strdup(title);
+  l->title = title;
   l->lstart = lstart;
 
   c->stack = l;
@@ -336,10 +338,17 @@ void process_lines(FILE *out, context_s *c, char *path)
     char *head = extract_head(line);
     char *title = extract_title(line);
 
+    printf("head: >%s<\n", head);
+    printf("  title: >%s<\n", title);
+
     char stype = type_on_stack(c);
     int sindent = indent_on_stack(c);
 
-    if (strcmp(head, "{") == 0 && stype != 'i')
+    if (strcmp(head, "{") == 0 && stype == 'g' && indent == sindent)
+    {
+      // do not output
+    }
+    else if (strcmp(head, "{") == 0 && stype != 'i')
     {
       // do not output
     }
@@ -351,6 +360,12 @@ void process_lines(FILE *out, context_s *c, char *path)
         fprintf(out, "  return 1;\n");
         fprintf(out, "%s", line);
       }
+    }
+    else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
+    {
+      fprintf(out, "  // %s\n", head);
+      fprintf(out, "  //\n");
+      push(c, indent, 'g', head, lnumber);
     }
     else if (strcmp(head, "describe") == 0)
     {
