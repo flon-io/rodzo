@@ -359,11 +359,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     char stype = type_on_stack(c);
     int sindent = indent_on_stack(c);
 
-    if (strcmp(head, "{") == 0 && stype == 'g' && indent == sindent)
-    {
-      // do not output
-    }
-    else if (strcmp(head, "{") == 0 && stype != 'i')
+    if (strcmp(head, "{") == 0 && indent == sindent)
     {
       // do not output
     }
@@ -400,6 +396,7 @@ void process_lines(FILE *out, context_s *c, char *path)
       fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
       fprintf(out, "char *fn_%i = \"%s\";\n", c->itcount, path);
       fprintf(out, "int it_%i()\n", c->itcount);
+      fprintf(out, "{\n");
       free(s);
     }
     else if (strcmp(head, "ensure") == 0)
