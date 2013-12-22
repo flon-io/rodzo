@@ -11,7 +11,7 @@ T=0
 test:
 	$(MAKE) && $(MAKE) -C test$(T) spec
 vtest:
-	$(MAKE) -C test$(T) vspec
+	$(MAKE) && $(MAKE) -C test$(T) vspec
 
 TS=$(shell ls -1 | grep test.)
 #
