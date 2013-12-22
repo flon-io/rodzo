@@ -57,7 +57,7 @@ rdz_result *rdz_malloc_result(
 {
   int sc; for (sc = 0; ; sc++) { if (s[sc] == NULL) break; }
   char **ss = calloc(sc + 1, sizeof(char *));
-  for (int i = 0; i < sc; i++) ss[i] = strdup(s[i]);
+  for (int i = 0; i < sc; i++) ss[i] = rdz_strdup(s[i]);
 
   char *context = calloc((sc - 1) * 160, sizeof(char));
   char *title = calloc(sc * 160, sizeof(char));
