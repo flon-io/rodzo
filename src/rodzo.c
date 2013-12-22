@@ -208,7 +208,7 @@ char *list_titles_as_literal(context_s *c)
     if (i < d - 1) { strcpy(rr, ", "); rr += 2; }
   }
 
-  strcpy(rr, " }"); rr += 2;
+  strcpy(rr, ", NULL }"); rr += 8;
   *rr = '\0';
 
   free(titles);
@@ -390,13 +390,11 @@ void process_lines(FILE *out, context_s *c, char *path)
     {
       push(c, indent, 'i', title, lnumber);
       char *s = list_titles_as_literal(c);
-      int sc = stack_depth(c);
       fprintf(out, "\n");
-      fprintf(out, "int sc_%i = %i;\n", c->itcount, sc);
-      fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
-      fprintf(out, "char *fn_%i = \"%s\";\n", c->itcount, path);
       fprintf(out, "int it_%i()\n", c->itcount);
       fprintf(out, "{\n");
+      fprintf(out, "  char *_s[] = %s;\n", s);
+      fprintf(out, "  char *_fn = \"%s\";\n", path);
       free(s);
     }
     else if (strcmp(head, "ensure") == 0)
@@ -409,8 +407,8 @@ void process_lines(FILE *out, context_s *c, char *path)
         "  int r%i = %s", varcount, con);
       fprintf(
         out,
-        "    rdz_record(r%i, sc_%i, s_%i, %i, fn_%i, %d);\n",
-        varcount, c->itcount, c->itcount, c->itcount, c->itcount, lnumber);
+        "    rdz_record(r%i, _s, %i, _fn, %d);\n",
+        varcount, c->itcount, lnumber);
       fprintf(
         out,
         "    if ( ! r%i) return 0;\n",

@@ -52,9 +52,13 @@ typedef struct rdz_result {
 } rdz_result;
 
 rdz_result *rdz_malloc_result(
-  int success, int sc, char *s[], int itnumber, char *fname, int lnumber
+  int success, char *s[], int itnumber, char *fname, int lnumber
 )
 {
+  int sc; for (sc = 0; ; sc++) { if (s[sc] == NULL) break; }
+  char **ss = calloc(sc + 1, sizeof(char *));
+  for (int i = 0; i < sc; i++) ss[i] = strdup(s[i]);
+
   char *context = calloc((sc - 1) * 160, sizeof(char));
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
@@ -68,7 +72,7 @@ rdz_result *rdz_malloc_result(
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
   r->stackc = sc;
-  r->stack = s;
+  r->stack = ss;
   r->context = context;
   r->title = title;
   r->itnumber = itnumber;
@@ -146,11 +150,10 @@ void rdz_do_record(rdz_result *r)
 }
 
 void rdz_record(
-  int success, int sc, char *s[], int itnumber, char *fname, int lnumber
+  int success, char *s[], int itnumber, char *fname, int lnumber
 )
 {
-  rdz_result *result =
-    rdz_malloc_result(success, sc, s, itnumber, fname, lnumber);
+  rdz_result *result = rdz_malloc_result(success, s, itnumber, fname, lnumber);
 
   rdz_do_record(result);
 
