@@ -49,46 +49,7 @@ int str_ends(char *s, char *end)
 }
 
 //
-// context
-
-typedef struct context_s {
-  int nodecount;
-  int itcount;
-  //int incc;
-  //char **includes;
-  char *out_fname;
-} context_s;
-
-context_s *malloc_context()
-{
-  context_s *c = malloc(sizeof(context_s));
-  c->nodecount = 0;
-  c->itcount = 0;
-  //c->incc = 0;
-  //c->includes = malloc(147 * sizeof(char *));
-  c->out_fname = NULL;
-  return c;
-}
-
-void free_context(context_s *c)
-{
-  //for (int i = 0; i < c->incc; i++) { free(c->includes[i]); }
-  //free(c->includes);
-  free(c->out_fname);
-  free(c);
-}
-
-//void include(context_s *c, char *title)
-//{
-//  for (int i = 0; i < c->incc; i++)
-//  {
-//    if (strcmp(c->includes[i], title) == 0) return;
-//  }
-//  c->includes[c->incc++] = strdup(title);
-//}
-
-//
-// the stack
+// context and stack
 
 typedef struct level_s {
   struct level_s *parent;
@@ -99,28 +60,42 @@ typedef struct level_s {
   int lstart;
 } level_s;
 
-void push(
-  level_s **stack, context_s *c, int ind, char type, char *title, int lstart
-)
+typedef struct context_s {
+  int nodecount;
+  int itcount;
+  level_s *stack;
+  char *out_fname;
+} context_s;
+
+context_s *malloc_context()
+{
+  context_s *c = malloc(sizeof(context_s));
+  c->nodecount = 0;
+  c->itcount = 0;
+  c->stack = NULL;
+  c->out_fname = NULL;
+  return c;
+}
+
+void free_context(context_s *c)
+{
+  free(c->out_fname);
+  free(c);
+}
+
+void push(context_s *c, int ind, char type, char *title, int lstart)
 {
   level_s *l = malloc(sizeof(level_s));
-  l->parent = *stack;
+  l->parent = c->stack;
   l->nodenumber = c->nodecount++;
   l->indent = ind;
   l->type = type;
   l->title = strdup(title);
   l->lstart = lstart;
-  *stack = l;
+
+  c->stack = l;
 
   if (type == 'i') c->itcount++;
-}
-
-int depth(level_s **stack)
-{
-  level_s *top = *stack;
-
-  if (top->parent == NULL) return 1;
-  return 1 + depth(&(top->parent));
 }
 
 void free_level(level_s *l)
@@ -129,25 +104,48 @@ void free_level(level_s *l)
   free(l);
 }
 
-int pop(level_s **stack, context_s *c)
+int pop(context_s *c)
 {
-  if (*stack == NULL) return 1;
+  if (c->stack == NULL) return 1;
   //printf("pop: %p -> %p -> %p\n", stack, *stack, (*stack)->parent);
-  level_s *t = *stack;
-  *stack = t->parent;
+  level_s *t = c->stack;
+  c->stack = t->parent;
   free_level(t);
   return 0;
 }
 
-void free_stack(level_s **stack, context_s *c)
+char type_on_stack(context_s *c)
 {
-  while ( ! pop(stack, c)) {}
+  if (c->stack == NULL) return 'X';
+  return c->stack->type;
 }
 
-char **list_titles(level_s **stack)
+int indent_on_stack(context_s *c)
+{
+  if (c->stack == NULL) return -1;
+  return c->stack->indent;
+}
+
+int depth(level_s *stack)
+{
+  if (stack == NULL) return 0;
+  return 1 + depth(stack->parent);
+}
+
+int stack_depth(context_s *c)
+{
+  return depth(c->stack);
+}
+
+void clear_stack(context_s *c)
+{
+  while (c->stack != NULL) pop(c);
+}
+
+char **list_titles(level_s *stack)
 {
   int d = depth(stack);
-  level_s *top = *stack;
+  level_s *top = stack;
 
   char **result = malloc(d * TITLE_MAX_LENGTH * sizeof(char));
 
@@ -173,11 +171,11 @@ size_t str_neuter_copy(char *target, char *source)
   return c;
 }
 
-char *list_titles_as_literal(level_s **stack)
+char *list_titles_as_literal(context_s *c)
 {
-  int d = depth(stack);
+  int d = depth(c->stack);
 
-  char **titles = list_titles(stack);
+  char **titles = list_titles(c->stack);
 
   char *r = calloc(d + 1, 4 + TITLE_MAX_LENGTH * sizeof(char));
   char *rr = r;
@@ -324,7 +322,6 @@ void process_lines(FILE *out, context_s *c, char *path)
   FILE *in = fopen(path, "r");
   if (in == NULL) return;
 
-  level_s *stack = NULL;
   int varcount = 0;
 
   int lnumber = 0;
@@ -339,8 +336,8 @@ void process_lines(FILE *out, context_s *c, char *path)
     char *head = extract_head(line);
     char *title = extract_title(line);
 
-    char stype = (stack != NULL) ? stack->type : 'X';
-    int sindent = (stack != NULL) ? stack->indent : -1;
+    char stype = type_on_stack(c);
+    int sindent = indent_on_stack(c);
 
     if (strcmp(head, "{") == 0 && stype != 'i')
     {
@@ -348,7 +345,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else if (strcmp(head, "}") == 0 && indent == sindent)
     {
-      pop(&stack, c);
+      pop(c);
       if (stype == 'i')
       {
         fprintf(out, "  return 1;\n");
@@ -357,17 +354,17 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else if (strcmp(head, "describe") == 0)
     {
-      push(&stack, c, indent, 'd', title, lnumber);
+      push(c, indent, 'd', title, lnumber);
     }
     else if (strcmp(head, "context") == 0)
     {
-      push(&stack, c, indent, 'c', title, lnumber);
+      push(c, indent, 'c', title, lnumber);
     }
     else if (strcmp(head, "it") == 0)
     {
-      push(&stack, c, indent, 'i', title, lnumber);
-      char *s = list_titles_as_literal(&stack);
-      int sc = depth(&stack);
+      push(c, indent, 'i', title, lnumber);
+      char *s = list_titles_as_literal(c);
+      int sc = stack_depth(c);
       fprintf(out, "\n");
       fprintf(out, "int sc_%i = %i;\n", c->itcount, sc);
       fprintf(out, "char *s_%i[] = %s;\n", c->itcount, s);
@@ -406,7 +403,7 @@ void process_lines(FILE *out, context_s *c, char *path)
   free(line);
   fclose(in);
 
-  free_stack(&stack, c);
+  clear_stack(c);
 }
 
 #include "header.c"
