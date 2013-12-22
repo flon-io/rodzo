@@ -65,6 +65,8 @@ typedef struct context_s {
   int itcount;
   level_s *stack;
   char *out_fname;
+  FILE *mainbody;
+  char *mainbody_buffer;
 } context_s;
 
 context_s *malloc_context()
@@ -74,12 +76,17 @@ context_s *malloc_context()
   c->itcount = 0;
   c->stack = NULL;
   c->out_fname = NULL;
+  c->mainbody_buffer = NULL;
+  size_t mainbody_size;
+  c->mainbody = open_memstream(&c->mainbody_buffer, &mainbody_size);
   return c;
 }
 
 void free_context(context_s *c)
 {
   free(c->out_fname);
+  //fclose(c->mainbody);
+  free(c->mainbody_buffer);
   free(c);
 }
 
@@ -109,10 +116,18 @@ void free_level(level_s *l)
 int pop(context_s *c)
 {
   if (c->stack == NULL) return 1;
+
+  if (c->stack->type == 'i')
+  {
+    fprintf(c->mainbody, "  it_%d();\n", c->itcount);
+  }
+
   //printf("pop: %p -> %p -> %p\n", stack, *stack, (*stack)->parent);
   level_s *t = c->stack;
   c->stack = t->parent;
   free_level(t);
+
+
   return 0;
 }
 
@@ -338,8 +353,8 @@ void process_lines(FILE *out, context_s *c, char *path)
     char *head = extract_head(line);
     char *title = extract_title(line);
 
-    printf("head: >%s<\n", head);
-    printf("  title: >%s<\n", title);
+    //printf("head: >%s<\n", head);
+    //printf("  title: >%s<\n", title);
 
     char stype = type_on_stack(c);
     int sindent = indent_on_stack(c);
@@ -434,10 +449,8 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "{\n");
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", c->itcount);
   fprintf(out, "\n");
-  for (int i = 1; i <= c->itcount; i++)
-  {
-    fprintf(out, "  it_%d();\n", i);
-  }
+  fclose(c->mainbody);
+  fputs(c->mainbody_buffer, out);
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", c->itcount);
   fputs("}\n", out);
