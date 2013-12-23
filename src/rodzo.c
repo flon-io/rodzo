@@ -32,6 +32,8 @@
 #include <libgen.h>
 #include <wordexp.h>
 
+#include "flutil.h"
+
 #define TITLE_MAX_LENGTH 210
 
 
@@ -476,8 +478,10 @@ void add_spec_files(int *count, char **names, char *path)
   struct dirent *ep;
   while ((ep = readdir(dir)) != NULL)
   {
-    char *fn = malloc(3 * 1024);
-    sprintf(fn, "%s/%s", path, ep->d_name);
+    flu_sbuffer *b = flu_malloc_sbuffer();
+    flu_sbprintf(b, "%s/%s", path, ep->d_name);
+
+    char *fn = flu_sbuffer_to_string(b);
 
     add_spec_file(count, names, fn);
 
