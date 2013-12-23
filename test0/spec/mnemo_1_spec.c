@@ -3,16 +3,14 @@
 #include "./mnemo.h"
 
 
-describe "mne_tos()"
-{
+describe "mne_tos()" {
   context "birds are flying"
   {
     it "finds the コンビニ convenient"
     {
       ensure(1 == 1);
     }
-    it "does not care about \n"
-    {
+    it "does not care about \n" {
       ensure(1 == 2);
     }
 

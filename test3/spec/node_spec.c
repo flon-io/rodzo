@@ -24,6 +24,7 @@ describe "abr_node"
   describe "abr_node_to_string(n)"
   {
     before each
+    //before each inline
     {
       do_something();
     }
