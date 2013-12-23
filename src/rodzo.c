@@ -478,10 +478,7 @@ void add_spec_files(int *count, char **names, char *path)
   struct dirent *ep;
   while ((ep = readdir(dir)) != NULL)
   {
-    flu_sbuffer *b = flu_malloc_sbuffer();
-    flu_sbprintf(b, "%s/%s", path, ep->d_name);
-
-    char *fn = flu_sbuffer_to_string(b);
+    char *fn = flu_sprintf("%s/%s", path, ep->d_name);
 
     add_spec_file(count, names, fn);
 

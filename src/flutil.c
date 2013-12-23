@@ -55,6 +55,7 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
   va_start(ap, format);
   int r = flu_vsbprintf(b, format, ap);
   va_end(ap);
+
   return r;
 }
 
@@ -63,6 +64,23 @@ char *flu_sbuffer_to_string(flu_sbuffer *b)
   fclose(b->stream);
   char *s = b->string;
   free(b);
+
+  return s;
+}
+
+char *flu_sprintf(const char *format, ...)
+{
+  // TODO: behave in case of error...
+
+  va_list ap;
+  va_start(ap, format);
+
+  flu_sbuffer *b = flu_malloc_sbuffer();
+  flu_vsbprintf(b, format, ap);
+  char *s = flu_sbuffer_to_string(b);
+
+  va_end(ap);
+
   return s;
 }
 
