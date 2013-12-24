@@ -92,7 +92,7 @@ void push(context_s *c, int ind, char type, char *title, int lstart)
   if (type == 'i') c->itcount++;
 }
 
-void free_level(node_s *l)
+void free_node(node_s *l)
 {
   free(l->title);
   free(l);
@@ -109,8 +109,7 @@ int pop(context_s *c)
 
   node_s *t = c->node;
   c->node = t->parent;
-  free_level(t);
-
+  free_node(t);
 
   return 0;
 }

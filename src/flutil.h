@@ -63,16 +63,23 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...);
 
 /*
  * Closes the buffer (stream) which causes the string to be made available.
+ *
+ * Doesn't not free the buffer, it still is around for further reading
+ * of b->string.
  */
 int flu_sbuffer_close(flu_sbuffer *b);
 
 /*
  * Closes the buffer, frees it and returns the pointer to the produced string.
+ *
+ * Returns NULL in case of issue (buffer should be free anyway).
  */
 char *flu_sbuffer_to_string(flu_sbuffer *b);
 
 /*
  * Wraps the sbuffer operations in a single call, yielding the result string.
+ *
+ * Returns NULL in case of issue.
  */
 char *flu_sprintf(const char *format, ...);
 

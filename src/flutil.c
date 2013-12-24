@@ -59,6 +59,7 @@ flu_sbuffer *flu_malloc_sbuffer()
 
 int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap)
 {
+  if (b->stream == NULL) return 0;
   return vfprintf(b->stream, format, ap);
 }
 
@@ -74,12 +75,20 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
 
 int flu_sbuffer_close(flu_sbuffer *b)
 {
-  return fclose(b->stream);
+  int r = fclose(b->stream);
+  b->stream = NULL;
+
+  return r;
 }
 
 char *flu_sbuffer_to_string(flu_sbuffer *b)
 {
-  fclose(b->stream);
+  //int r = flu_sbuffer_close(b);
+  //if (r != 0) return NULL;
+  flu_sbuffer_close(b);
+    //
+    // the string should be NULL, let flow and reach free(b)
+
   char *s = b->string;
   free(b);
 
@@ -88,8 +97,6 @@ char *flu_sbuffer_to_string(flu_sbuffer *b)
 
 char *flu_sprintf(const char *format, ...)
 {
-  // TODO: behave in case of error...
-
   va_list ap;
   va_start(ap, format);
 
