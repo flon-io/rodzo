@@ -54,8 +54,7 @@ typedef struct context_s {
   int itcount;
   level_s *stack;
   char *out_fname;
-  FILE *mainbody;
-  char *mainbody_buffer;
+  flu_sbuffer *mainbody;
 } context_s;
 
 context_s *malloc_context()
@@ -65,17 +64,14 @@ context_s *malloc_context()
   c->itcount = 0;
   c->stack = NULL;
   c->out_fname = NULL;
-  c->mainbody_buffer = NULL;
-  size_t mainbody_size;
-  c->mainbody = open_memstream(&c->mainbody_buffer, &mainbody_size);
+  c->mainbody = flu_malloc_sbuffer();
   return c;
 }
 
 void free_context(context_s *c)
 {
   free(c->out_fname);
-  //fclose(c->mainbody);
-  free(c->mainbody_buffer);
+  //free(c->mainbody);
   free(c);
 }
 
@@ -108,7 +104,7 @@ int pop(context_s *c)
 
   if (c->stack->type == 'i')
   {
-    fprintf(c->mainbody, "  it_%d();\n", c->itcount);
+    flu_sbprintf(c->mainbody,"  it_%d();\n", c->itcount);
   }
 
   //printf("pop: %p -> %p -> %p\n", stack, *stack, (*stack)->parent);
@@ -433,8 +429,11 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "{\n");
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", c->itcount);
   fprintf(out, "\n");
-  fclose(c->mainbody);
-  fputs(c->mainbody_buffer, out);
+
+  char *body = flu_sbuffer_to_string(c->mainbody);
+  fputs(body, out);
+  free(body);
+
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", c->itcount);
   fputs("}\n", out);
