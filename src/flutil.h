@@ -49,7 +49,7 @@ typedef struct flu_sbuffer {
 /*
  * Creates a buffer (its stream) and returns a pointer to it.
  */
-flu_sbuffer *flu_malloc_sbuffer();
+flu_sbuffer *flu_sbuffer_malloc();
 
 /*
  * Formats input and writes into buffer. Takes a va_list.

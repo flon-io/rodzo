@@ -50,7 +50,7 @@ int flu_strends(char *s, char *end)
 //
 // sbuffer
 
-flu_sbuffer *flu_malloc_sbuffer()
+flu_sbuffer *flu_sbuffer_malloc()
 {
   flu_sbuffer *b = malloc(sizeof(flu_sbuffer));
   b->stream = open_memstream(&b->string, &b->len);
@@ -100,7 +100,7 @@ char *flu_sprintf(const char *format, ...)
   va_list ap;
   va_start(ap, format);
 
-  flu_sbuffer *b = flu_malloc_sbuffer();
+  flu_sbuffer *b = flu_sbuffer_malloc();
   flu_vsbprintf(b, format, ap);
   char *s = flu_sbuffer_to_string(b);
 

@@ -46,6 +46,7 @@ typedef struct node_s {
   int indent;
   char type;
   char *title;
+  char *fname;
   int lstart;
 } node_s;
 
@@ -57,6 +58,25 @@ typedef struct context_s {
   flu_sbuffer *mainbody;
 } context_s;
 
+void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
+{
+  if (title != NULL) title = strdup(title);
+  if (fn != NULL) fn = strdup(fn);
+
+  node_s *n = malloc(sizeof(node_s));
+  n->parent = c->node;
+  n->nodenumber = c->nodecount++;
+  n->indent = ind;
+  n->type = type;
+  n->title = title;
+  n->fname = fn;
+  n->lstart = lstart;
+
+  c->node = n;
+
+  if (type == 'i') c->itcount++;
+}
+
 context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
@@ -64,54 +84,51 @@ context_s *malloc_context()
   c->itcount = 0;
   c->node = NULL;
   c->out_fname = NULL;
-  c->mainbody = flu_malloc_sbuffer();
+  c->mainbody = flu_sbuffer_malloc();
+
+  push(c, 0, 'g', NULL, NULL, -1);
+
   return c;
-}
-
-void free_context(context_s *c)
-{
-  free(c->out_fname);
-  //free(c->mainbody);
-  free(c);
-}
-
-void push(context_s *c, int ind, char type, char *title, int lstart)
-{
-  if (title != NULL) title = strdup(title);
-
-  node_s *l = malloc(sizeof(node_s));
-  l->parent = c->node;
-  l->nodenumber = c->nodecount++;
-  l->indent = ind;
-  l->type = type;
-  l->title = title;
-  l->lstart = lstart;
-
-  c->node = l;
-
-  if (type == 'i') c->itcount++;
 }
 
 void free_node(node_s *l)
 {
   free(l->title);
+  free(l->fname);
   free(l);
 }
 
-int pop(context_s *c)
+void clear_tree(context_s *c)
 {
-  if (c->node == NULL) return 1;
+  //while (c->node != NULL) pull(c);
 
-  if (c->node->type == 'i')
+  // TODO: go to root and clear children from there...
+
+  node_s *n = c->node;
+  while (n->parent != NULL) n = n->parent;
+
+  free_node(n);
+}
+
+void free_context(context_s *c)
+{
+  clear_tree(c);
+
+  free(c->out_fname);
+  //free(c->mainbody);
+  free(c);
+}
+
+void pull(context_s *c)
+{
+  node_s *n = c->node;
+
+  if (n->type == 'i')
   {
     flu_sbprintf(c->mainbody,"  it_%d();\n", c->itcount);
   }
 
-  node_s *t = c->node;
-  c->node = t->parent;
-  free_node(t);
-
-  return 0;
+  c->node = n->parent;
 }
 
 char current_type(context_s *c)
@@ -126,37 +143,27 @@ int current_indent(context_s *c)
   return c->node->indent;
 }
 
-int depth(node_s *node)
-{
-  if (node == NULL) return 0;
-  return 1 + depth(node->parent);
-}
-
-int node_depth(context_s *c)
-{
-  return depth(c->node);
-}
-
-void clear_tree(context_s *c)
-{
-  // TODO: go to root and clear children from there...
-  while (c->node != NULL) pop(c);
-}
-
 char **list_titles(node_s *node)
 {
-  int d = depth(node);
-  node_s *top = node;
-
-  char **result = malloc(d * TITLE_MAX_LENGTH * sizeof(char));
-
-  for (int i = d - 1; i >= 0; i--)
+  char **a = malloc(256 * sizeof(char *));
+  int c = 0;
+  node_s *n = node;
+  while (n != NULL)
   {
-    result[i] = strdup(top->title);
-    top = top->parent;
+    if (n->title != NULL) a[c++] = strdup(n->title);
+    n = n->parent;
   }
 
-  return result;
+  char **r = calloc(c + 1, sizeof(char *));
+  for (int i = 0; ; i++)
+  {
+    if (c < 0) break;
+    r[i] = a[--c];
+  }
+
+  free(a);
+
+  return r;
 }
 
 size_t str_neuter_copy(char *target, char *source)
@@ -174,30 +181,27 @@ size_t str_neuter_copy(char *target, char *source)
 
 char *list_titles_as_literal(context_s *c)
 {
-  int d = depth(c->node);
+  // TODO: use/adapt str_neuter_copy()
+
+  flu_sbuffer *b = flu_sbuffer_malloc();
 
   char **titles = list_titles(c->node);
+  char **t = titles;
 
-  char *r = calloc(d + 1, 4 + TITLE_MAX_LENGTH * sizeof(char));
-  char *rr = r;
+  flu_sbprintf(b, "{ ");
 
-  strcpy(rr, "{ "); rr += 2;
-
-  for (int i = 0; i < d; i++)
+  while (*t != NULL)
   {
-    strcpy(rr, "\""); rr += 1;
-    rr += str_neuter_copy(rr, titles[i]);
-    free(titles[i]);
-    strcpy(rr, "\""); rr += 1;
-    if (i < d - 1) { strcpy(rr, ", "); rr += 2; }
+    flu_sbprintf(b, "\"%s\", ", *t);
+    free(*t);
+    t++;
   }
-
-  strcpy(rr, ", NULL }"); rr += 8;
-  *rr = '\0';
 
   free(titles);
 
-  return r;
+  flu_sbprintf(b, "NULL }");
+
+  return flu_sbuffer_to_string(b);
 }
 
 //
@@ -349,7 +353,7 @@ void process_lines(FILE *out, context_s *c, char *path)
     }
     else if (strcmp(head, "}") == 0 && indent == cindent)
     {
-      pop(c);
+      pull(c);
       if (ctype == 'i')
       {
         fprintf(out, "  return 1;\n");
@@ -360,19 +364,19 @@ void process_lines(FILE *out, context_s *c, char *path)
     {
       fprintf(out, "  // %s\n", head);
       fprintf(out, "  //\n");
-      push(c, indent, 'g', head, lnumber);
+      push(c, indent, 'g', head, path, lnumber);
     }
     else if (strcmp(head, "describe") == 0)
     {
-      push(c, indent, 'd', title, lnumber);
+      push(c, indent, 'd', title, path, lnumber);
     }
     else if (strcmp(head, "context") == 0)
     {
-      push(c, indent, 'c', title, lnumber);
+      push(c, indent, 'c', title, path, lnumber);
     }
     else if (strcmp(head, "it") == 0)
     {
-      push(c, indent, 'i', title, lnumber);
+      push(c, indent, 'i', title, path, lnumber);
       char *s = list_titles_as_literal(c);
       fprintf(out, "\n");
       fprintf(out, "int it_%i()\n", c->itcount);
@@ -411,8 +415,6 @@ void process_lines(FILE *out, context_s *c, char *path)
 
   free(line);
   fclose(in);
-
-  clear_tree(c);
 }
 
 #include "header.c"
