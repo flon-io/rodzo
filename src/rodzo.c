@@ -38,19 +38,6 @@
 
 
 //
-// helper functions
-
-int str_ends(char *s, char *end)
-{
-  size_t ls = strlen(s);
-  size_t le = strlen(end);
-
-  if (le > ls) return 0;
-
-  return (strncmp(s + ls - le, end, le) == 0);
-}
-
-//
 // context and stack
 
 typedef struct level_s {
@@ -456,7 +443,7 @@ void print_footer(FILE *out, context_s *c)
 
 int add_spec_file(int *count, char **names, char *fname)
 {
-  if ( ! str_ends(fname, "_spec.c")) return 0;
+  if ( ! flu_strends(fname, "_spec.c")) return 0;
 
   for (int i = 0; i < *count; i++)
   {

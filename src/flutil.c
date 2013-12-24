@@ -35,7 +35,20 @@
 // flutil.c
 
 //
-// string_buffer
+// str functions
+
+int flu_strends(char *s, char *end)
+{
+  size_t ls = strlen(s);
+  size_t le = strlen(end);
+
+  if (le > ls) return 0;
+
+  return (strncmp(s + ls - le, end, le) == 0);
+}
+
+//
+// sbuffer
 
 flu_sbuffer *flu_malloc_sbuffer()
 {

@@ -23,9 +23,15 @@
 // Made in Japan.
 //
 
-// flutil.c
+// flutil.h
 
 #include <stdarg.h>
+
+
+//
+// str functions
+
+int flu_strends(char *s, char *end);
 
 //
 // string_buffer
