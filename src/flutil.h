@@ -26,6 +26,7 @@
 // flutil.h
 
 #include <stdarg.h>
+#include <string.h>
 
 
 //
@@ -47,6 +48,7 @@ flu_sbuffer *flu_malloc_sbuffer();
 int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap);
 int flu_sbprintf(flu_sbuffer *b, const char *format, ...);
 
+int flu_sbuffer_close(flu_sbuffer *b);
 char *flu_sbuffer_to_string(flu_sbuffer *b);
 
 char *flu_sprintf(const char *format, ...);

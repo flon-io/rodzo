@@ -72,6 +72,11 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
   return r;
 }
 
+int flu_sbuffer_close(flu_sbuffer *b)
+{
+  return fclose(b->stream);
+}
+
 char *flu_sbuffer_to_string(flu_sbuffer *b)
 {
   fclose(b->stream);
