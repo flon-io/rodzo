@@ -38,21 +38,21 @@
 
 
 //
-// context and stack
+// context and tree
 
-typedef struct level_s {
-  struct level_s *parent;
+typedef struct node_s {
+  struct node_s *parent;
   int nodenumber;
   int indent;
   char type;
   char *title;
   int lstart;
-} level_s;
+} node_s;
 
 typedef struct context_s {
   int nodecount;
   int itcount;
-  level_s *stack;
+  node_s *node;
   char *out_fname;
   flu_sbuffer *mainbody;
 } context_s;
@@ -62,7 +62,7 @@ context_s *malloc_context()
   context_s *c = malloc(sizeof(context_s));
   c->nodecount = 0;
   c->itcount = 0;
-  c->stack = NULL;
+  c->node = NULL;
   c->out_fname = NULL;
   c->mainbody = flu_malloc_sbuffer();
   return c;
@@ -79,20 +79,20 @@ void push(context_s *c, int ind, char type, char *title, int lstart)
 {
   if (title != NULL) title = strdup(title);
 
-  level_s *l = malloc(sizeof(level_s));
-  l->parent = c->stack;
+  node_s *l = malloc(sizeof(node_s));
+  l->parent = c->node;
   l->nodenumber = c->nodecount++;
   l->indent = ind;
   l->type = type;
   l->title = title;
   l->lstart = lstart;
 
-  c->stack = l;
+  c->node = l;
 
   if (type == 'i') c->itcount++;
 }
 
-void free_level(level_s *l)
+void free_level(node_s *l)
 {
   free(l->title);
   free(l);
@@ -100,54 +100,54 @@ void free_level(level_s *l)
 
 int pop(context_s *c)
 {
-  if (c->stack == NULL) return 1;
+  if (c->node == NULL) return 1;
 
-  if (c->stack->type == 'i')
+  if (c->node->type == 'i')
   {
     flu_sbprintf(c->mainbody,"  it_%d();\n", c->itcount);
   }
 
-  //printf("pop: %p -> %p -> %p\n", stack, *stack, (*stack)->parent);
-  level_s *t = c->stack;
-  c->stack = t->parent;
+  node_s *t = c->node;
+  c->node = t->parent;
   free_level(t);
 
 
   return 0;
 }
 
-char type_on_stack(context_s *c)
+char current_type(context_s *c)
 {
-  if (c->stack == NULL) return 'X';
-  return c->stack->type;
+  if (c->node == NULL) return 'X';
+  return c->node->type;
 }
 
-int indent_on_stack(context_s *c)
+int current_indent(context_s *c)
 {
-  if (c->stack == NULL) return -1;
-  return c->stack->indent;
+  if (c->node == NULL) return -1;
+  return c->node->indent;
 }
 
-int depth(level_s *stack)
+int depth(node_s *node)
 {
-  if (stack == NULL) return 0;
-  return 1 + depth(stack->parent);
+  if (node == NULL) return 0;
+  return 1 + depth(node->parent);
 }
 
-int stack_depth(context_s *c)
+int node_depth(context_s *c)
 {
-  return depth(c->stack);
+  return depth(c->node);
 }
 
-void clear_stack(context_s *c)
+void clear_tree(context_s *c)
 {
-  while (c->stack != NULL) pop(c);
+  // TODO: go to root and clear children from there...
+  while (c->node != NULL) pop(c);
 }
 
-char **list_titles(level_s *stack)
+char **list_titles(node_s *node)
 {
-  int d = depth(stack);
-  level_s *top = stack;
+  int d = depth(node);
+  node_s *top = node;
 
   char **result = malloc(d * TITLE_MAX_LENGTH * sizeof(char));
 
@@ -175,9 +175,9 @@ size_t str_neuter_copy(char *target, char *source)
 
 char *list_titles_as_literal(context_s *c)
 {
-  int d = depth(c->stack);
+  int d = depth(c->node);
 
-  char **titles = list_titles(c->stack);
+  char **titles = list_titles(c->node);
 
   char *r = calloc(d + 1, 4 + TITLE_MAX_LENGTH * sizeof(char));
   char *rr = r;
@@ -341,17 +341,17 @@ void process_lines(FILE *out, context_s *c, char *path)
     //printf("head: >%s<\n", head);
     //printf("  title: >%s<\n", title);
 
-    char stype = type_on_stack(c);
-    int sindent = indent_on_stack(c);
+    char ctype = current_type(c);
+    int cindent = current_indent(c);
 
-    if (strcmp(head, "{") == 0 && indent == sindent)
+    if (strcmp(head, "{") == 0 && indent == cindent)
     {
       // do not output
     }
-    else if (strcmp(head, "}") == 0 && indent == sindent)
+    else if (strcmp(head, "}") == 0 && indent == cindent)
     {
       pop(c);
-      if (stype == 'i')
+      if (ctype == 'i')
       {
         fprintf(out, "  return 1;\n");
         fprintf(out, "%s", line);
@@ -413,7 +413,7 @@ void process_lines(FILE *out, context_s *c, char *path)
   free(line);
   fclose(in);
 
-  clear_stack(c);
+  clear_tree(c);
 }
 
 #include "header.c"
