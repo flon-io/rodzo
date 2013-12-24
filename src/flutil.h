@@ -32,10 +32,13 @@
 //
 // str functions
 
+/*
+ * Returns 1 if the string s ends with the end string. Returns 0 else.
+ */
 int flu_strends(char *s, char *end);
 
 //
-// string_buffer
+// sbuffer
 
 typedef struct flu_sbuffer {
   FILE *stream;
@@ -43,13 +46,33 @@ typedef struct flu_sbuffer {
   size_t len;
 } flu_sbuffer;
 
+/*
+ * Creates a buffer (its stream) and returns a pointer to it.
+ */
 flu_sbuffer *flu_malloc_sbuffer();
 
+/*
+ * Formats input and writes into buffer. Takes a va_list.
+ */
 int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap);
+
+/*
+ * Formats input and writes into buffer. Called like printf is called.
+ */
 int flu_sbprintf(flu_sbuffer *b, const char *format, ...);
 
+/*
+ * Closes the buffer (stream) which causes the string to be made available.
+ */
 int flu_sbuffer_close(flu_sbuffer *b);
+
+/*
+ * Closes the buffer, frees it and returns the pointer to the produced string.
+ */
 char *flu_sbuffer_to_string(flu_sbuffer *b);
 
+/*
+ * Wraps the sbuffer operations in a single call, yielding the result string.
+ */
 char *flu_sprintf(const char *format, ...);
 
