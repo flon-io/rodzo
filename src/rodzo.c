@@ -60,6 +60,33 @@ typedef struct context_s {
   flu_sbuffer *mainbody;
 } context_s;
 
+char *node_to_string(int level, node_s *n)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  if (n == NULL)
+  {
+    flu_sbprintf(b, "*** (nil)");
+  }
+  else
+  {
+    int p = (n->parent == NULL) ? -1 : n->parent->nodenumber;
+    for (int i = 0; i < level; i++) flu_sbputs(b, " ");
+    flu_sbprintf(b, "\\-- n:%d i:%d t:%c ", n->nodenumber, n->indent, n->type);
+    flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
+    for (int i = 0; i < level; i++) flu_sbputs(b, " ");
+    flu_sbprintf(b, "    ti: >%s<\n", n->title);
+    for (size_t i = 0; ; i++)
+    {
+      node_s *cn = n->children[i];
+      if (cn == NULL) break;
+      flu_sbputs(b, node_to_string(level + 1, cn));
+    }
+  }
+
+  return flu_sbuffer_to_string(b);
+}
+
 void push_line(context_s *c, char *l)
 {
   node_s *n = c->node;
@@ -86,7 +113,7 @@ void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
   n->lines = NULL;
   n->children = calloc(NODE_MAX_CHILDREN + 1, sizeof(node_s *));
 
-  for (int i = 0; ; i++)
+  for (size_t i = 0; ; i++)
   {
     if (cn == NULL) break;
     if (cn->children[i] != NULL) continue;
@@ -449,6 +476,9 @@ void process_lines(context_s *c, char *path)
 void print_body(FILE *out, context_s *c)
 {
   // TODO
+  node_s *n = c->node;
+  while (n->parent != NULL) n = n->parent;
+  puts(node_to_string(0, n));
 }
 
 void print_footer(FILE *out, context_s *c)
