@@ -477,7 +477,8 @@ void add_spec_files(int *count, char **names, char *path)
   struct dirent *ep;
   while ((ep = readdir(dir)) != NULL)
   {
-    char *fn = flu_sprintf("%s/%s", path, ep->d_name);
+    char *fn = flu_sprintf(
+      path[strlen(path) - 1] == '/' ? "%s%s" : "%s/%s", path, ep->d_name);
 
     add_spec_file(count, names, fn);
 
