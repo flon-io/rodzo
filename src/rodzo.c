@@ -178,23 +178,21 @@ char **list_titles(node_s *node)
   return r;
 }
 
-size_t str_neuter_copy(char *target, char *source)
+char *str_neuter(char *s)
 {
-  size_t c = 0;
-  for (size_t i = 0; ; i++)
+  for (size_t i, j = 0; ; i++)
   {
-    char cs = source[i];
-    if (cs == '\\') { i++; continue; }
-    if (cs == '\0') break;
-    target[c++] = cs;
+    char c = s[i];
+    if (c == '\\') { i++; continue; }
+    s[j++] = c;
+    if (c == '\0') break;
   }
-  return c;
+
+  return s;
 }
 
 char *list_titles_as_literal(context_s *c)
 {
-  // TODO: use/adapt str_neuter_copy()
-
   flu_sbuffer *b = flu_sbuffer_malloc();
 
   char **titles = list_titles(c->node);
@@ -204,7 +202,7 @@ char *list_titles_as_literal(context_s *c)
 
   while (*t != NULL)
   {
-    flu_sbprintf(b, "\"%s\", ", *t);
+    flu_sbprintf(b, "\"%s\", ", str_neuter(*t));
     free(*t);
     t++;
   }
