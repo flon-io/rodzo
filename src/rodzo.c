@@ -48,6 +48,7 @@ typedef struct node_s {
   char *title;
   char *fname;
   int lstart;
+  flu_sbuffer *lines;
   struct node_s **children;
 } node_s;
 
@@ -328,17 +329,19 @@ int count_lines(char *s)
   return count;
 }
 
-void process_lines(FILE *out, context_s *c, char *path)
+void process_lines(context_s *c, char *path)
 {
-  fprintf(out, "\n");
-  fprintf(out, "  /*\n");
-  fprintf(out, "   * %s\n", path);
-  fprintf(out, "   */\n");
+  push(c, 0, 'g', NULL, path, 0);
+
+  //fprintf(out, "\n");
+  //fprintf(out, "  /*\n");
+  //fprintf(out, "   * %s\n", path);
+  //fprintf(out, "   */\n");
 
   FILE *in = fopen(path, "r");
   if (in == NULL) return;
 
-  int varcount = 0;
+  //int varcount = 0;
 
   int lnumber = 0;
   char *line = NULL;
@@ -360,21 +363,21 @@ void process_lines(FILE *out, context_s *c, char *path)
 
     if (strcmp(head, "{") == 0 && indent == cindent)
     {
-      // do not output
+      // do nothing
     }
     else if (strcmp(head, "}") == 0 && indent == cindent)
     {
       pull(c);
-      if (ctype == 'i')
-      {
-        fprintf(out, "  return 1;\n");
-        fprintf(out, "%s", line);
-      }
+      //if (ctype == 'i')
+      //{
+      //  fprintf(out, "  return 1;\n");
+      //  fprintf(out, "%s", line);
+      //}
     }
     else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
     {
-      fprintf(out, "  // %s\n", head);
-      fprintf(out, "  //\n");
+      //fprintf(out, "  // %s\n", head);
+      //fprintf(out, "  //\n");
       push(c, indent, 'g', head, path, lnumber);
     }
     else if (strcmp(head, "describe") == 0)
@@ -388,36 +391,38 @@ void process_lines(FILE *out, context_s *c, char *path)
     else if (strcmp(head, "it") == 0)
     {
       push(c, indent, 'i', title, path, lnumber);
-      char *s = list_titles_as_literal(c);
-      fprintf(out, "\n");
-      fprintf(out, "int it_%i()\n", c->itcount);
-      fprintf(out, "{\n");
-      fprintf(out, "  char *_s[] = %s;\n", s);
-      fprintf(out, "  char *_fn = \"%s\";\n", path);
-      free(s);
+      //char *s = list_titles_as_literal(c);
+      //fprintf(out, "\n");
+      //fprintf(out, "int it_%i()\n", c->itcount);
+      //fprintf(out, "{\n");
+      //fprintf(out, "  char *_s[] = %s;\n", s);
+      //fprintf(out, "  char *_fn = \"%s\";\n", path);
+      //free(s);
     }
     else if (strcmp(head, "ensure") == 0)
     {
       char *l = strpbrk(line, "e");
       char *con = extract_condition(in, l + 6);
       lnumber += count_lines(con);
-      fprintf(
-        out,
-        "  int r%i = %s", varcount, con);
-      fprintf(
-        out,
-        "    rdz_record(r%i, _s, %i, _fn, %d);\n",
-        varcount, c->itcount, lnumber);
-      fprintf(
-        out,
-        "    if ( ! r%i) return 0;\n",
-        varcount);
+      //fprintf(
+      //  out,
+      //  "  int r%i = %s", varcount, con);
+      //fprintf(
+      //  out,
+      //  "    rdz_record(r%i, _s, %i, _fn, %d);\n",
+      //  varcount, c->itcount, lnumber);
+      //fprintf(
+      //  out,
+      //  "    if ( ! r%i) return 0;\n",
+      //  varcount);
+      //++varcount;
       free(con);
-      ++varcount;
+      push(c, indent, 'e', title, path, lnumber);
     }
     else
     {
-      fprintf(out, "%s", line);
+      //fprintf(out, "%s", line);
+      push(c, 0, 'l', line, path, lnumber);
     }
 
     free(head);
@@ -429,6 +434,11 @@ void process_lines(FILE *out, context_s *c, char *path)
 }
 
 #include "header.c"
+
+void print_body(FILE *out, context_s *c)
+{
+  // TODO
+}
 
 void print_footer(FILE *out, context_s *c)
 {
@@ -540,7 +550,23 @@ int main(int argc, char *argv[])
 
   if (c->out_fname == NULL) c->out_fname = strdup("spec.c");
 
-  // begin work
+  // reads specs, grow tree
+
+  char **fnames = list_spec_files(argc, argv);
+
+  for (int i = 0; ; i++)
+  {
+    if (fnames[i] == NULL) break;
+
+    printf(". processing %s\n", fnames[i]);
+
+    process_lines(c, fnames[i]);
+
+    free(fnames[i]);
+  }
+  free(fnames);
+
+  // write
 
   FILE *out = fopen(c->out_fname, "wb");
 
@@ -554,22 +580,10 @@ int main(int argc, char *argv[])
   }
 
   print_header(out);
-
-  char **fnames = list_spec_files(argc, argv);
-
-  for (int i = 0; ; i++)
-  {
-    if (fnames[i] == NULL) break;
-
-    printf(". processing %s\n", fnames[i]);
-
-    process_lines(out, c, fnames[i]);
-
-    free(fnames[i]);
-  }
-  free(fnames);
-
+  print_body(out, c);
   print_footer(out, c);
+
+  // over
 
   fclose(out);
 
