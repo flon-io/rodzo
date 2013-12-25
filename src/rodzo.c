@@ -114,6 +114,7 @@ void free_node(node_s *n)
     if (c == NULL) break;
     free_node(c);
   }
+  free(n->children);
 
   free(n);
 }
