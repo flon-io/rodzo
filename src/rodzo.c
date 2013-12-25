@@ -60,6 +60,14 @@ typedef struct context_s {
   flu_sbuffer *mainbody;
 } context_s;
 
+void push_line(context_s *c, char *l)
+{
+  node_s *n = c->node;
+  if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
+  //flu_sbprint(n->lines, "%s", l);
+  flu_sbputs(n->lines, l);
+}
+
 void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
 {
   if (title != NULL) title = strdup(title);
@@ -75,6 +83,7 @@ void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
   n->title = title;
   n->fname = fn;
   n->lstart = lstart;
+  n->lines = NULL;
   n->children = calloc(NODE_MAX_CHILDREN + 1, sizeof(node_s *));
 
   for (int i = 0; ; i++)
@@ -108,6 +117,8 @@ void free_node(node_s *n)
 {
   free(n->title);
   free(n->fname);
+
+  flu_sbuffer_free(n->lines);
 
   for (size_t i = 0; ; i++)
   {
@@ -149,11 +160,11 @@ void pull(context_s *c)
   c->node = n->parent;
 }
 
-char current_type(context_s *c)
-{
-  if (c->node == NULL) return 'X';
-  return c->node->type;
-}
+//char current_type(context_s *c)
+//{
+//  if (c->node == NULL) return 'X';
+//  return c->node->type;
+//}
 
 int current_indent(context_s *c)
 {
@@ -182,7 +193,7 @@ char **list_titles(node_s *node)
 
 char *str_neuter(char *s)
 {
-  for (size_t i, j = 0; ; i++)
+  for (size_t i = 0, j = 0; ; i++)
   {
     char c = s[i];
     if (c == '\\') { i++; continue; }
@@ -358,7 +369,7 @@ void process_lines(context_s *c, char *path)
     //printf("head: >%s<\n", head);
     //printf("  title: >%s<\n", title);
 
-    char ctype = current_type(c);
+    //char ctype = current_type(c);
     int cindent = current_indent(c);
 
     if (strcmp(head, "{") == 0 && indent == cindent)
@@ -422,7 +433,7 @@ void process_lines(context_s *c, char *path)
     else
     {
       //fprintf(out, "%s", line);
-      push(c, 0, 'l', line, path, lnumber);
+      push_line(c, line);
     }
 
     free(head);

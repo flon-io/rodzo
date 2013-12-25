@@ -57,6 +57,19 @@ flu_sbuffer *flu_sbuffer_malloc()
   return b;
 }
 
+void flu_sbuffer_free(flu_sbuffer *b)
+{
+  if (b == NULL) return;
+
+  if (b->stream != NULL)
+  {
+    fclose(b->stream);
+    //b->stream = NULL;
+    free(b->string);
+  }
+  free(b);
+}
+
 int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap)
 {
   if (b->stream == NULL) return 0;
@@ -71,6 +84,11 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
   va_end(ap);
 
   return r;
+}
+
+int flu_sbputs(flu_sbuffer *b, char *s)
+{
+  return fputs(s, b->stream);
 }
 
 int flu_sbuffer_close(flu_sbuffer *b)

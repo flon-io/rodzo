@@ -53,6 +53,11 @@ typedef struct flu_sbuffer {
 flu_sbuffer *flu_sbuffer_malloc();
 
 /*
+ * Frees the sbuffer (closes the stream and frees the string if necessary).
+ */
+void flu_sbuffer_free(flu_sbuffer *b);
+
+/*
  * Formats input and writes into buffer. Takes a va_list.
  */
 int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap);
@@ -61,6 +66,11 @@ int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap);
  * Formats input and writes into buffer. Called like printf is called.
  */
 int flu_sbprintf(flu_sbuffer *b, const char *format, ...);
+
+/*
+ * The equivalent of fputs(). Warning: the buffer is the first argument.
+ */
+int flu_sbputs(flu_sbuffer *b, char *s);
 
 /*
  * Closes the buffer (stream) which causes the string to be made available.
