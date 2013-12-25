@@ -34,7 +34,7 @@
 
 #include "flutil.h"
 
-#define TITLE_MAX_LENGTH 210
+#define NODE_MAX_CHILDREN 128
 
 
 //
@@ -48,6 +48,7 @@ typedef struct node_s {
   char *title;
   char *fname;
   int lstart;
+  struct node_s **children;
 } node_s;
 
 typedef struct context_s {
@@ -63,14 +64,25 @@ void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
   if (title != NULL) title = strdup(title);
   if (fn != NULL) fn = strdup(fn);
 
+  node_s *cn = c->node;
+
   node_s *n = malloc(sizeof(node_s));
-  n->parent = c->node;
+  n->parent = cn;
   n->nodenumber = c->nodecount++;
   n->indent = ind;
   n->type = type;
   n->title = title;
   n->fname = fn;
   n->lstart = lstart;
+  n->children = calloc(NODE_MAX_CHILDREN + 1, sizeof(node_s *));
+
+  for (int i = 0; ; i++)
+  {
+    if (cn == NULL) break;
+    if (cn->children[i] != NULL) continue;
+    cn->children[i] = n;
+    break;
+  }
 
   c->node = n;
 
@@ -91,19 +103,23 @@ context_s *malloc_context()
   return c;
 }
 
-void free_node(node_s *l)
+void free_node(node_s *n)
 {
-  free(l->title);
-  free(l->fname);
-  free(l);
+  free(n->title);
+  free(n->fname);
+
+  for (size_t i = 0; ; i++)
+  {
+    node_s *c = n->children[i];
+    if (c == NULL) break;
+    free_node(c);
+  }
+
+  free(n);
 }
 
 void clear_tree(context_s *c)
 {
-  //while (c->node != NULL) pull(c);
-
-  // TODO: go to root and clear children from there...
-
   node_s *n = c->node;
   while (n->parent != NULL) n = n->parent;
 
@@ -146,7 +162,7 @@ int current_indent(context_s *c)
 char **list_titles(node_s *node)
 {
   char **a = malloc(256 * sizeof(char *));
-  int c = 0;
+  size_t c = 0;
   node_s *n = node;
   while (n != NULL)
   {
@@ -155,11 +171,7 @@ char **list_titles(node_s *node)
   }
 
   char **r = calloc(c + 1, sizeof(char *));
-  for (int i = 0; ; i++)
-  {
-    if (c < 0) break;
-    r[i] = a[--c];
-  }
+  for (size_t i = 0; c > 0; ) r[i++] = a[--c];
 
   free(a);
 
