@@ -572,11 +572,7 @@ int main(int argc, char *argv[])
 
   if (out == NULL)
   {
-    char *msg = malloc((32 + strlen(c->out_fname)) * sizeof(char));
-    sprintf(msg, "couldn't open %s file for writing", c->out_fname);
-    perror(msg); // TODO: replace with die()
-    free(msg);
-    return 1;
+    flu_die(1, "couldn't open %s file for writing", c->out_fname);
   }
 
   print_header(out);

@@ -109,3 +109,25 @@ char *flu_sprintf(const char *format, ...)
   return s;
 }
 
+
+//
+// die
+
+void flu_die(int exit_value, const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+
+  flu_sbuffer *b = flu_sbuffer_malloc();
+  flu_vsbprintf(b, format, ap);
+  char *s = flu_sbuffer_to_string(b);
+
+  perror(s);
+
+  free(s);
+
+  va_end(ap);
+
+  exit(exit_value);
+}
+

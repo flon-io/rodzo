@@ -37,6 +37,7 @@
  */
 int flu_strends(char *s, char *end);
 
+
 //
 // sbuffer
 
@@ -82,4 +83,15 @@ char *flu_sbuffer_to_string(flu_sbuffer *b);
  * Returns NULL in case of issue.
  */
 char *flu_sprintf(const char *format, ...);
+
+
+//
+// die
+
+/*
+ * Makes the process exit with the given exit_value. Right before
+ * that it does perror(msg) where msg is composed with the given format
+ * and arguments.
+ */
+void flu_die(int exit_value, const char *format, ...);
 
