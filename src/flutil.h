@@ -42,6 +42,11 @@ int flu_strends(char *s, char *end);
  */
 char *flu_strrtrim(char *s);
 
+/*
+ * Returns a trimmed copy of the string, left and right.
+ */
+char *flu_strtrim(s);
+
 
 //
 // sbuffer

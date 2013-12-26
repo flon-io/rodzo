@@ -65,8 +65,10 @@ char *type_to_string(char t)
   if (t == 'd') return "describe";
   if (t == 'c') return "context";
   if (t == 'i') return "it";
-  if (t == 'b') return "before";
-  if (t == 'a') return "after";
+  if (t == 'b') return "before each";
+  if (t == 'B') return "before all";
+  if (t == 'a') return "after each";
+  if (t == 'A') return "after all";
   if (t == 'g') return "g";
   if (t == 'G') return "G";
   return "???";
@@ -424,9 +426,23 @@ void process_lines(context_s *c, char *path)
     {
       pull(c, lnumber + 1);
     }
-    else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
+    //else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
+    //{
+    //  push(c, indent, 'g', head, path, lnumber);
+    //}
+    else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {
-      push(c, indent, 'g', head, path, lnumber);
+      char *tline = flu_strtrim(line);
+      char t = 'b';
+      if (strncmp(tline, "before all", 10) == 0) t = 'B';
+      else if (strncmp(tline, "after each", 10) == 0) t = 'a';
+      else if (strncmp(tline, "after all", 9) == 0) t = 'A';
+      push(c, indent, t, tline, path, lnumber);
+      free(tline);
+    }
+    else if (strcmp(head, "after") == 0)
+    {
+      // ...
     }
     else if (strcmp(head, "describe") == 0)
     {
@@ -483,6 +499,7 @@ void print_node(FILE *out, node_s *n)
   char t = n->type;
 
   if (t == 'a' || t == 'b') return;
+  if (t == 'A' || t == 'B') return;
 
   char *ind;
   if (n->indent > 0)
@@ -501,9 +518,11 @@ void print_node(FILE *out, node_s *n)
   }
   else if (t == 'd' || t == 'c' || t == 'i')
   {
-    if (t == 'i') fprintf(out, "\n");
+    fprintf(
+      out, "\n");
     fprintf(
       out, "%s// %s \"%s\" li%d\n", ind, type_to_string(t), n->text, n->lstart);
+
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
@@ -546,7 +565,7 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  //char *s = node_to_string(n); puts(s); free(s); // prints debug tree
+  char *s = node_to_string(n); puts(s); free(s); // prints debug tree
 
   print_node(out, n);
 }

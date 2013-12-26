@@ -7,13 +7,18 @@
 
 #include "aabro.h"
 
-globally
-{
-  char *global_string = NULL;
-}
+char *global_string = NULL;
 
 describe "abr_node"
 {
+  before all
+  {
+    printf("BEFORE ALL\n");
+  }
+  after all
+  {
+    printf("AFTER ALL\n");
+  }
   describe "abr_malloc_node()"
   {
     it "creates a node"
@@ -26,7 +31,11 @@ describe "abr_node"
     before each
     //before each inline
     {
-      do_something();
+      printf("before each\n");
+    }
+    after each
+    {
+      printf("after each\n");
     }
     it "returns a string representation of the node"
     {
@@ -41,12 +50,5 @@ describe "abr_node"
       ensure(4 == 5);
     }
   }
-}
-
-finally
-{
-}
-literally
-{
 }
 

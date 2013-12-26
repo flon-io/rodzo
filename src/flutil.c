@@ -56,6 +56,23 @@ char *flu_strrtrim(char *s)
     if (c == ' ' || c == '\t' || c == '\n' || c == '\r') r[l - 1] = '\0';
     else break;
   }
+
+  return r;
+}
+
+char *flu_strtrim(s)
+{
+  char *s1 = flu_strrtrim(s);
+  char *s2 = s1;
+  while (1)
+  {
+    char c = *s2;
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') ++s2;
+    else break;
+  }
+  char *r = strdup(s2);
+  free(s1);
+
   return r;
 }
 
