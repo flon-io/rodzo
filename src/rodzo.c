@@ -69,10 +69,20 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
   else
   {
     int p = n->parent == NULL ? -1 : n->parent->nodenumber;
-    char *te = flu_strrtrim(n->text == NULL ? "nil" : n->text);
+    char t = n->type;
+    char *te = n->text != NULL ? n->text : "(nil)";
+    if (flu_strends(te, "\n")) te = flu_strrtrim(te); else te = strdup(te);
 
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
-    flu_sbprintf(b, "\\-- n:%d i:%d t:%c ", n->nodenumber, n->indent, n->type);
+    flu_sbprintf(b, "\\-- ");
+    if (t == 'd') flu_sbputs(b, "describe");
+    else if (t == 'c') flu_sbputs(b, "context");
+    else if (t == 'i') flu_sbputs(b, "it");
+    else if (t == 'e') flu_sbputs(b, "ensure");
+    else if (t == 'b') flu_sbputs(b, "before");
+    else if (t == 'a') flu_sbputs(b, "after");
+    else flu_sbprintf(b, "%c", t);
+    flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "    te: >%s<\n", te);
