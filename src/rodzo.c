@@ -45,7 +45,7 @@ typedef struct node_s {
   int nodenumber;
   int indent;
   char type;
-  char *title;
+  char *text;
   char *fname;
   int lstart;
   flu_sbuffer *lines;
@@ -69,15 +69,15 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
   else
   {
     int p = n->parent == NULL ? -1 : n->parent->nodenumber;
-    char *ti = flu_strrtrim(n->title == NULL ? "nil" : n->title);
+    char *te = flu_strrtrim(n->text == NULL ? "nil" : n->text);
 
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "\\-- n:%d i:%d t:%c ", n->nodenumber, n->indent, n->type);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
-    flu_sbprintf(b, "    ti: >%s<\n", ti);
+    flu_sbprintf(b, "    te: >%s<\n", te);
 
-    free(ti);
+    free(te);
 
     for (size_t i = 0; n->children[i] != NULL; i++)
     {
@@ -101,9 +101,9 @@ void push_line(context_s *c, char *l)
   flu_sbputs(n->lines, l);
 }
 
-void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
+void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 {
-  if (title != NULL) title = strdup(title);
+  if (text != NULL) text = strdup(text);
   if (fn != NULL) fn = strdup(fn);
 
   node_s *cn = c->node;
@@ -113,7 +113,7 @@ void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
   n->nodenumber = c->nodecount++;
   n->indent = ind;
   n->type = type;
-  n->title = title;
+  n->text = text;
   n->fname = fn;
   n->lstart = lstart;
   n->lines = NULL;
@@ -148,7 +148,7 @@ context_s *malloc_context()
 
 void free_node(node_s *n)
 {
-  free(n->title);
+  free(n->text);
   free(n->fname);
 
   flu_sbuffer_free(n->lines);
@@ -205,14 +205,14 @@ int current_indent(context_s *c)
   return c->node->indent;
 }
 
-char **list_titles(node_s *node)
+char **list_texts(node_s *node)
 {
   char **a = malloc(256 * sizeof(char *));
   size_t c = 0;
   node_s *n = node;
   while (n != NULL)
   {
-    if (n->title != NULL) a[c++] = strdup(n->title);
+    if (n->text != NULL) a[c++] = strdup(n->text);
     n = n->parent;
   }
 
@@ -237,12 +237,12 @@ char *str_neuter(char *s)
   return s;
 }
 
-char *list_titles_as_literal(context_s *c)
+char *list_texts_as_literal(context_s *c)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  char **titles = list_titles(c->node);
-  char **t = titles;
+  char **texts = list_texts(c->node);
+  char **t = texts;
 
   flu_sbprintf(b, "{ ");
 
@@ -253,7 +253,7 @@ char *list_titles_as_literal(context_s *c)
     t++;
   }
 
-  free(titles);
+  free(texts);
 
   flu_sbprintf(b, "NULL }");
 
@@ -305,7 +305,7 @@ char *extract_string(char *line)
   return NULL;
 }
 
-char *extract_title(char *line)
+char *extract_text(char *line)
 {
   char *start = strpbrk(line, "\"");
   if (start == NULL) return NULL;
@@ -386,10 +386,10 @@ void process_lines(context_s *c, char *path)
 
     int indent = extract_indent(line);
     char *head = extract_head(line);
-    char *title = extract_title(line);
+    char *text = extract_text(line);
 
     //printf("head: >%s<\n", head);
-    //printf("  title: >%s<\n", title);
+    //printf("  text: >%s<\n", text);
 
     //char ctype = current_type(c);
     int cindent = current_indent(c);
@@ -415,16 +415,16 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "describe") == 0)
     {
-      push(c, indent, 'd', title, path, lnumber);
+      push(c, indent, 'd', text, path, lnumber);
     }
     else if (strcmp(head, "context") == 0)
     {
-      push(c, indent, 'c', title, path, lnumber);
+      push(c, indent, 'c', text, path, lnumber);
     }
     else if (strcmp(head, "it") == 0)
     {
-      push(c, indent, 'i', title, path, lnumber);
-      //char *s = list_titles_as_literal(c);
+      push(c, indent, 'i', text, path, lnumber);
+      //char *s = list_texts_as_literal(c);
       //fprintf(out, "\n");
       //fprintf(out, "int it_%i()\n", c->itcount);
       //fprintf(out, "{\n");
@@ -459,7 +459,7 @@ void process_lines(context_s *c, char *path)
     }
 
     free(head);
-    free(title);
+    free(text);
   }
 
   free(line);
