@@ -47,6 +47,20 @@ int flu_strends(char *s, char *end)
   return (strncmp(s + ls - le, end, le) == 0);
 }
 
+char *flu_strrtrim(char *s)
+{
+  char *r = strdup(s);
+  for (size_t l = strlen(r); l > 0; l--)
+  {
+    char c = r[l - 1];
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+      r[l - 1] = '\0';
+      break;
+    }
+  }
+  return r;
+}
+
 //
 // sbuffer
 

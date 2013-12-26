@@ -70,12 +70,14 @@ char *node_to_string(int level, node_s *n)
   }
   else
   {
-    int p = (n->parent == NULL) ? -1 : n->parent->nodenumber;
+    int p = n->parent == NULL ? -1 : n->parent->nodenumber;
+    char *ti = n->title == NULL ? "nil" : flu_strrtrim(n->title);
+
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "\\-- n:%d i:%d t:%c ", n->nodenumber, n->indent, n->type);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
-    flu_sbprintf(b, "    ti: >%s<\n", n->title);
+    flu_sbprintf(b, "    ti: >%s<\n", ti);
     for (size_t i = 0; ; i++)
     {
       node_s *cn = n->children[i];
@@ -121,7 +123,7 @@ void push(context_s *c, int ind, char type, char *title, char *fn, int lstart)
     break;
   }
 
-  c->node = n;
+  if (type != 'e') c->node = n;
 
   if (type == 'i') c->itcount++;
 }
@@ -268,22 +270,11 @@ int extract_indent(char *line)
   return -1;
 }
 
-char *str_rtrim(char *s)
-{
-  char *r = strdup(s);
-  for (size_t l = strlen(r); l > 0; l--)
-  {
-    char c = r[l - 1];
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') r[l - 1] = '\0';
-  }
-  return r;
-}
-
 char *extract_head(char *line)
 {
   char *stop = strpbrk(line, "     (");
 
-  if (stop == NULL) return str_rtrim(line);
+  if (stop == NULL) return flu_strrtrim(line);
   if (stop == line) return extract_head(line + 1);
   return strndup(line, stop - line);
 }
@@ -454,8 +445,8 @@ void process_lines(context_s *c, char *path)
       //  "    if ( ! r%i) return 0;\n",
       //  varcount);
       //++varcount;
+      push(c, indent, 'e', con, path, lnumber);
       free(con);
-      push(c, indent, 'e', title, path, lnumber);
     }
     else
     {
