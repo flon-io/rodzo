@@ -53,10 +53,8 @@ char *flu_strrtrim(char *s)
   for (size_t l = strlen(r); l > 0; l--)
   {
     char c = r[l - 1];
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-      r[l - 1] = '\0';
-      break;
-    }
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') r[l - 1] = '\0';
+    else break;
   }
   return r;
 }

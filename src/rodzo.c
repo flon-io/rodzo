@@ -70,8 +70,7 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
   {
     int p = n->parent == NULL ? -1 : n->parent->nodenumber;
     char t = n->type;
-    char *te = n->text != NULL ? n->text : "(nil)";
-    if (flu_strends(te, "\n")) te = flu_strrtrim(te); else te = strdup(te);
+    char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
 
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "\\-- ");
