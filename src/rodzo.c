@@ -60,10 +60,8 @@ typedef struct context_s {
   flu_sbuffer *mainbody;
 } context_s;
 
-char *node_to_string(int level, node_s *n)
+void node_to_s(flu_sbuffer *b, int level, node_s *n)
 {
-  flu_sbuffer *b = flu_sbuffer_malloc();
-
   if (n == NULL)
   {
     flu_sbprintf(b, "*** (nil)");
@@ -71,21 +69,27 @@ char *node_to_string(int level, node_s *n)
   else
   {
     int p = n->parent == NULL ? -1 : n->parent->nodenumber;
-    char *ti = n->title == NULL ? "nil" : flu_strrtrim(n->title);
+    char *ti = flu_strrtrim(n->title == NULL ? "nil" : n->title);
 
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "\\-- n:%d i:%d t:%c ", n->nodenumber, n->indent, n->type);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
     for (int i = 0; i < level; i++) flu_sbputs(b, " ");
     flu_sbprintf(b, "    ti: >%s<\n", ti);
-    for (size_t i = 0; ; i++)
+
+    free(ti);
+
+    for (size_t i = 0; n->children[i] != NULL; i++)
     {
-      node_s *cn = n->children[i];
-      if (cn == NULL) break;
-      flu_sbputs(b, node_to_string(level + 1, cn));
+      node_to_s(b, level + 1, n->children[i]);
     }
   }
+}
 
+char *node_to_string(node_s *n)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+  node_to_s(b, 0, n);
   return flu_sbuffer_to_string(b);
 }
 
@@ -469,7 +473,9 @@ void print_body(FILE *out, context_s *c)
   // TODO
   node_s *n = c->node;
   while (n->parent != NULL) n = n->parent;
-  puts(node_to_string(0, n));
+  char *s = node_to_string(n);
+  puts(s);
+  free(s);
 }
 
 void print_footer(FILE *out, context_s *c)
