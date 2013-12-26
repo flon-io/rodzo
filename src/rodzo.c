@@ -60,6 +60,18 @@ typedef struct context_s {
   flu_sbuffer *mainbody;
 } context_s;
 
+char *type_to_string(char t)
+{
+  if (t == 'd') return "describe";
+  if (t == 'c') return "context";
+  if (t == 'i') return "it";
+  if (t == 'b') return "before";
+  if (t == 'a') return "after";
+  if (t == 'g') return "g";
+  if (t == 'G') return "G";
+  return "???";
+}
+
 void node_to_s(flu_sbuffer *b, int level, node_s *n)
 {
   if (n == NULL)
@@ -73,14 +85,7 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
 
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
-    flu_sbprintf(b, "|-- ");
-    if (t == 'd') flu_sbputs(b, "describe");
-    else if (t == 'c') flu_sbputs(b, "context");
-    else if (t == 'i') flu_sbputs(b, "it");
-    else if (t == 'e') flu_sbputs(b, "ensure");
-    else if (t == 'b') flu_sbputs(b, "before");
-    else if (t == 'a') flu_sbputs(b, "after");
-    else flu_sbprintf(b, "%c", t);
+    flu_sbprintf(b, "|-- %s", type_to_string(t));
     flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
@@ -105,9 +110,18 @@ char *node_to_string(node_s *n)
 void push_line(context_s *c, char *l)
 {
   node_s *n = c->node;
-  printf("push_line() to node: %d >%s", n->nodenumber, l);
+  //printf("push_line() to node: %d >%s", n->nodenumber, l);
   if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
   flu_sbputs(n->lines, l);
+}
+void push_linef(context_s *c, const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  node_s *n = c->node;
+  if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
+  flu_vsbprintf(n->lines, format, ap);
+  va_end(ap);
 }
 
 void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
@@ -163,7 +177,8 @@ void free_node(node_s *n)
   free(n->text);
   free(n->fname);
 
-  flu_sbuffer_free(n->lines);
+  //flu_sbuffer_free(n->lines);
+    // freed from print_body()
 
   for (size_t i = 0; ; i++)
   {
@@ -197,7 +212,7 @@ void pull(context_s *c, int lnumber)
 
   if (n->type == 'i')
   {
-    flu_sbprintf(c->mainbody, "  it_%d();\n", c->itcount);
+    flu_sbprintf(c->mainbody, "  it_%d();\n", n->nodenumber);
   }
 
   c->node = n->parent;
@@ -386,7 +401,7 @@ void process_lines(context_s *c, char *path)
   FILE *in = fopen(path, "r");
   if (in == NULL) return;
 
-  //int varcount = 0;
+  int varcount = 0;
 
   int lnumber = 0;
   char *line = NULL;
@@ -413,16 +428,9 @@ void process_lines(context_s *c, char *path)
     else if (strcmp(head, "}") == 0 && indent == cindent)
     {
       pull(c, lnumber + 1);
-      //if (ctype == 'i')
-      //{
-      //  fprintf(out, "  return 1;\n");
-      //  fprintf(out, "%s", line);
-      //}
     }
     else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
     {
-      //fprintf(out, "  // %s\n", head);
-      //fprintf(out, "  //\n");
       push(c, indent, 'g', head, path, lnumber);
     }
     else if (strcmp(head, "describe") == 0)
@@ -436,33 +444,29 @@ void process_lines(context_s *c, char *path)
     else if (strcmp(head, "it") == 0)
     {
       push(c, indent, 'i', text, path, lnumber);
-      //char *s = list_texts_as_literal(c);
-      //fprintf(out, "\n");
-      //fprintf(out, "int it_%i()\n", c->itcount);
-      //fprintf(out, "{\n");
-      //fprintf(out, "  char *_s[] = %s;\n", s);
-      //fprintf(out, "  char *_fn = \"%s\";\n", path);
-      //free(s);
     }
     else if (strcmp(head, "ensure") == 0)
     {
       char *l = strpbrk(line, "e");
       char *con = extract_condition(in, l + 6);
       lnumber += count_lines(con);
-      //fprintf(
-      //  out,
-      //  "  int r%i = %s", varcount, con);
-      //fprintf(
-      //  out,
-      //  "    rdz_record(r%i, _s, %i, _fn, %d);\n",
-      //  varcount, c->itcount, lnumber);
-      //fprintf(
-      //  out,
-      //  "    if ( ! r%i) return 0;\n",
-      //  varcount);
-      //++varcount;
-      push(c, indent, 'e', con, path, lnumber);
+
+      char *ind = calloc(indent + 1, sizeof(char));
+      for (size_t i = 0; i < indent; i++) ind[i] = ' ';
+
+      push_linef(
+        c, "%sint r%i = %s",
+        ind, varcount, con);
+      push_linef(
+        c, "%s  rdz_record(r%i, _s, %i, _fn, %d); ",
+        ind, varcount, c->node->nodenumber, lnumber);
+      push_linef(
+        c, "if ( ! r%i) return 0;\n",
+        varcount);
+
+      free(ind);
       free(con);
+      ++varcount;
     }
     else
     {
@@ -480,14 +484,70 @@ void process_lines(context_s *c, char *path)
 
 #include "header.c"
 
+void print_node(FILE *out, node_s *n)
+{
+  char t = n->type;
+
+  if (t == 'a' || t == 'b') return;
+
+  char *ind;
+  if (n->indent > 0)
+  {
+    ind = calloc(n->indent + 1, sizeof(char));
+    for (size_t i = 0; i < n->indent; i++) ind[i] = ' ';
+  }
+  else
+  {
+    ind = strdup("");
+  }
+
+  if (t == 'g' && n->lstart == 0)
+  {
+    printf("// file %s\n", n->fname);
+  }
+  else if (t == 'd' || t == 'c' || t == 'i')
+  {
+    if (t == 'i') printf("\n");
+    printf("%s// %s \"%s\" li%d\n", ind, type_to_string(t), n->text, n->lstart);
+    if (t == 'i') printf("%s//\n", ind);
+  }
+
+  if (t == 'i')
+  {
+    printf("%sint it_%d()\n", ind, n->nodenumber);
+    printf("%s{\n", ind);
+  }
+
+  if (n->lines != NULL)
+  {
+    char *s = flu_sbuffer_to_string(n->lines);
+    puts(s);
+    free(s);
+  }
+
+  if (t == 'i')
+  {
+    printf("%s  return 1;\n", ind);
+    printf("%s}\n", ind);
+  }
+
+  free(ind);
+
+  for (size_t i = 0; ; i++)
+  {
+    node_s *cn = n->children[i];
+    if (cn == NULL) break;
+    print_node(out, cn);
+  }
+}
+
 void print_body(FILE *out, context_s *c)
 {
-  // TODO
-  node_s *n = c->node;
-  while (n->parent != NULL) n = n->parent;
-  char *s = node_to_string(n);
-  puts(s);
-  free(s);
+  node_s *n = c->node; while (n->parent != NULL) n = n->parent;
+
+  //char *s = node_to_string(n); puts(s); free(s);
+
+  print_node(out, n);
 }
 
 void print_footer(FILE *out, context_s *c)
