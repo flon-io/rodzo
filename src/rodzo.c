@@ -72,8 +72,8 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     char t = n->type;
     char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
 
-    for (int i = 0; i < level; i++) flu_sbputs(b, " ");
-    flu_sbprintf(b, "\\-- ");
+    for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+    flu_sbprintf(b, "|-- ");
     if (t == 'd') flu_sbputs(b, "describe");
     else if (t == 'c') flu_sbputs(b, "context");
     else if (t == 'i') flu_sbputs(b, "it");
@@ -83,8 +83,8 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     else flu_sbprintf(b, "%c", t);
     flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
     flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
-    for (int i = 0; i < level; i++) flu_sbputs(b, " ");
-    flu_sbprintf(b, "    te: >%s<\n", te);
+    for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+    flu_sbprintf(b, "|   te: >%s<\n", te);
 
     free(te);
 
@@ -114,6 +114,9 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 {
   if (text != NULL) text = strdup(text);
   if (fn != NULL) fn = strdup(fn);
+
+  if (ind == 0) while (c->node->parent != NULL) c->node = c->node->parent;
+    // if indentation is 0, go back to trunk
 
   node_s *cn = c->node;
 
@@ -150,7 +153,7 @@ context_s *malloc_context()
   c->out_fname = NULL;
   c->mainbody = flu_sbuffer_malloc();
 
-  push(c, 0, 'g', NULL, NULL, -1);
+  push(c, -1, 'G', NULL, NULL, -1);
 
   return c;
 }
@@ -175,10 +178,8 @@ void free_node(node_s *n)
 
 void clear_tree(context_s *c)
 {
-  node_s *n = c->node;
-  while (n->parent != NULL) n = n->parent;
-
-  free_node(n);
+  while (c->node->parent != NULL) c->node = c->node->parent;
+  free_node(c->node);
 }
 
 void free_context(context_s *c)
@@ -190,16 +191,18 @@ void free_context(context_s *c)
   free(c);
 }
 
-void pull(context_s *c)
+void pull(context_s *c, int lnumber)
 {
   node_s *n = c->node;
 
   if (n->type == 'i')
   {
-    flu_sbprintf(c->mainbody,"  it_%d();\n", c->itcount);
+    flu_sbprintf(c->mainbody, "  it_%d();\n", c->itcount);
   }
 
   c->node = n->parent;
+
+  if (c->node->type == 'G') push(c, 0, 'g', NULL, n->fname, lnumber);
 }
 
 //char current_type(context_s *c)
@@ -409,7 +412,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "}") == 0 && indent == cindent)
     {
-      pull(c);
+      pull(c, lnumber + 1);
       //if (ctype == 'i')
       //{
       //  fprintf(out, "  return 1;\n");
