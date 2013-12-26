@@ -90,12 +90,8 @@ void flu_sbuffer_free(flu_sbuffer *b)
 {
   if (b == NULL) return;
 
-  if (b->stream != NULL)
-  {
-    fclose(b->stream);
-    //b->stream = NULL;
-    free(b->string);
-  }
+  if (b->stream != NULL) fclose(b->stream);
+  free(b->string);
   free(b);
 }
 

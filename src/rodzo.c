@@ -106,6 +106,7 @@ char *node_to_string(node_s *n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
   node_to_s(b, 0, n);
+
   return flu_sbuffer_to_string(b);
 }
 
@@ -179,8 +180,7 @@ void free_node(node_s *n)
   free(n->text);
   free(n->fname);
 
-  //flu_sbuffer_free(n->lines);
-    // freed from print_body()
+  flu_sbuffer_free(n->lines);
 
   for (size_t i = 0; ; i++)
   {
@@ -563,9 +563,8 @@ void print_node(FILE *out, node_s *n)
 
   if (n->lines != NULL)
   {
-    char *s = flu_sbuffer_to_string(n->lines);
-    fputs(s, out);
-    free(s);
+    flu_sbuffer_close(n->lines);
+    fputs(n->lines->string, out);
   }
 
   if (t == 'i')
