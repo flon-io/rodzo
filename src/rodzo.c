@@ -494,6 +494,28 @@ void process_lines(context_s *c, char *path)
 
 #include "header.c"
 
+void print_eaches(FILE *out, char t, node_s *n)
+{
+  if (n == NULL) return;
+  if (n->type == 'i') return print_eaches(out, t, n->parent);
+
+  for (size_t i = 0; ; i++)
+  {
+    node_s *cn = n->children[i];
+
+    if (cn == NULL) break;
+    if (cn->type != t) continue;
+
+    flu_sbuffer_close(cn->lines);
+
+    if (t == 'a') fputs("\n", out);
+    fputs(cn->lines->string, out);
+    if (t == 'b') fputs("\n", out);
+  }
+
+  print_eaches(out, t, n->parent);
+}
+
 void print_node(FILE *out, node_s *n)
 {
   char t = n->type;
@@ -535,6 +557,8 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "%s  char *_fn = \"%s\";\n", ind, n->fname);
     fprintf(out, "\n");
     free(_s);
+
+    print_eaches(out, 'b', n);
   }
 
   if (n->lines != NULL)
@@ -546,6 +570,8 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
+    print_eaches(out, 'a', n);
+
     fprintf(out, "\n");
     fprintf(out, "%s  return 1;\n", ind);
     fprintf(out, "%s}\n", ind);
@@ -565,7 +591,7 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  char *s = node_to_string(n); puts(s); free(s); // prints debug tree
+  char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
 
   print_node(out, n);
 }

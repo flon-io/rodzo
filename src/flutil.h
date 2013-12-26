@@ -45,7 +45,7 @@ char *flu_strrtrim(char *s);
 /*
  * Returns a trimmed copy of the string, left and right.
  */
-char *flu_strtrim(s);
+char *flu_strtrim(char *s);
 
 
 //

@@ -60,7 +60,7 @@ char *flu_strrtrim(char *s)
   return r;
 }
 
-char *flu_strtrim(s)
+char *flu_strtrim(char *s)
 {
   char *s1 = flu_strrtrim(s);
   char *s2 = s1;
@@ -122,7 +122,8 @@ int flu_sbputs(flu_sbuffer *b, char *s)
 
 int flu_sbuffer_close(flu_sbuffer *b)
 {
-  int r = fclose(b->stream);
+  int r = 0;
+  if (b->stream != NULL) r = fclose(b->stream);
   b->stream = NULL;
 
   return r;

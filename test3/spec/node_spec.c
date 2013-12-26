@@ -19,6 +19,14 @@ describe "abr_node"
   {
     printf("AFTER ALL\n");
   }
+  before each
+  {
+    printf("0 before each\n");
+  }
+  after each
+  {
+    printf("0 after each\n");
+  }
   describe "abr_malloc_node()"
   {
     it "creates a node"
@@ -29,13 +37,12 @@ describe "abr_node"
   describe "abr_node_to_string(n)"
   {
     before each
-    //before each inline
     {
-      printf("before each\n");
+      printf("1 before each\n");
     }
     after each
     {
-      printf("after each\n");
+      printf("1 after each\n");
     }
     it "returns a string representation of the node"
     {
