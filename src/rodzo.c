@@ -105,8 +105,8 @@ char *node_to_string(node_s *n)
 void push_line(context_s *c, char *l)
 {
   node_s *n = c->node;
+  printf("push_line() to node: %d >%s", n->nodenumber, l);
   if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
-  //flu_sbprint(n->lines, "%s", l);
   flu_sbputs(n->lines, l);
 }
 
