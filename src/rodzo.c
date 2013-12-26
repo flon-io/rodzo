@@ -264,11 +264,11 @@ char *str_neuter(char *s)
   return s;
 }
 
-char *list_texts_as_literal(context_s *c)
+char *list_texts_as_literal(node_s *n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  char **texts = list_texts(c->node);
+  char **texts = list_texts(n);
   char **t = texts;
 
   flu_sbprintf(b, "{ ");
@@ -393,11 +393,6 @@ void process_lines(context_s *c, char *path)
 {
   push(c, 0, 'g', NULL, path, 0);
 
-  //fprintf(out, "\n");
-  //fprintf(out, "  /*\n");
-  //fprintf(out, "   * %s\n", path);
-  //fprintf(out, "   */\n");
-
   FILE *in = fopen(path, "r");
   if (in == NULL) return;
 
@@ -470,7 +465,6 @@ void process_lines(context_s *c, char *path)
     }
     else
     {
-      //fprintf(out, "%s", line);
       push_line(c, line);
     }
 
@@ -503,32 +497,39 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'g' && n->lstart == 0)
   {
-    printf("// file %s\n", n->fname);
+    fprintf(out, "// file %s\n", n->fname);
   }
   else if (t == 'd' || t == 'c' || t == 'i')
   {
-    if (t == 'i') printf("\n");
-    printf("%s// %s \"%s\" li%d\n", ind, type_to_string(t), n->text, n->lstart);
-    if (t == 'i') printf("%s//\n", ind);
+    if (t == 'i') fprintf(out, "\n");
+    fprintf(
+      out, "%s// %s \"%s\" li%d\n", ind, type_to_string(t), n->text, n->lstart);
+    if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
   if (t == 'i')
   {
-    printf("%sint it_%d()\n", ind, n->nodenumber);
-    printf("%s{\n", ind);
+    char *_s = list_texts_as_literal(n);
+    fprintf(out, "%sint it_%d()\n", ind, n->nodenumber);
+    fprintf(out, "%s{\n", ind);
+    fprintf(out, "%s  char *_s[] = %s;\n", ind, _s);
+    fprintf(out, "%s  char *_fn = \"%s\";\n", ind, n->fname);
+    fprintf(out, "\n");
+    free(_s);
   }
 
   if (n->lines != NULL)
   {
     char *s = flu_sbuffer_to_string(n->lines);
-    puts(s);
+    fputs(s, out);
     free(s);
   }
 
   if (t == 'i')
   {
-    printf("%s  return 1;\n", ind);
-    printf("%s}\n", ind);
+    fprintf(out, "\n");
+    fprintf(out, "%s  return 1;\n", ind);
+    fprintf(out, "%s}\n", ind);
   }
 
   free(ind);
@@ -545,7 +546,7 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  //char *s = node_to_string(n); puts(s); free(s);
+  //char *s = node_to_string(n); puts(s); free(s); // prints debug tree
 
   print_node(out, n);
 }
