@@ -494,11 +494,29 @@ void process_lines(context_s *c, char *path)
 
 #include "header.c"
 
-void print_eaches(FILE *out, char *indent, char t, node_s *n)
+//void print_alls(FILE *out, char t, node_s *n)
+//{
+//  for (size_t i = 0; ; i++)
+//  {
+//    node_s *cn = n->children[i];
+//
+//    if (cn == NULL) break;
+//    if (cn->type != t) continue;
+//
+//    flu_sbuffer_close(cn->lines);
+//
+//    //if (t == 'A') fputs("\n", out);
+//    fprintf(out, "  // %s li%d\n", cn->text, cn->lstart);
+//    fputs(cn->lines->string, out);
+//    //if (t == 'B') fputs("\n", out);
+//  }
+//}
+
+void print_befafts(FILE *out, char *indent, char t, node_s *n)
 {
   if (n == NULL) return;
 
-  if (t == 'b') print_eaches(out, indent, t, n->parent);
+  if (t == 'b') print_befafts(out, indent, t, n->parent);
 
   for (size_t i = 0; ; i++)
   {
@@ -509,13 +527,13 @@ void print_eaches(FILE *out, char *indent, char t, node_s *n)
 
     flu_sbuffer_close(cn->lines);
 
-    if (t == 'a') fputs("\n", out);
+    if (t == 'a' || t == 'A' || t == 'B') fputs("\n", out);
     fprintf(out, "%s  // %s li%d\n", indent, cn->text, cn->lstart);
     fputs(cn->lines->string, out);
-    if (t == 'b') fputs("\n", out);
+    if (t == 'b' || t == 'B') fputs("\n", out);
   }
 
-  if (t == 'a') print_eaches(out, indent, t, n->parent);
+  if (t == 'a') print_befafts(out, indent, t, n->parent);
 }
 
 void print_node(FILE *out, node_s *n)
@@ -550,6 +568,8 @@ void print_node(FILE *out, node_s *n)
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
+  print_befafts(out, "", 'B', n);
+
   if (t == 'i')
   {
     char *_s = list_texts_as_literal(n);
@@ -560,7 +580,7 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "\n");
     free(_s);
 
-    print_eaches(out, ind, 'b', n->parent);
+    print_befafts(out, ind, 'b', n->parent);
   }
 
   if (n->lines != NULL)
@@ -571,7 +591,7 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    print_eaches(out, ind, 'a', n->parent);
+    print_befafts(out, ind, 'a', n->parent);
 
     fprintf(out, "\n");
     fprintf(out, "%s  return 1;\n", ind);
@@ -586,6 +606,8 @@ void print_node(FILE *out, node_s *n)
     if (cn == NULL) break;
     print_node(out, cn);
   }
+
+  print_befafts(out, "", 'A', n);
 }
 
 void print_body(FILE *out, context_s *c)

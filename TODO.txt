@@ -13,6 +13,7 @@
 [o] ensure it's ok to define function at the head of spec files
 [o] move away perror(), look for a die() ?
 
+[ ] before|after each inline...
 [ ] cat .rspec --> ```--colour --format documentation```
 [ ] spec1 comes before spec0, why?
 
