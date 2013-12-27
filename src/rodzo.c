@@ -497,7 +497,6 @@ void process_lines(context_s *c, char *path)
 void print_eaches(FILE *out, char t, node_s *n)
 {
   if (n == NULL) return;
-  if (n->type == 'i') return print_eaches(out, t, n->parent);
 
   if (t == 'b') print_eaches(out, t, n->parent);
 
@@ -560,7 +559,7 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "\n");
     free(_s);
 
-    print_eaches(out, 'b', n);
+    print_eaches(out, 'b', n->parent);
   }
 
   if (n->lines != NULL)
@@ -571,7 +570,7 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    print_eaches(out, 'a', n);
+    print_eaches(out, 'a', n->parent);
 
     fprintf(out, "\n");
     fprintf(out, "%s  return 1;\n", ind);
