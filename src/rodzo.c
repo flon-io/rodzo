@@ -499,6 +499,8 @@ void print_eaches(FILE *out, char t, node_s *n)
   if (n == NULL) return;
   if (n->type == 'i') return print_eaches(out, t, n->parent);
 
+  if (t == 'b') print_eaches(out, t, n->parent);
+
   for (size_t i = 0; ; i++)
   {
     node_s *cn = n->children[i];
@@ -513,7 +515,7 @@ void print_eaches(FILE *out, char t, node_s *n)
     if (t == 'b') fputs("\n", out);
   }
 
-  print_eaches(out, t, n->parent);
+  if (t == 'a') print_eaches(out, t, n->parent);
 }
 
 void print_node(FILE *out, node_s *n)
