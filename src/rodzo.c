@@ -472,7 +472,7 @@ void process_lines(context_s *c, char *path)
         c, "%s  rdz_record(r%i, _s, %i, _fn, %d); ",
         ind, varcount, c->node->nodenumber, lnumber);
       push_linef(
-        c, "if ( ! r%i) return 0;\n",
+        c, "if ( ! r%i) goto _over;\n",
         varcount);
 
       free(ind);
@@ -512,11 +512,11 @@ void process_lines(context_s *c, char *path)
 //  }
 //}
 
-void print_befafts(FILE *out, char *indent, char t, node_s *n)
+void print_eaches(FILE *out, char *indent, char t, node_s *n)
 {
   if (n == NULL) return;
 
-  if (t == 'b') print_befafts(out, indent, t, n->parent);
+  if (t == 'b') print_eaches(out, indent, t, n->parent);
 
   for (size_t i = 0; ; i++)
   {
@@ -527,13 +527,13 @@ void print_befafts(FILE *out, char *indent, char t, node_s *n)
 
     flu_sbuffer_close(cn->lines);
 
-    if (t == 'a' || t == 'A' || t == 'B') fputs("\n", out);
+    if (t == 'a') fputs("\n", out);
     fprintf(out, "%s  // %s li%d\n", indent, cn->text, cn->lstart);
     fputs(cn->lines->string, out);
-    if (t == 'b' || t == 'B') fputs("\n", out);
+    if (t == 'b') fputs("\n", out);
   }
 
-  if (t == 'a') print_befafts(out, indent, t, n->parent);
+  if (t == 'a') print_eaches(out, indent, t, n->parent);
 }
 
 void print_node(FILE *out, node_s *n)
@@ -568,7 +568,7 @@ void print_node(FILE *out, node_s *n)
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
-  print_befafts(out, "", 'B', n);
+  //print_befafts(out, "", 'B', n);
 
   if (t == 'i')
   {
@@ -580,7 +580,7 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "\n");
     free(_s);
 
-    print_befafts(out, ind, 'b', n->parent);
+    print_eaches(out, ind, 'b', n->parent);
   }
 
   if (n->lines != NULL)
@@ -591,11 +591,11 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    print_befafts(out, ind, 'a', n->parent);
-
     fprintf(out, "\n");
-    fprintf(out, "%s  return 1;\n", ind);
-    fprintf(out, "%s}\n", ind);
+    fprintf(out, "%s_over:\n", ind);
+    print_eaches(out, ind, 'a', n->parent);
+
+    fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
   }
 
   free(ind);
@@ -607,7 +607,7 @@ void print_node(FILE *out, node_s *n)
     print_node(out, cn);
   }
 
-  print_befafts(out, "", 'A', n);
+  //print_befafts(out, "", 'A', n);
 }
 
 void print_body(FILE *out, context_s *c)
