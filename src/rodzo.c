@@ -587,6 +587,8 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "%s_over:\n", ind);
     print_eaches(out, ind, 'a', n->parent);
 
+    fprintf(out, "\n");
+    fprintf(out, "%s  return 1;\n", ind);
     fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
   }
 
