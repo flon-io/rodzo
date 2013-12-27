@@ -9,15 +9,24 @@
 
 char *global_string = NULL;
 
+before all
+{
+  printf("0 BEFORE ALL\n");
+}
+after all
+{
+  printf("0 AFTER ALL\n");
+}
+
 describe "abr_node"
 {
   before all
   {
-    printf("BEFORE ALL\n");
+    printf("1 BEFORE ALL\n");
   }
   after all
   {
-    printf("AFTER ALL\n");
+    printf("1 AFTER ALL\n");
   }
   before each
   {
