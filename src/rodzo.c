@@ -533,7 +533,7 @@ void print_node(FILE *out, node_s *n)
   char t = n->type;
 
   if (t == 'a' || t == 'b') return;
-  if (t == 'A' || t == 'B') return;
+  //if (t == 'A' || t == 'B') return;
 
   char *ind;
   if (n->indent > 0)
@@ -560,8 +560,6 @@ void print_node(FILE *out, node_s *n)
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
-  //print_befafts(out, "", 'B', n);
-
   if (t == 'i')
   {
     char *_s = list_texts_as_literal(n);
@@ -573,6 +571,14 @@ void print_node(FILE *out, node_s *n)
     free(_s);
 
     print_eaches(out, ind, 'b', n->parent);
+  }
+  else if (t == 'B' || t == 'A')
+  {
+    char *type = t == 'B' ? "before_all" : "after_all";
+    fprintf(out, "\n");
+    fprintf(out, "%svoid %s_%d()", ind, type, n->nodenumber);
+    fprintf(out, " // li%d\n", n->lstart);
+    fprintf(out, "%s{\n", ind);
   }
 
   if (n->lines != NULL)
@@ -591,6 +597,10 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "%s  return 1;\n", ind);
     fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
   }
+  else if (t == 'B' || t == 'A')
+  {
+    fprintf(out, "%s}\n", ind);
+  }
 
   free(ind);
 
@@ -600,8 +610,6 @@ void print_node(FILE *out, node_s *n)
     if (cn == NULL) break;
     print_node(out, cn);
   }
-
-  //print_befafts(out, "", 'A', n);
 }
 
 void print_body(FILE *out, context_s *c)
@@ -622,10 +630,26 @@ void print_it_calls(FILE *out, node_s *n)
   }
   else
   {
+    for (size_t i = 0; ; i++) // befores
+    {
+      node_s *cn = n->children[i];
+      if (cn == NULL) break;
+      if (cn->type != 'B') continue;
+      fprintf(out, "  before_all_%d();\n", cn->nodenumber);
+    }
     for (size_t i = 0; ; i++)
     {
-      if (n->children[i] == NULL) break;
-      print_it_calls(out, n->children[i]);
+      node_s *cn = n->children[i];
+      if (cn == NULL) break;
+      if (cn == 'B' || cn == 'A') continue;
+      print_it_calls(out, cn);
+    }
+    for (size_t i = 0; ; i++) // afters
+    {
+      node_s *cn = n->children[i];
+      if (cn == NULL) break;
+      if (cn->type != 'A') continue;
+      fprintf(out, "  after_all_%d();\n", cn->nodenumber);
     }
   }
 }
