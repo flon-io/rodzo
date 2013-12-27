@@ -57,7 +57,6 @@ typedef struct context_s {
   int itcount;
   node_s *node;
   char *out_fname;
-  flu_sbuffer *mainbody;
 } context_s;
 
 char *type_to_string(char t)
@@ -168,7 +167,6 @@ context_s *malloc_context()
   c->itcount = 0;
   c->node = NULL;
   c->out_fname = NULL;
-  c->mainbody = flu_sbuffer_malloc();
 
   push(c, -1, 'G', NULL, NULL, -1);
 
@@ -204,18 +202,12 @@ void free_context(context_s *c)
   clear_tree(c);
 
   free(c->out_fname);
-  //free(c->mainbody);
   free(c);
 }
 
 void pull(context_s *c, int lnumber)
 {
   node_s *n = c->node;
-
-  if (n->type == 'i')
-  {
-    flu_sbprintf(c->mainbody, "  it_%d();\n", n->nodenumber);
-  }
 
   c->node = n->parent;
 
@@ -619,6 +611,23 @@ void print_body(FILE *out, context_s *c)
   print_node(out, n);
 }
 
+void print_it_calls(FILE *out, node_s *n)
+{
+  if (n->type == 'i')
+  {
+    fprintf(out, "  it_%d();", n->nodenumber);
+    fprintf(out, " // %s li%d\n", n->fname, n->lstart);
+  }
+  else
+  {
+    for (size_t i = 0; ; i++)
+    {
+      if (n->children[i] == NULL) break;
+      print_it_calls(out, n->children[i]);
+    }
+  }
+}
+
 void print_footer(FILE *out, context_s *c)
 {
   fputs("\n", out);
@@ -631,9 +640,8 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", c->itcount);
   fprintf(out, "\n");
 
-  char *body = flu_sbuffer_to_string(c->mainbody);
-  fputs(body, out);
-  free(body);
+  node_s *n = c->node; while (n->parent != NULL) n = n->parent;
+  print_it_calls(out, n);
 
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", c->itcount);
