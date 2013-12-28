@@ -112,7 +112,6 @@ char *node_to_string(node_s *n)
 void push_line(context_s *c, char *l)
 {
   node_s *n = c->node;
-  //printf("push_line() to node: %d >%s", n->nodenumber, l);
   if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
   flu_sbputs(n->lines, l);
 }
@@ -122,7 +121,7 @@ void push_linef(context_s *c, const char *format, ...)
   va_start(ap, format);
   node_s *n = c->node;
   if (n->lines == NULL) n->lines = flu_sbuffer_malloc();
-  flu_vsbprintf(n->lines, format, ap);
+  flu_sbvprintf(n->lines, format, ap);
   va_end(ap);
 }
 
@@ -213,12 +212,6 @@ void pull(context_s *c, int lnumber)
 
   if (c->node->type == 'G') push(c, 0, 'g', NULL, n->fname, lnumber);
 }
-
-//char current_type(context_s *c)
-//{
-//  if (c->node == NULL) return 'X';
-//  return c->node->type;
-//}
 
 int current_indent(context_s *c)
 {
@@ -486,24 +479,6 @@ void process_lines(context_s *c, char *path)
 
 #include "header.c"
 
-//void print_alls(FILE *out, char t, node_s *n)
-//{
-//  for (size_t i = 0; ; i++)
-//  {
-//    node_s *cn = n->children[i];
-//
-//    if (cn == NULL) break;
-//    if (cn->type != t) continue;
-//
-//    flu_sbuffer_close(cn->lines);
-//
-//    //if (t == 'A') fputs("\n", out);
-//    fprintf(out, "  // %s li%d\n", cn->text, cn->lstart);
-//    fputs(cn->lines->string, out);
-//    //if (t == 'B') fputs("\n", out);
-//  }
-//}
-
 void print_eaches(FILE *out, char *indent, char t, node_s *n)
 {
   if (n == NULL) return;
@@ -533,7 +508,6 @@ void print_node(FILE *out, node_s *n)
   char t = n->type;
 
   if (t == 'a' || t == 'b') return;
-  //if (t == 'A' || t == 'B') return;
 
   char *ind;
   if (n->indent > 0)
@@ -616,7 +590,7 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
+  //char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
 
   print_node(out, n);
 }

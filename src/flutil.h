@@ -29,6 +29,8 @@
 #include <string.h>
 
 
+#define FLU_VERSION "1.0.0"
+
 //
 // str functions
 
@@ -70,7 +72,7 @@ void flu_sbuffer_free(flu_sbuffer *b);
 /*
  * Formats input and writes into buffer. Takes a va_list.
  */
-int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap);
+int flu_sbvprintf(flu_sbuffer *b, const char *format, va_list ap);
 
 /*
  * Formats input and writes into buffer. Called like printf is called.

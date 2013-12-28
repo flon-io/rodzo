@@ -95,7 +95,7 @@ void flu_sbuffer_free(flu_sbuffer *b)
   free(b);
 }
 
-int flu_vsbprintf(flu_sbuffer *b, const char *format, va_list ap)
+int flu_sbvprintf(flu_sbuffer *b, const char *format, va_list ap)
 {
   if (b->stream == NULL) return 0;
   return vfprintf(b->stream, format, ap);
@@ -105,7 +105,7 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  int r = flu_vsbprintf(b, format, ap);
+  int r = flu_sbvprintf(b, format, ap);
   va_end(ap);
 
   return r;
@@ -145,7 +145,7 @@ char *flu_sprintf(const char *format, ...)
   va_start(ap, format);
 
   flu_sbuffer *b = flu_sbuffer_malloc();
-  flu_vsbprintf(b, format, ap);
+  flu_sbvprintf(b, format, ap);
   char *s = flu_sbuffer_to_string(b);
 
   va_end(ap);
@@ -163,7 +163,7 @@ void flu_die(int exit_value, const char *format, ...)
   va_start(ap, format);
 
   flu_sbuffer *b = flu_sbuffer_malloc();
-  flu_vsbprintf(b, format, ap);
+  flu_sbvprintf(b, format, ap);
   char *s = flu_sbuffer_to_string(b);
 
   perror(s);
