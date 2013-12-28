@@ -641,7 +641,7 @@ void print_it_calls(FILE *out, node_s *n)
     {
       node_s *cn = n->children[i];
       if (cn == NULL) break;
-      if (cn == 'B' || cn == 'A') continue;
+      if (cn->type == 'B' || cn->type == 'A') continue;
       print_it_calls(out, cn);
     }
     for (size_t i = 0; ; i++) // afters
