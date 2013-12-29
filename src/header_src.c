@@ -87,6 +87,9 @@ void rdz_free_result(rdz_result *r)
   free(r->context);
   free(r->title);
   free(r->fname);
+  for (size_t i = 0; i < r->stackc; i++) free(r->stack[i]);
+  free(r->stack);
+
   free(r);
 }
 

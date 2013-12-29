@@ -637,7 +637,7 @@ void print_footer(FILE *out, context_s *c)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
-  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result));\n", c->itcount);
+  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->itcount);
   fprintf(out, "\n");
 
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
