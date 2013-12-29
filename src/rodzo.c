@@ -55,7 +55,8 @@ typedef struct node_s {
 
 typedef struct context_s {
   int nodecount;
-  int itcount;
+  int itcount; // it count
+  int encount; // ensure count
   node_s *node;
   char *out_fname;
 } context_s;
@@ -157,7 +158,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
     break;
   }
 
-  if (type != 'e') c->node = n;
+  c->node = n;
 
   if (type == 'i') c->itcount++;
 }
@@ -167,6 +168,7 @@ context_s *malloc_context()
   context_s *c = malloc(sizeof(context_s));
   c->nodecount = 0;
   c->itcount = 0;
+  c->encount = 0;
   c->node = NULL;
   c->out_fname = NULL;
 
@@ -468,6 +470,8 @@ void process_lines(context_s *c, char *path)
       free(ind);
       free(con);
       ++varcount;
+
+      c->encount++;
     }
     else
     {
@@ -642,7 +646,7 @@ void print_footer(FILE *out, context_s *c)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
-  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->itcount);
+  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
   fprintf(out, "\n");
 
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
