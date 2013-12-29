@@ -48,6 +48,7 @@ typedef struct node_s {
   char *text;
   char *fname;
   int lstart;
+  int lend;
   flu_sbuffer *lines;
   struct node_s **children;
 } node_s;
@@ -88,7 +89,8 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
     flu_sbprintf(b, "|-- %s", type_to_string(t));
     flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
-    flu_sbprintf(b, "fn:%s l:%d p:%d\n", n->fname, n->lstart, p);
+    flu_sbprintf(b, "fn:%s ls:%d le:%d ", n->fname, n->lstart, n->lend);
+    flu_sbprintf(b, "p:%d\n", p);
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
     flu_sbprintf(b, "|   te: >%s<\n", te);
 
@@ -143,6 +145,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
   n->text = text;
   n->fname = fn;
   n->lstart = lstart;
+  n->lend = lstart;
   n->lines = NULL;
   n->children = calloc(NODE_MAX_CHILDREN + 1, sizeof(node_s *));
 
@@ -208,9 +211,11 @@ void pull(context_s *c, int lnumber)
 {
   node_s *n = c->node;
 
+  n->lend = lnumber;
+
   c->node = n->parent;
 
-  if (c->node->type == 'G') push(c, 0, 'g', NULL, n->fname, lnumber);
+  if (c->node->type == 'G') push(c, 0, 'g', NULL, n->fname, lnumber + 1);
 }
 
 int current_indent(context_s *c)
@@ -409,7 +414,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "}") == 0 && indent == cindent)
     {
-      pull(c, lnumber + 1);
+      pull(c, lnumber);
     }
     //else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
     //{
@@ -590,7 +595,7 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  //char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
+  char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
 
   print_node(out, n);
 }
