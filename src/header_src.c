@@ -51,7 +51,7 @@ typedef struct rdz_result {
   int lnumber;
 } rdz_result;
 
-rdz_result *rdz_malloc_result(
+rdz_result *rdz_result_malloc(
   int success, char *s[], int itnumber, char *fname, int lnumber
 )
 {
@@ -82,7 +82,7 @@ rdz_result *rdz_malloc_result(
   return r;
 }
 
-void rdz_free_result(rdz_result *r)
+void rdz_result_free(rdz_result *r)
 {
   free(r->context);
   free(r->title);
@@ -156,7 +156,7 @@ void rdz_record(
   int success, char *s[], int itnumber, char *fname, int lnumber
 )
 {
-  rdz_result *result = rdz_malloc_result(success, s, itnumber, fname, lnumber);
+  rdz_result *result = rdz_result_malloc(success, s, itnumber, fname, lnumber);
 
   rdz_do_record(result);
 
@@ -207,7 +207,7 @@ void rdz_summary(int itcount)
       free(line);
     }
 
-    rdz_free_result(r);
+    rdz_result_free(r);
   }
   free(rdz_results);
 
