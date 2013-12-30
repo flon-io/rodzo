@@ -42,6 +42,7 @@ char *rdz_strdup(char *s)
 
 typedef struct rdz_result {
   int success;
+  char *message;
   int stackc;
   char **stack;
   char *context;
@@ -49,10 +50,13 @@ typedef struct rdz_result {
   int itnumber;
   char *fname;
   int lnumber;
+  int ltnumber;
 } rdz_result;
 
 rdz_result *rdz_result_malloc(
-  int success, char *s[], int itnumber, char *fname, int lnumber
+  int success, char *msg,
+  char *s[], int itnumber,
+  char *fname, int lnumber, int ltnumber
 )
 {
   int sc; for (sc = 0; ; sc++) { if (s[sc] == NULL) break; }
@@ -71,6 +75,7 @@ rdz_result *rdz_result_malloc(
 
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
+  r->message = msg;
   r->stackc = sc;
   r->stack = ss;
   r->context = context;
@@ -78,6 +83,7 @@ rdz_result *rdz_result_malloc(
   r->itnumber = itnumber;
   r->fname = rdz_strdup(fname);
   r->lnumber = lnumber;
+  r->ltnumber = ltnumber;
 
   return r;
 }
@@ -153,10 +159,13 @@ void rdz_do_record(rdz_result *r)
 }
 
 void rdz_record(
-  int success, char *s[], int itnumber, char *fname, int lnumber
+  int success, char *msg,
+  char *s[], int itnumber,
+  char *fname, int lnumber, int ltnumber
 )
 {
-  rdz_result *result = rdz_result_malloc(success, s, itnumber, fname, lnumber);
+  rdz_result *result =
+    rdz_result_malloc(success, msg, s, itnumber, fname, lnumber, ltnumber);
 
   rdz_do_record(result);
 
@@ -203,7 +212,8 @@ void rdz_summary(int itcount)
       printf("     >");
       rdz_red(); printf("%s", line); rdz_clear();
       printf("<\n");
-      rdz_cyan(); printf("     # %s:%d\n", r->fname, r->lnumber); rdz_clear();
+      rdz_cyan(); printf("     # %s:%d", r->fname, r->lnumber); rdz_clear();
+      printf(" (%d)\n", r->ltnumber);
       free(line);
     }
 

@@ -48,12 +48,14 @@ typedef struct node_s {
   char *text;
   char *fname;
   int lstart;
-  int lend;
+  int ltstart;
+  int llength;
   flu_sbuffer *lines;
   struct node_s **children;
 } node_s;
 
 typedef struct context_s {
+  int loffset;
   int nodecount;
   int itcount; // it count
   int encount; // ensure count
@@ -90,7 +92,8 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
     flu_sbprintf(b, "|-- %s", type_to_string(t));
     flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
-    flu_sbprintf(b, "fn:%s ls:%d le:%d ", n->fname, n->lstart, n->lend);
+    flu_sbprintf(b, "fn:%s ls:%d ", n->fname);
+    flu_sbprintf(b, "ls:%d lts:%d ll:%d ", n->lstart, n->ltstart, n->llength);
     flu_sbprintf(b, "p:%d\n", p);
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
     flu_sbprintf(b, "|   te: >%s<\n", te);
@@ -146,7 +149,8 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
   n->text = text;
   n->fname = fn;
   n->lstart = lstart;
-  n->lend = lstart;
+  n->ltstart = c->loffset + lstart;
+  n->llength = 0;
   n->lines = NULL;
   n->children = calloc(NODE_MAX_CHILDREN + 1, sizeof(node_s *));
 
@@ -166,6 +170,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 context_s *malloc_context()
 {
   context_s *c = malloc(sizeof(context_s));
+  c->loffset = 0;
   c->nodecount = 0;
   c->itcount = 0;
   c->encount = 0;
@@ -213,7 +218,7 @@ void pull(context_s *c, int lnumber)
 {
   node_s *n = c->node;
 
-  n->lend = lnumber;
+  n->llength = lnumber - n->lstart;
 
   c->node = n->parent;
 
@@ -461,8 +466,8 @@ void process_lines(context_s *c, char *path)
         c, "%sint r%i = %s",
         ind, varcount, con);
       push_linef(
-        c, "%s  rdz_record(r%i, _s, %i, _fn, %d); ",
-        ind, varcount, c->node->nodenumber, lnumber);
+        c, "%s  rdz_record(r%i, NULL, _s, %i, _fn, %d, %d); ",
+        ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
       push_linef(
         c, "if ( ! r%i) goto _over;\n",
         varcount);
@@ -484,6 +489,8 @@ void process_lines(context_s *c, char *path)
 
   free(line);
   fclose(in);
+
+  c->loffset += lnumber;
 }
 
 #include "header.c"
