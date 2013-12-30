@@ -611,10 +611,19 @@ void print_body(FILE *out, context_s *c)
   print_node(out, n);
 }
 
+void print_if_line(FILE *out, node_s *n)
+{
+  fprintf(
+    out,
+    "  if (l < 0 || (l >= %d && l <= %d))",
+    n->ltstart, n->ltstart + n->llength);
+}
+
 void print_it_calls(FILE *out, node_s *n)
 {
   if (n->type == 'i')
   {
+    print_if_line(out,n);
     fprintf(out, "  it_%d();", n->nodenumber);
     fprintf(out, " // %s li%d\n", n->fname, n->lstart);
   }
@@ -625,6 +634,7 @@ void print_it_calls(FILE *out, node_s *n)
       node_s *cn = n->children[i];
       if (cn == NULL) break;
       if (cn->type != 'B') continue;
+      print_if_line(out,n);
       fprintf(out, "  before_all_%d();\n", cn->nodenumber);
     }
     for (size_t i = 0; ; i++)
@@ -639,6 +649,7 @@ void print_it_calls(FILE *out, node_s *n)
       node_s *cn = n->children[i];
       if (cn == NULL) break;
       if (cn->type != 'A') continue;
+      print_if_line(out,n);
       fprintf(out, "  after_all_%d();\n", cn->nodenumber);
     }
   }
@@ -653,6 +664,9 @@ void print_footer(FILE *out, context_s *c)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
+  fprintf(out, "  char *sl = getenv(\"L\");\n");
+  fprintf(out, "  int l = sl == NULL ? -1 : atoi(sl);\n");
+  fprintf(out, "\n");
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
   fprintf(out, "\n");
 
