@@ -611,50 +611,6 @@ void print_body(FILE *out, context_s *c)
   print_node(out, n);
 }
 
-//void print_if_line(FILE *out, node_s *n)
-//{
-//  fprintf(
-//    out,
-//    "  if (l < 0 || (l >= %d && l <= %d))",
-//    n->ltstart, n->ltstart + n->llength);
-//}
-
-//void print_it_calls(FILE *out, node_s *n)
-//{
-//  if (n->type == 'i')
-//  {
-//    //print_if_line(out,n);
-//    fprintf(out, "  it_%d();", n->nodenumber);
-//    fprintf(out, " // %s li%d\n", n->fname, n->lstart);
-//  }
-//  else
-//  {
-//    for (size_t i = 0; ; i++) // befores
-//    {
-//      node_s *cn = n->children[i];
-//      if (cn == NULL) break;
-//      if (cn->type != 'B') continue;
-//      //print_if_line(out,n);
-//      fprintf(out, "  before_all_%d();\n", cn->nodenumber);
-//    }
-//    for (size_t i = 0; ; i++)
-//    {
-//      node_s *cn = n->children[i];
-//      if (cn == NULL) break;
-//      if (cn->type == 'B' || cn->type == 'A') continue;
-//      print_it_calls(out, cn);
-//    }
-//    for (size_t i = 0; ; i++) // afters
-//    {
-//      node_s *cn = n->children[i];
-//      if (cn == NULL) break;
-//      if (cn->type != 'A') continue;
-//      //print_if_line(out,n);
-//      fprintf(out, "  after_all_%d();\n", cn->nodenumber);
-//    }
-//  }
-//}
-
 void print_nodes(FILE *out, node_s *n)
 {
   char t = n->type;
@@ -696,21 +652,18 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
 
-  //fprintf(out, "  char *sl = getenv(\"L\");\n");
-  //fprintf(out, "  int l = sl == NULL ? -1 : atoi(sl);\n");
-  //fprintf(out, "\n");
   fprintf(out, "  rdz_extract_arguments();\n");
+  fprintf(out, "\n");
 
-  fprintf(out, "  rdz_nodes = calloc(%d, sizeof(rdz_node *));\n", c->nodecount);
+  fprintf(out, "  rdz_node_count = %d;\n", c->nodecount);
+  fprintf(out, "  rdz_nodes = calloc(rdz_node_count, sizeof(rdz_node *));\n");
   print_nodes(out, n);
-
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
   fprintf(out, "\n");
 
-  //print_it_calls(out, n);
-  fprintf(out, "  rdz_determine_dorun(rdz_nodes[0]);\n");
+  fprintf(out, "  rdz_determine_dorun();\n");
   fprintf(out, "  rdz_dorun(rdz_nodes[0]);\n");
 
   fputs("\n", out);

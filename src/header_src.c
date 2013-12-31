@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-// avoiding strdup and the posix_source requirement...
+  // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
 {
   int l = strlen(s);
@@ -113,6 +113,7 @@ void rdz_result_free(rdz_result *r)
   free(r);
 }
 
+int rdz_node_count = 0;
 rdz_node **rdz_nodes = NULL;
 
 int *rdz_lines = NULL;
@@ -217,13 +218,19 @@ void rdz_extract_arguments()
   }
 }
 
-void rdz_determine_dorun(rdz_node *n)
+void rdz_set_dorun(rdz_node *n)
 {
-  if (n->type == 'i')
+  // TODO
+}
+
+void rdz_determine_dorun()
+{
+  // TODO
+
+  for (size_t i = 0; i < rdz_node_count; i++)
   {
-  }
-  else
-  {
+    rdz_node *n = rdz_nodes[i];
+    n->dorun = 1;
   }
 }
 
@@ -231,11 +238,35 @@ void rdz_dorun(rdz_node *n)
 {
   if ( ! n->dorun) return;
 
-  if (n->type == 'i')
+  char t = n->type;
+
+  if (t == 'i')
   {
+    n->func();
   }
-  else
+  else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
+    for (size_t i = 0; i < rdz_node_count; i++) // before all
+    {
+      rdz_node *nn = rdz_nodes[i];
+      if (nn->type != 'B') continue;
+      if (nn->parentnumber != n->nodenumber) continue;
+      nn->func();
+    }
+    for (size_t i = 0; i < rdz_node_count; i++) // children
+    {
+      rdz_node *nn = rdz_nodes[i];
+      if (nn->parentnumber != n->nodenumber) continue;
+      if (nn->type != 'd' && nn->type != 'c' && nn->type != 'i') continue;
+      rdz_dorun(nn);
+    }
+    for (size_t i = 0; i < rdz_node_count; i++) // after all
+    {
+      rdz_node *nn = rdz_nodes[i];
+      if (nn->type != 'A') continue;
+      if (nn->parentnumber != n->nodenumber) continue;
+      nn->func();
+    }
   }
 }
 
