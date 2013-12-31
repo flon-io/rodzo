@@ -43,6 +43,7 @@ char *rdz_strdup(char *s)
 typedef int rdz_func();
 
 typedef struct rdz_node {
+  int dorun;
   int parentnumber;
   int nodenumber;
   char type;
@@ -113,6 +114,9 @@ void rdz_result_free(rdz_result *r)
 }
 
 rdz_node **rdz_nodes = NULL;
+
+int *rdz_lines = NULL;
+char *rdz_example = NULL;
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
@@ -186,6 +190,53 @@ void rdz_record(
 
   rdz_results[rdz_count++] = result;
   if ( ! success) rdz_fail_count++;
+}
+
+void rdz_extract_arguments()
+{
+  // E=example
+
+  rdz_example = getenv("E");
+
+  rdz_lines = malloc(64 * sizeof(int));
+  for (size_t i = 0; i < 64; i++) rdz_lines[i] = -1;
+
+  // L=12,67
+
+  char *l = getenv("L");
+
+  if (l == NULL) return;
+
+  for (size_t i = 0; ; i++)
+  {
+    char *c = strpbrk(l, ",");
+    if (c != NULL) *c = '\0';
+    rdz_lines[i] = atoi(l);
+    if (c == NULL) break;
+    l = c + 1;
+  }
+}
+
+void rdz_determine_dorun(rdz_node *n)
+{
+  if (n->type == 'i')
+  {
+  }
+  else
+  {
+  }
+}
+
+void rdz_dorun(rdz_node *n)
+{
+  if ( ! n->dorun) return;
+
+  if (n->type == 'i')
+  {
+  }
+  else
+  {
+  }
 }
 
 char *rdz_read_line(char *fname, int lnumber)

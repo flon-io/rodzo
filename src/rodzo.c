@@ -619,41 +619,41 @@ void print_body(FILE *out, context_s *c)
 //    n->ltstart, n->ltstart + n->llength);
 //}
 
-void print_it_calls(FILE *out, node_s *n)
-{
-  if (n->type == 'i')
-  {
-    //print_if_line(out,n);
-    fprintf(out, "  it_%d();", n->nodenumber);
-    fprintf(out, " // %s li%d\n", n->fname, n->lstart);
-  }
-  else
-  {
-    for (size_t i = 0; ; i++) // befores
-    {
-      node_s *cn = n->children[i];
-      if (cn == NULL) break;
-      if (cn->type != 'B') continue;
-      //print_if_line(out,n);
-      fprintf(out, "  before_all_%d();\n", cn->nodenumber);
-    }
-    for (size_t i = 0; ; i++)
-    {
-      node_s *cn = n->children[i];
-      if (cn == NULL) break;
-      if (cn->type == 'B' || cn->type == 'A') continue;
-      print_it_calls(out, cn);
-    }
-    for (size_t i = 0; ; i++) // afters
-    {
-      node_s *cn = n->children[i];
-      if (cn == NULL) break;
-      if (cn->type != 'A') continue;
-      //print_if_line(out,n);
-      fprintf(out, "  after_all_%d();\n", cn->nodenumber);
-    }
-  }
-}
+//void print_it_calls(FILE *out, node_s *n)
+//{
+//  if (n->type == 'i')
+//  {
+//    //print_if_line(out,n);
+//    fprintf(out, "  it_%d();", n->nodenumber);
+//    fprintf(out, " // %s li%d\n", n->fname, n->lstart);
+//  }
+//  else
+//  {
+//    for (size_t i = 0; ; i++) // befores
+//    {
+//      node_s *cn = n->children[i];
+//      if (cn == NULL) break;
+//      if (cn->type != 'B') continue;
+//      //print_if_line(out,n);
+//      fprintf(out, "  before_all_%d();\n", cn->nodenumber);
+//    }
+//    for (size_t i = 0; ; i++)
+//    {
+//      node_s *cn = n->children[i];
+//      if (cn == NULL) break;
+//      if (cn->type == 'B' || cn->type == 'A') continue;
+//      print_it_calls(out, cn);
+//    }
+//    for (size_t i = 0; ; i++) // afters
+//    {
+//      node_s *cn = n->children[i];
+//      if (cn == NULL) break;
+//      if (cn->type != 'A') continue;
+//      //print_if_line(out,n);
+//      fprintf(out, "  after_all_%d();\n", cn->nodenumber);
+//    }
+//  }
+//}
 
 void print_nodes(FILE *out, node_s *n)
 {
@@ -671,7 +671,7 @@ void print_nodes(FILE *out, node_s *n)
 
   fprintf(
     out,
-    "  rdz_nodes[%d] = &(rdz_node){ %d, %d, '%c', %d, %d, %d, %s, %s };\n",
+    "  rdz_nodes[%d] = &(rdz_node){ 0, %d, %d, '%c', %d, %d, %d, %s, %s };\n",
     n->nodenumber,
     n->parent != NULL ? n->parent->nodenumber : -1, n->nodenumber,
     t, n->lstart, n->ltstart, n->llength, ss, func);
@@ -695,9 +695,11 @@ void print_footer(FILE *out, context_s *c)
 
   fprintf(out, "int main(int argc, char *argv[])\n");
   fprintf(out, "{\n");
+
   //fprintf(out, "  char *sl = getenv(\"L\");\n");
   //fprintf(out, "  int l = sl == NULL ? -1 : atoi(sl);\n");
   //fprintf(out, "\n");
+  fprintf(out, "  rdz_extract_arguments();\n");
 
   fprintf(out, "  rdz_nodes = calloc(%d, sizeof(rdz_node *));\n", c->nodecount);
   print_nodes(out, n);
@@ -707,7 +709,9 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
   fprintf(out, "\n");
 
-  print_it_calls(out, n);
+  //print_it_calls(out, n);
+  fprintf(out, "  rdz_determine_dorun(rdz_nodes[0]);\n");
+  fprintf(out, "  rdz_dorun(rdz_nodes[0]);\n");
 
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", c->itcount);
