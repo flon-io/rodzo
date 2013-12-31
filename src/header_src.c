@@ -40,6 +40,19 @@ char *rdz_strdup(char *s)
   return r;
 }
 
+typedef int rdz_func();
+
+typedef struct rdz_node {
+  int parentnumber;
+  int nodenumber;
+  char type;
+  int lstart;
+  int ltstart;
+  int llength;
+  char **stack;
+  rdz_func *func;
+} rdz_node;
+
 typedef struct rdz_result {
   int success;
   char *message;
@@ -98,6 +111,8 @@ void rdz_result_free(rdz_result *r)
 
   free(r);
 }
+
+rdz_node **rdz_nodes = NULL;
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
