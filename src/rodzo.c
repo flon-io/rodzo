@@ -663,7 +663,7 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
   fprintf(out, "\n");
 
-  fprintf(out, "  rdz_determine_dorun();\n");
+  fprintf(out, "  rdz_determine_dorun(rdz_nodes[0]);\n");
   fprintf(out, "  rdz_dorun(rdz_nodes[0]);\n");
 
   fputs("\n", out);

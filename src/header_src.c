@@ -218,20 +218,65 @@ void rdz_extract_arguments()
   }
 }
 
-void rdz_set_dorun(rdz_node *n)
+int rdz_run_children(rdz_node *n)
 {
-  // TODO
+  for (size_t i = 0; i < rdz_node_count; i++)
+  {
+    rdz_node *cn = rdz_nodes[i];
+    if (cn->parentnumber != n->nodenumber) continue;
+    char ct = cn->type;
+    if (ct != 'd' && ct != 'c' && ct != 'i') continue;
+    cn->dorun = 1;
+    if (ct != 'i') rdz_run_children(cn);
+  }
 }
 
-void rdz_determine_dorun()
+int rdz_determine_dorun(rdz_node *n)
 {
-  // TODO
+  char t = n->type;
+
+  if (t == 'B' || t == 'b' || t == 'A' || t == 'a') return 0;
+
+  if (t == 'G' || t == 'g')
+  {
+    n->dorun = 1;
+  }
+  else
+  {
+    // L
+
+    if (rdz_lines[0] == -1) n->dorun = 1;
+
+    for (size_t i = 0; n->dorun == 0 && rdz_lines[i] > -1; i++)
+    {
+      int l = rdz_lines[i];
+      if (l >= n->ltstart && l <= n->ltstart + n->llength) n->dorun = 1;
+    }
+
+    // E
+
+    if (t == 'i') // only match "it" instances
+    {
+      // TODO
+    }
+  }
+
+  if ( ! n->dorun) return 0;
+  if (t == 'i') return 1;
+
+  int r = 0;
 
   for (size_t i = 0; i < rdz_node_count; i++)
   {
-    rdz_node *n = rdz_nodes[i];
-    n->dorun = 1;
+    rdz_node *cn = rdz_nodes[i];
+    if (cn->parentnumber != n->nodenumber) continue;
+    int rr = rdz_determine_dorun(cn);
+    r = r || rr;
   }
+
+  if (r == 0) rdz_run_children(n); // force all children to run
+
+  return 1;
 }
 
 void rdz_dorun(rdz_node *n)
