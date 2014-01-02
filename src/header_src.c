@@ -141,7 +141,9 @@ void rdz_print_context(rdz_result *p, rdz_result *r)
     char *rt = rit->stack[i];
     if (strcmp(pt, rt) == 0) continue;
     for (int ii = 0; ii < i; ii++) printf("  "); // indent
-    printf("%s\n", rit->stack[i]);
+    printf("%s", rit->stack[i]);
+    //printf(" (%d)", rit->ltstart); // FIXME
+    printf("\n");
   }
 }
 
@@ -155,8 +157,9 @@ void rdz_do_print_result(rdz_result *r)
   if (r->success) rdz_green(); else rdz_red();
   printf("%s", rit->stack[r->stackc - 1]);
   if ( ! r->success) printf(" (FAILED)");
-  printf("\n");
   rdz_clear();
+  printf(" (%d)", r->ltnumber);
+  printf("\n");
 }
 
 void rdz_print_result(rdz_result *p, rdz_result *r)
