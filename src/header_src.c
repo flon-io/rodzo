@@ -56,7 +56,6 @@ typedef struct rdz_node {
   rdz_func *func;
 } rdz_node;
 
-int rdz_node_count = 0;
 rdz_node **rdz_nodes = NULL;
 
 typedef struct rdz_result {
@@ -219,10 +218,9 @@ void rdz_extract_arguments()
 
 int rdz_run_children(rdz_node *n)
 {
-  for (size_t i = 0; i < rdz_node_count; i++)
+  for (size_t i = 0; n->children[i] > -1; i++)
   {
-    rdz_node *cn = rdz_nodes[i];
-    if (cn->parentnumber != n->nodenumber) continue;
+    rdz_node *cn = rdz_nodes[n->children[i]];
     char ct = cn->type;
     if (ct != 'd' && ct != 'c' && ct != 'i') continue;
     cn->dorun = 1;
@@ -265,10 +263,9 @@ int rdz_determine_dorun(rdz_node *n)
 
   int r = 0;
 
-  for (size_t i = 0; i < rdz_node_count; i++)
+  for (size_t i = 0; n->children[i] > -1; i++)
   {
-    rdz_node *cn = rdz_nodes[i];
-    if (cn->parentnumber != n->nodenumber) continue;
+    rdz_node *cn = rdz_nodes[n->children[i]];
     int rr = rdz_determine_dorun(cn);
     r = r || rr;
   }
@@ -290,25 +287,22 @@ void rdz_dorun(rdz_node *n)
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
-    for (size_t i = 0; i < rdz_node_count; i++) // before all
+    for (size_t i = 0; n->children[i] > -1; i++) // before all
     {
-      rdz_node *nn = rdz_nodes[i];
+      rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'B') continue;
-      if (nn->parentnumber != n->nodenumber) continue;
       nn->func();
     }
-    for (size_t i = 0; i < rdz_node_count; i++) // children
+    for (size_t i = 0; n->children[i] > -1; i++) // children
     {
-      rdz_node *nn = rdz_nodes[i];
-      if (nn->parentnumber != n->nodenumber) continue;
+      rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'd' && nn->type != 'c' && nn->type != 'i') continue;
       rdz_dorun(nn);
     }
-    for (size_t i = 0; i < rdz_node_count; i++) // after all
+    for (size_t i = 0; n->children[i] > -1; i++) // after all
     {
-      rdz_node *nn = rdz_nodes[i];
+      rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'A') continue;
-      if (nn->parentnumber != n->nodenumber) continue;
       nn->func();
     }
   }

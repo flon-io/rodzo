@@ -663,7 +663,6 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "  rdz_extract_arguments();\n");
   fprintf(out, "\n");
 
-  fprintf(out, "  rdz_node_count = %d;\n", c->nodecount);
   fprintf(out, "  rdz_nodes = (rdz_node *[]){\n");
   print_nodes(out, n);
   fprintf(out, "    NULL };\n");
