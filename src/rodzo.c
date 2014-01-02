@@ -460,8 +460,11 @@ void process_lines(context_s *c, char *path)
       push_linef(
         c, "%sint r%i = %s",
         ind, varcount, con);
+      //push_linef(
+      //  c, "%s  rdz_record(r%i, NULL, _s, %i, _fn, %d, %d); ",
+      //  ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
       push_linef(
-        c, "%s  rdz_record(r%i, NULL, _s, %i, _fn, %d, %d); ",
+        c, "%s  rdz_record(r%i, NULL, %d, %d, %d); ",
         ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
       push_linef(
         c, "if ( ! r%i) goto _over;\n",
@@ -550,9 +553,6 @@ void print_node(FILE *out, node_s *n)
     char *_s = list_texts_as_literal(n);
     fprintf(out, "%sint it_%d()\n", ind, n->nodenumber);
     fprintf(out, "%s{\n", ind);
-    fprintf(out, "%s  char *_s[] = %s;\n", ind, _s);
-    fprintf(out, "%s  char *_fn = \"%s\";\n", ind, n->fname);
-    fprintf(out, "\n");
     free(_s);
 
     print_eaches(out, ind, 'b', n->parent);

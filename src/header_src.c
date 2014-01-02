@@ -55,35 +55,36 @@ typedef struct rdz_node {
   rdz_func *func;
 } rdz_node;
 
+int rdz_node_count = 0;
+rdz_node **rdz_nodes = NULL;
+
 typedef struct rdz_result {
   int success;
   char *message;
-  int stackc;
-  char **stack;
   char *context;
   char *title;
   int itnumber;
-  char *fname;
+  size_t stackc;
   int lnumber;
   int ltnumber;
 } rdz_result;
 
 rdz_result *rdz_result_malloc(
-  int success, char *msg,
-  char *s[], int itnumber,
-  char *fname, int lnumber, int ltnumber
+  int success, char *msg, int itnumber, int lnumber, int ltnumber
 )
 {
-  int sc; for (sc = 0; ; sc++) { if (s[sc] == NULL) break; }
+  rdz_node *n = rdz_nodes[itnumber];
+
+  size_t sc; for (sc = 0; ; sc++) { if (n->stack[sc] == NULL) break; }
   char **ss = calloc(sc + 1, sizeof(char *));
-  for (int i = 0; i < sc; i++) ss[i] = rdz_strdup(s[i]);
+  for (size_t i = 0; i < sc; i++) ss[i] = rdz_strdup(n->stack[i]);
 
   char *context = calloc((sc - 1) * 160, sizeof(char));
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
 
   for (int i = 0; i < sc; i++) {
-    strcpy(t, s[i]); t += strlen(s[i]);
+    strcpy(t, n->stack[i]); t += strlen(n->stack[i]);
     if (i == sc - 2) strcpy(context, title);
     if (i < sc - 1) *(t++) = ' ';
   }
@@ -91,12 +92,10 @@ rdz_result *rdz_result_malloc(
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
   r->message = msg;
-  r->stackc = sc;
-  r->stack = ss;
   r->context = context;
   r->title = title;
   r->itnumber = itnumber;
-  r->fname = rdz_strdup(fname);
+  r->stackc = sc;
   r->lnumber = lnumber;
   r->ltnumber = ltnumber;
 
@@ -107,15 +106,9 @@ void rdz_result_free(rdz_result *r)
 {
   free(r->context);
   free(r->title);
-  free(r->fname);
-  for (size_t i = 0; i < r->stackc; i++) free(r->stack[i]);
-  free(r->stack);
 
   free(r);
 }
-
-int rdz_node_count = 0;
-rdz_node **rdz_nodes = NULL;
 
 int *rdz_lines = NULL;
 char *rdz_example = NULL;
@@ -138,14 +131,17 @@ void rdz_print_context(rdz_result *p, rdz_result *r)
   if (r == NULL) return;
   if (p != NULL && r->itnumber == p->itnumber) return;
 
-  for (int i = 0; i < r->stackc - 1; i++)
+  rdz_node *pit = p ? rdz_nodes[p->itnumber] : NULL;
+  rdz_node *rit = rdz_nodes[r->itnumber];
+
+  for (size_t i = 0; i < r->stackc - 1; i++)
   {
     char *pt = "";
-    if (p != NULL && p->stackc > i) pt = p->stack[i];
-    char *rt = r->stack[i];
+    if (p != NULL && p->stackc > i) pt = pit->stack[i];
+    char *rt = rit->stack[i];
     if (strcmp(pt, rt) == 0) continue;
     for (int ii = 0; ii < i; ii++) printf("  "); // indent
-    printf("%s\n", r->stack[i]);
+    printf("%s\n", rit->stack[i]);
   }
 }
 
@@ -153,9 +149,11 @@ void rdz_do_print_result(rdz_result *r)
 {
   if (r == NULL) return;
 
+  rdz_node *rit = rdz_nodes[r->itnumber];
+
   for (int ii = 0; ii < r->stackc - 1; ii++) printf("  "); // indent
   if (r->success) rdz_green(); else rdz_red();
-  printf("%s", r->stack[r->stackc - 1]);
+  printf("%s", rit->stack[r->stackc - 1]);
   if ( ! r->success) printf(" (FAILED)");
   printf("\n");
   rdz_clear();
@@ -179,14 +177,10 @@ void rdz_do_record(rdz_result *r)
   rdz_print_context(prev, r);
 }
 
-void rdz_record(
-  int success, char *msg,
-  char *s[], int itnumber,
-  char *fname, int lnumber, int ltnumber
-)
+void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
 {
   rdz_result *result =
-    rdz_result_malloc(success, msg, s, itnumber, fname, lnumber, ltnumber);
+    rdz_result_malloc(success, msg, itnumber, lnumber, ltnumber);
 
   rdz_do_record(result);
 
@@ -347,15 +341,16 @@ void rdz_summary(int itcount)
   for (int i = 0, j = 0; i < rdz_count; i++)
   {
     rdz_result *r = rdz_results[i];
+    rdz_node *rit = rdz_nodes[r->itnumber];
 
     if ( ! r->success)
     {
-      char *line = rdz_read_line(r->fname, r->lnumber);
+      char *line = rdz_read_line(rit->fname, r->lnumber);
       printf("  %d) %s\n", ++j, r->title);
       printf("     >");
       rdz_red(); printf("%s", line); rdz_clear();
       printf("<\n");
-      rdz_cyan(); printf("     # %s:%d", r->fname, r->lnumber); rdz_clear();
+      rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
       printf(" (%d)\n", r->ltnumber);
       free(line);
     }
