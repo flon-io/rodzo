@@ -126,25 +126,29 @@ void rdz_cyan() { printf("[36m"); }
 //void rdz_white() { printf("[37m"); }
 void rdz_clear() { printf("[0m"); }
 
+void rdz_print_level(int nodenumber, int min)
+{
+  if (nodenumber < 0) return;
+  if (nodenumber < min) return;
+
+  rdz_node *n = rdz_nodes[nodenumber];
+  if (n->stack == NULL) return;
+
+  rdz_print_level(n->parentnumber, min);
+
+  size_t i; for (i = 0; n->stack[i] != NULL; i++)
+  for (size_t ii = 0; ii < i; ii++) printf("  ");
+
+  printf("%s", n->stack[i - 1]);
+  printf(" (%d)", n->ltstart);
+  printf("\n");
+}
 void rdz_print_context(rdz_result *p, rdz_result *r)
 {
   if (r == NULL) return;
-  if (p != NULL && r->itnumber == p->itnumber) return;
 
-  rdz_node *pit = p ? rdz_nodes[p->itnumber] : NULL;
   rdz_node *rit = rdz_nodes[r->itnumber];
-
-  for (size_t i = 0; i < r->stackc - 1; i++)
-  {
-    char *pt = "";
-    if (p != NULL && p->stackc > i) pt = pit->stack[i];
-    char *rt = rit->stack[i];
-    if (strcmp(pt, rt) == 0) continue;
-    for (int ii = 0; ii < i; ii++) printf("  "); // indent
-    printf("%s", rit->stack[i]);
-    //printf(" (%d)", rit->ltstart); // FIXME
-    printf("\n");
-  }
+  rdz_print_level(rit->parentnumber, p != NULL ? p->itnumber : -1);
 }
 
 void rdz_do_print_result(rdz_result *r)
