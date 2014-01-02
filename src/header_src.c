@@ -61,7 +61,6 @@ rdz_node **rdz_nodes = NULL;
 typedef struct rdz_result {
   int success;
   char *message;
-  char *context;
   char *title;
   int itnumber;
   size_t stackc;
@@ -79,20 +78,17 @@ rdz_result *rdz_result_malloc(
   char **ss = calloc(sc + 1, sizeof(char *));
   for (size_t i = 0; i < sc; i++) ss[i] = rdz_strdup(n->stack[i]);
 
-  char *context = calloc((sc - 1) * 160, sizeof(char));
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
 
   for (int i = 0; i < sc; i++) {
     strcpy(t, n->stack[i]); t += strlen(n->stack[i]);
-    if (i == sc - 2) strcpy(context, title);
     if (i < sc - 1) *(t++) = ' ';
   }
 
   rdz_result *r = malloc(sizeof(rdz_result));
   r->success = success;
   r->message = msg;
-  r->context = context;
   r->title = title;
   r->itnumber = itnumber;
   r->stackc = sc;
@@ -104,7 +100,7 @@ rdz_result *rdz_result_malloc(
 
 void rdz_result_free(rdz_result *r)
 {
-  free(r->context);
+  free(r->message);
   free(r->title);
 
   free(r);
