@@ -345,26 +345,22 @@ void rdz_summary(int itcount)
     printf("Failures:\n\n");
   }
 
-  for (int i = 0, j = 0; i < rdz_count; i++)
+  for (size_t i = 0, j = 0; i < rdz_count; i++)
   {
     rdz_result *r = rdz_results[i];
     rdz_node *rit = rdz_nodes[r->itnumber];
 
-    if ( ! r->success)
-    {
-      char *line = rdz_read_line(rit->fname, r->lnumber);
-      printf("  %d) %s\n", ++j, r->title);
-      printf("     >");
-      rdz_red(); printf("%s", line); rdz_clear();
-      printf("<\n");
-      rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
-      printf(" (%d)\n", r->ltnumber);
-      free(line);
-    }
+    if (r->success) continue;
 
-    rdz_result_free(r);
+    char *line = rdz_read_line(rit->fname, r->lnumber);
+    printf("  %d) %s\n", ++j, r->title);
+    printf("     >");
+    rdz_red(); printf("%s", line); rdz_clear();
+    printf("<\n");
+    rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
+    printf(" (%d)\n", r->ltnumber);
+    free(line);
   }
-  free(rdz_results);
 
   printf("\n");
   if (rdz_fail_count > 0) rdz_red(); else rdz_green();
@@ -377,7 +373,22 @@ void rdz_summary(int itcount)
   if (rdz_fail_count > 0)
   {
     printf("Failed examples:\n\n");
-    rdz_red(); printf("TODO (maybe)\n\n"); rdz_clear();
+
+    for (size_t i = 0; i < rdz_count; i++)
+    {
+      rdz_result *r = rdz_results[i];
+
+      if (r->success) continue;
+
+      rdz_red(); printf("make spec L=%d", r->ltnumber);
+      rdz_cyan(); printf(" # %s\n", r->title);
+      rdz_clear();
+    }
+
+    printf("\n");
   }
+
+  for (size_t i = 0; i < rdz_count; i++) rdz_result_free(rdz_results[i]);
+  free(rdz_results);
 }
 
