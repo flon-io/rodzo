@@ -47,6 +47,7 @@ typedef struct rdz_node {
   int parentnumber;
   int nodenumber;
   char type;
+  char *fname;
   int lstart;
   int ltstart;
   int llength;

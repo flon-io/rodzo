@@ -412,7 +412,6 @@ void process_lines(context_s *c, char *path)
     //printf("head: >%s<\n", head);
     //printf("  text: >%s<\n", text);
 
-    //char ctype = current_type(c);
     int cindent = current_indent(c);
 
     if (strcmp(head, "{") == 0 && indent == cindent)
@@ -423,10 +422,6 @@ void process_lines(context_s *c, char *path)
     {
       pull(c, lnumber);
     }
-    //else if (strcmp(head, "global") == 0 || strcmp(head, "globally") == 0)
-    //{
-    //  push(c, indent, 'g', head, path, lnumber);
-    //}
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {
       char *tline = flu_strtrim(line);
@@ -627,10 +622,12 @@ void print_nodes(FILE *out, node_s *n)
 
   fprintf(
     out,
-    "  rdz_nodes[%d] = &(rdz_node){ 0, %d, %d, '%c', %d, %d, %d, %s, %s };\n",
+    "  rdz_nodes[%d] = &(rdz_node)"
+    "{ 0, %d, %d, '%c', \"%s\", %d, %d, %d, %s, %s };\n",
     n->nodenumber,
     n->parent != NULL ? n->parent->nodenumber : -1, n->nodenumber,
-    t, n->lstart, n->ltstart, n->llength, ss, func);
+    t, n->fname,
+    n->lstart, n->ltstart, n->llength, ss, func);
 
   for (size_t i = 0; ; i++)
   {
