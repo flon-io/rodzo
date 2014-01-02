@@ -610,6 +610,15 @@ void print_nodes(FILE *out, node_s *n)
 {
   char t = n->type;
 
+  flu_sbuffer *b = flu_sbuffer_malloc();
+  flu_sbprintf(b, "(int []){");
+  for (size_t i = 0; n->children[i] != NULL; i++)
+  {
+    flu_sbprintf(b, " %d,", n->children[i]->nodenumber);
+  }
+  flu_sbprintf(b, " -1 }");
+  char *children = flu_sbuffer_to_string(b);
+
   char *func = "NULL";
   if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
   else if (t == 'B') func = flu_sprintf("before_all_%d", n->nodenumber);
@@ -623,16 +632,19 @@ void print_nodes(FILE *out, node_s *n)
   fprintf(
     out,
     "    &(rdz_node)"
-    "{ 0, %d, %d, '%c', \"%s\", %d, %d, %d, %s, %s },\n",
-    n->parent != NULL ? n->parent->nodenumber : -1, n->nodenumber,
-    t, n->fname,
+    "{ 0, %d, %d, %s, '%c', \"%s\", %d, %d, %d, %s, %s },\n",
+    n->nodenumber,
+    n->parent != NULL ? n->parent->nodenumber : -1,
+    children,
+    t,
+    n->fname,
     n->lstart, n->ltstart, n->llength, ss, func);
 
-  for (size_t i = 0; ; i++)
+  free(children);
+
+  for (size_t i = 0; n->children[i] != NULL; i++)
   {
-    node_s *cn = n->children[i];
-    if (cn == NULL) break;
-    print_nodes(out, cn);
+    print_nodes(out, n->children[i]);
   }
 }
 

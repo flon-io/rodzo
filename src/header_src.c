@@ -44,8 +44,9 @@ typedef int rdz_func();
 
 typedef struct rdz_node {
   int dorun;
-  int parentnumber;
   int nodenumber;
+  int parentnumber;
+  int *children;
   char type;
   char *fname;
   int lstart;
