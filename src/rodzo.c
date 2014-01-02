@@ -622,9 +622,8 @@ void print_nodes(FILE *out, node_s *n)
 
   fprintf(
     out,
-    "  rdz_nodes[%d] = &(rdz_node)"
-    "{ 0, %d, %d, '%c', \"%s\", %d, %d, %d, %s, %s };\n",
-    n->nodenumber,
+    "    &(rdz_node)"
+    "{ 0, %d, %d, '%c', \"%s\", %d, %d, %d, %s, %s },\n",
     n->parent != NULL ? n->parent->nodenumber : -1, n->nodenumber,
     t, n->fname,
     n->lstart, n->ltstart, n->llength, ss, func);
@@ -653,8 +652,9 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_node_count = %d;\n", c->nodecount);
-  fprintf(out, "  rdz_nodes = calloc(rdz_node_count, sizeof(rdz_node *));\n");
+  fprintf(out, "  rdz_nodes = (rdz_node *[]){\n");
   print_nodes(out, n);
+  fprintf(out, "    NULL };\n");
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
