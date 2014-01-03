@@ -376,8 +376,5 @@ void rdz_summary(int itcount)
 
     printf("\n");
   }
-
-  for (size_t i = 0; i < rdz_count; i++) rdz_result_free(rdz_results[i]);
-  free(rdz_results);
 }
 

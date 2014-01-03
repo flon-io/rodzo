@@ -685,6 +685,14 @@ void print_footer(FILE *out, context_s *c)
 
   fputs("\n", out);
   fprintf(out, "  rdz_summary(%d);\n", c->itcount);
+
+  fputs("\n", out);
+  fprintf(out, "  for (size_t i = 0; i < rdz_count; i++) rdz_result_free(rdz_results[i]);\n");
+  fprintf(out, "  free(rdz_results);\n");
+
+  fputs("\n", out);
+  fprintf(out, "  free(rdz_lines);\n");
+
   fputs("}\n", out);
   fputs("\n", out);
 }
