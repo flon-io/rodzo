@@ -619,14 +619,21 @@ void print_nodes(FILE *out, node_s *n)
   flu_sbprintf(b, " -1 }");
   char *children = flu_sbuffer_to_string(b);
 
-  char *func = "NULL";
+  char *func;
   if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
   else if (t == 'B') func = flu_sprintf("before_all_%d", n->nodenumber);
   else if (t == 'A') func = flu_sprintf("after_all_%d", n->nodenumber);
+  else func = strdup("NULL");
 
-  char *ss = "NULL";
+  char *ss;
   if (t == 'i' || t == 'd' || t == 'c') {
-    ss = flu_sprintf("(char *[])%s", list_texts_as_literal(n));
+    char *ls = list_texts_as_literal(n);
+    ss = flu_sprintf("(char *[])%s", ls);
+    free(ls);
+  }
+  else
+  {
+    ss = strdup("NULL");
   }
 
   fprintf(
@@ -641,6 +648,8 @@ void print_nodes(FILE *out, node_s *n)
     n->lstart, n->ltstart, n->llength, ss, func);
 
   free(children);
+  free(ss);
+  free(func);
 
   for (size_t i = 0; n->children[i] != NULL; i++)
   {
