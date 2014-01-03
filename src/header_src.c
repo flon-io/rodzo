@@ -75,8 +75,6 @@ rdz_result *rdz_result_malloc(
   rdz_node *n = rdz_nodes[itnumber];
 
   size_t sc; for (sc = 0; ; sc++) { if (n->stack[sc] == NULL) break; }
-  char **ss = calloc(sc + 1, sizeof(char *));
-  for (size_t i = 0; i < sc; i++) ss[i] = rdz_strdup(n->stack[i]);
 
   char *title = calloc(sc * 160, sizeof(char));
   char *t = title;
