@@ -214,7 +214,7 @@ void rdz_extract_arguments()
   }
 }
 
-int rdz_run_children(rdz_node *n)
+void rdz_run_all_children(rdz_node *n)
 {
   for (size_t i = 0; n->children[i] > -1; i++)
   {
@@ -222,53 +222,66 @@ int rdz_run_children(rdz_node *n)
     char ct = cn->type;
     if (ct != 'd' && ct != 'c' && ct != 'i') continue;
     cn->dorun = 1;
-    if (ct != 'i') rdz_run_children(cn);
+    if (ct != 'i') rdz_run_all_children(cn);
   }
+}
+
+int rdz_determine_dorun_l(rdz_node *n)
+{
+  if (rdz_lines[0] == -1) return 1;
+
+  char t = n->type;
+
+  if (t == 'G' || t == 'g') return 1;
+
+  int r = 0;
+
+  for (size_t i = 0; r == 0 && rdz_lines[i] > -1; i++)
+  {
+    int l = rdz_lines[i];
+    if (l >= n->ltstart && l <= n->ltstart + n->llength) r = 1;
+  }
+
+  return r;
+}
+
+int rdz_determine_dorun_e(rdz_node *n)
+{
+  if (rdz_example == NULL) return 1;
+
+  return 0; // TODO
 }
 
 int rdz_determine_dorun(rdz_node *n)
 {
+  // sub determine functions do return:
+  // 0 : do not run
+  // 1 : dorun
+  // 2 : dorun and all the children as well
+
   char t = n->type;
 
   if (t == 'B' || t == 'b' || t == 'A' || t == 'a') return 0;
 
-  if (t == 'G' || t == 'g')
-  {
-    n->dorun = 1;
-  }
-  else
-  {
-    // L
+  int rl = rdz_determine_dorun_l(n);
+  int re = rdz_determine_dorun_e(n);
 
-    if (rdz_lines[0] == -1) n->dorun = 1;
+  if (rl && re) n->dorun = 1; else return 0;
 
-    for (size_t i = 0; n->dorun == 0 && rdz_lines[i] > -1; i++)
+  int run_all = (rl == 2 || re == 2);
+
+  if (run_all == 0)
+  {
+    int r = 0;
+    for (size_t i = 0; n->children[i] > -1; i++)
     {
-      int l = rdz_lines[i];
-      if (l >= n->ltstart && l <= n->ltstart + n->llength) n->dorun = 1;
+      int rc = rdz_determine_dorun(rdz_nodes[n->children[i]]);
+      r = r || rc;
     }
-
-    // E
-
-    if (t == 'i') // only match "it" instances
-    {
-      // TODO
-    }
+    if (r == 0) run_all = 1;
   }
 
-  if ( ! n->dorun) return 0;
-  if (t == 'i') return 1;
-
-  int r = 0;
-
-  for (size_t i = 0; n->children[i] > -1; i++)
-  {
-    rdz_node *cn = rdz_nodes[n->children[i]];
-    int rr = rdz_determine_dorun(cn);
-    r = r || rr;
-  }
-
-  if (r == 0) rdz_run_children(n); // force all children to run
+  if (run_all) rdz_run_all_children(n);
 
   return 1;
 }
