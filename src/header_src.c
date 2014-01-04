@@ -249,7 +249,15 @@ int rdz_determine_dorun_e(rdz_node *n)
 {
   if (rdz_example == NULL) return 1;
 
-  return 0; // TODO
+  return 0;
+
+  //if (n->stack == NULL) return 1;
+  //
+  //char *s; for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
+  //printf("t: '%c' text: >%s<\n", n->type, s);
+  //
+  //if (strstr(s, rdz_example)) return 2;
+  //return 0;
 }
 
 int rdz_determine_dorun(rdz_node *n)
