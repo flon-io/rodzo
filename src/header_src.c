@@ -226,6 +226,12 @@ void rdz_run_all_children(rdz_node *n)
   }
 }
 
+void rdz_run_all_parents(rdz_node *n)
+{
+  n->dorun = 1;
+  if (n->parentnumber > -1) rdz_run_all_parents(rdz_nodes[n->parentnumber]);
+}
+
 int rdz_determine_dorun_l(rdz_node *n)
 {
   if (rdz_lines[0] == -1) return 1;
