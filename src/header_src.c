@@ -262,7 +262,8 @@ int rdz_determine_dorun_l(rdz_node *n)
 
 int rdz_determine_dorun_e(rdz_node *n)
 {
-  char *s; for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
+  char *s = NULL;
+  for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
 
   return (strstr(s, rdz_example) != NULL);
 }
@@ -390,7 +391,7 @@ void rdz_summary(int itcount)
     if (r->success) continue;
 
     char *line = rdz_read_line(rit->fname, r->lnumber);
-    printf("  %d) %s\n", ++j, r->title);
+    printf("  %zu) %s\n", ++j, r->title);
     printf("     >");
     rdz_red(); printf("%s", line); rdz_clear();
     printf("<\n");
