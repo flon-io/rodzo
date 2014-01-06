@@ -22,10 +22,7 @@ vspec: s
 	valgrind --leak-check=full -v ./s
 
 clean:
-	rm -f *.o
-	rm -f *.so
-	rm -f *.c
-	rm -f s
+	rm -f *.o *.so *.c s
 
 .PHONY: spec vspec clean
 

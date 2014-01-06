@@ -26,7 +26,7 @@ context "str functions"
     {
       s = flu_strrtrim("brown fox \n\t");
 
-      ensure(strcmp("brown fox", s) == 0);
+      ensure(strcmp("brown fox nada", s) == 0);
     }
 
     it "doesn't trim when not necessary"
