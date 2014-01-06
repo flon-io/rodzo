@@ -7,14 +7,15 @@ Only tested on Debian GNU/Linux (7). I'll ready it for OSX later on (have to upg
 
 Rodzo is mostly a pre-preprocessor (bin/rodzo) that turns a set of _spec.c files into a single .c file ready to compile. It's probably best to use rodzo in conjunction with GNU Make to have a very short spec / run (red) / implement / run (green) loop.
 
+This readme is split between [Usage](#Usage) and [Writing specs](#Writing-specs).
 
-## similar projects
+### Similar projects
 
 * [cspec](https://github.com/arnaudbrejeon/cspec)
 * [cspec](https://github.com/nebularis/cspec)
 
 
-## usage
+## Usage
 
 Under [test4/](test4) is a vanilla project with rodzo included in its scaffold.
 
@@ -78,6 +79,42 @@ clean:
 .PHONY: spec vspec clean
 ```
 
+A [spec file](test4/spec/str_spec.c) looks like:
+
+```c
+#include "flutil.h"
+
+context "str functions"
+{
+  before each
+  {
+    char *s = NULL;
+  }
+  after each
+  {
+    if (s != NULL) free(s);
+  }
+
+  describe "flu_strrtrim(char *s)"
+  {
+    it "trims on the right"
+    {
+      s = flu_strrtrim("brown fox \n\t");
+
+      ensure(strcmp("brown fox", s) == 0);
+    }
+
+    it "doesn't trim when not necessary"
+    {
+      s = flu_strrtrim("");
+
+      ensure(strcmp("", s) == 0);
+    }
+  }
+}
+```
+(note: before each and after each get inlined in the examples).
+
 Running ```make spec``` from test4/ should yield something like:
 
 <img src="doc/output0.png" />
@@ -89,6 +126,17 @@ TODO
 ### specifying a pattern with E=
 
 TODO
+
+
+## Writing specs
+
+TODO
+
+### ensure
+### streq / === / whatever
+### before all / after all
+### before each / after each
+### before each / after each offline
 
 
 ## License

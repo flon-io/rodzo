@@ -1,5 +1,5 @@
 
 ## rodzo test4
 
-More a example than a test.
+More an example than a test.
 
