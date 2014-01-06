@@ -7,7 +7,7 @@ Only tested on Debian GNU/Linux (7). I'll ready it for OSX later on (have to upg
 
 Rodzo is mostly a pre-preprocessor (bin/rodzo) that turns a set of _spec.c files into a single .c file ready to compile. It's probably best to use rodzo in conjunction with GNU Make to have a very short spec / run (red) / implement / run (green) loop.
 
-This readme is split between [Usage](#usage) and [Writing specs](#writing-specs).
+This readme is split between [Usage](#usage), [Writing specs](#writing-specs), and [How it works](#how-it-works).
 
 ### Similar projects
 
@@ -137,6 +137,11 @@ TODO
 ### before all / after all
 ### before each / after each
 ### before each / after each offline
+
+
+## How it works
+
+TODO
 
 
 ## License
