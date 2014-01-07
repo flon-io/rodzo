@@ -11,8 +11,8 @@ This readme is split between [Usage](#usage), [Writing specs](#writing-specs), a
 
 ### Similar projects
 
-* [cspec](https://github.com/arnaudbrejeon/cspec)
-* [cspec](https://github.com/nebularis/cspec)
+* [https://github.com/arnaudbrejeon/cspec](https://github.com/arnaudbrejeon/cspec)
+* [https://github.com/nebularis/cspec](https://github.com/nebularis/cspec)
 
 
 ## Usage
