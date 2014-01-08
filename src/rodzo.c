@@ -341,11 +341,9 @@ char *extract_text(char *line)
 
 int ends_in_semicolon(char *line)
 {
-  //printf("strlen(line): %ld\n", strlen(line));
   for (int l = strlen(line); l > 1; l--)
   {
     char c = line[l - 1];
-    //printf("c: >%c<\n", c);
     if (c == ';') return 1;
     if (c == ' ' || c == '\t' || c == '\n') continue;
     return 0;
@@ -388,6 +386,35 @@ int count_lines(char *s)
   return count;
 }
 
+int push_ensure(
+  context_s *c, FILE *in, int indent, int lnumber, int varcount, char *l
+)
+{
+  l = strpbrk(l, "e");
+  char *con = extract_condition(in, l + 6);
+  lnumber += count_lines(con);
+
+  char *ind = calloc(indent + 1, sizeof(char));
+  for (size_t i = 0; i < indent; i++) ind[i] = ' ';
+
+  push_linef(
+    c, "%sint r%i = %s",
+    ind, varcount, con);
+  push_linef(
+    c, "%s  rdz_record(r%i, NULL, %d, %d, %d); ",
+    ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
+  push_linef(
+    c, "if ( ! r%i) goto _over;\n",
+    varcount);
+
+  free(ind);
+  free(con);
+
+  c->encount++;
+
+  return lnumber;
+}
+
 void process_lines(context_s *c, char *path)
 {
   push(c, 0, 'g', NULL, path, 0);
@@ -425,7 +452,7 @@ void process_lines(context_s *c, char *path)
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {
       char *tline = flu_strtrim(line);
-      char t = 'b';
+      char t = 'b'; // "before each"
       if (strncmp(tline, "before all", 10) == 0) t = 'B';
       else if (strncmp(tline, "after each", 10) == 0) t = 'a';
       else if (strncmp(tline, "after all", 9) == 0) t = 'A';
@@ -450,31 +477,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "ensure") == 0)
     {
-      char *l = strpbrk(line, "e");
-      char *con = extract_condition(in, l + 6);
-      lnumber += count_lines(con);
-
-      char *ind = calloc(indent + 1, sizeof(char));
-      for (size_t i = 0; i < indent; i++) ind[i] = ' ';
-
-      push_linef(
-        c, "%sint r%i = %s",
-        ind, varcount, con);
-      //push_linef(
-      //  c, "%s  rdz_record(r%i, NULL, _s, %i, _fn, %d, %d); ",
-      //  ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
-      push_linef(
-        c, "%s  rdz_record(r%i, NULL, %d, %d, %d); ",
-        ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
-      push_linef(
-        c, "if ( ! r%i) goto _over;\n",
-        varcount);
-
-      free(ind);
-      free(con);
-      ++varcount;
-
-      c->encount++;
+      lnumber = push_ensure(c, in, indent, lnumber, varcount++, line);
     }
     else
     {
