@@ -397,17 +397,40 @@ int push_ensure(
   char *ind = calloc(indent + 1, sizeof(char));
   for (size_t i = 0; i < indent; i++) ind[i] = ' ';
 
+  char *msg = strdup("NULL");
+
+  char *s = strstr(con, "===");
+
+  if (s == NULL)
+  {
+    push_linef(c, "%sint r%i = %s", ind, varcount, con);
+  }
+  else
+  {
+    s[0] = '\0';
+    char *left = flu_strtrim(con);
+    char *right = flu_strtrim(s + 3);
+    right[strlen(right) - 2] = '\0'; // remove traling ;
+
+    //if (right[0] == '"') ... ? is that a good idea ?
+
+    push_linef(
+      c, "%sint r%i = (strcmp%s, %s) == 0);\n",
+      ind, varcount, left, right);
+
+    free(left);
+    free(right);
+  }
+
   push_linef(
-    c, "%sint r%i = %s",
-    ind, varcount, con);
-  push_linef(
-    c, "%s  rdz_record(r%i, NULL, %d, %d, %d); ",
-    ind, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
+    c, "%s  rdz_record(r%i, %s, %d, %d, %d); ",
+    ind, varcount, msg, c->node->nodenumber, lnumber, c->loffset + lnumber);
   push_linef(
     c, "if ( ! r%i) goto _over;\n",
     varcount);
 
   free(ind);
+  free(msg);
   free(con);
 
   c->encount++;

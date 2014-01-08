@@ -42,6 +42,20 @@ describe "mne_tos()"
     {
       ensure(strcmp(mne_tos(0), "a") == 0);
     }
+    it "compares strings 1"
+    {
+      ensure(mne_tos(1) === "i");
+    }
+    it "compares strings 2"
+    {
+      ensure(mne_tos(7) === "FAIL");
+    }
+    it "compares strings 2"
+    {
+      ensure(
+        mne_tos(47) === "ia"
+      );
+    }
   }
 }
 
