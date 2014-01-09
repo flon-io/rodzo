@@ -390,6 +390,8 @@ int push_ensure(
   context_s *c, FILE *in, int indent, int lnumber, int varcount, char *l
 )
 {
+  // TODO: replace varcount by lnumber
+
   l = strpbrk(l, "e");
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
@@ -397,40 +399,48 @@ int push_ensure(
   char *ind = calloc(indent + 1, sizeof(char));
   for (size_t i = 0; i < indent; i++) ind[i] = ' ';
 
-  char *msg = strdup("NULL");
+  push_linef(c, "%schar *msg%d = NULL;\n", ind, varcount);
 
   char *s = strstr(con, "===");
 
   if (s == NULL)
   {
-    push_linef(c, "%sint r%i = %s", ind, varcount, con);
+    push_linef(c, "%sint r%d = %s", ind, varcount, con);
   }
   else
   {
+    //if (right[0] == '"') {} // for now it only works with strings
+
     s[0] = '\0';
     char *left = flu_strtrim(con);
     char *right = flu_strtrim(s + 3);
     right[strlen(right) - 2] = '\0'; // remove trailing ;
 
-    //if (right[0] == '"') ... ? is that a good idea ?
-
     push_linef(
-      c, "%sint r%i = (strcmp%s, %s) == 0);\n",
-      ind, varcount, left, right);
+      c, "%schar *result%d = %s);\n",
+      ind, varcount, left);
+    push_linef(
+      c, "%schar *expected%d = %s;\n",
+      ind, varcount, right);
+    push_linef(
+      c, "%smsg%d = rdz_compare_strings(result%d, expected%d);\n",
+      ind, varcount, varcount, varcount);
+    push_linef(
+      c, "%sint r%d = (msg%d == NULL);\n",
+      ind, varcount, varcount);
 
     free(left);
     free(right);
   }
 
   push_linef(
-    c, "%s  rdz_record(r%i, %s, %d, %d, %d); ",
-    ind, varcount, msg, c->node->nodenumber, lnumber, c->loffset + lnumber);
+    c, "%s  rdz_record(r%d, msg%d, %d, %d, %d); ",
+    ind, varcount, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
   push_linef(
-    c, "if ( ! r%i) goto _over;\n",
+    c, "if ( ! r%d) goto _over;\n",
     varcount);
 
   free(ind);
-  free(msg);
   free(con);
 
   c->encount++;

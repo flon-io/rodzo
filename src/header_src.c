@@ -181,6 +181,24 @@ void rdz_print_result(rdz_result *p, rdz_result *r)
   rdz_do_print_result(p);
 }
 
+char *rdz_compare_strings(char *result, char *expected)
+{
+  if (strcmp(result, expected) == 0) return NULL;
+
+  size_t le = strlen(expected);
+  size_t lr = strlen(result);
+
+  char *s = calloc(lr + le + 28, sizeof(char));
+
+  strcpy(s, "expected \"");
+  strcpy(s + 10, expected);
+  strcpy(s + 10 + le, "\" but was \"");
+  strcpy(s + 10 + le + 11, result);
+  strcpy(s + 10 + le + 11 + lr, "\"");
+
+  return s;
+}
+
 void rdz_do_record(rdz_result *r)
 {
   rdz_result *prev = NULL;
@@ -392,6 +410,9 @@ void rdz_summary(int itcount)
 
     char *line = rdz_read_line(rit->fname, r->lnumber);
     printf("  %zu) %s\n", ++j, r->title);
+    if (r->message) {
+      rdz_red(); printf("     %s\n", r->message); rdz_clear();
+    }
     printf("     >");
     rdz_red(); printf("%s", line); rdz_clear();
     printf("<\n");
