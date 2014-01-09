@@ -410,7 +410,7 @@ int push_ensure(
     s[0] = '\0';
     char *left = flu_strtrim(con);
     char *right = flu_strtrim(s + 3);
-    right[strlen(right) - 2] = '\0'; // remove traling ;
+    right[strlen(right) - 2] = '\0'; // remove trailing ;
 
     //if (right[0] == '"') ... ? is that a good idea ?
 
