@@ -386,12 +386,8 @@ int count_lines(char *s)
   return count;
 }
 
-int push_ensure(
-  context_s *c, FILE *in, int indent, int lnumber, int varcount, char *l
-)
+int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
-  // TODO: replace varcount by lnumber
-
   l = strpbrk(l, "e");
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
@@ -399,13 +395,13 @@ int push_ensure(
   char *ind = calloc(indent + 1, sizeof(char));
   for (size_t i = 0; i < indent; i++) ind[i] = ' ';
 
-  push_linef(c, "%schar *msg%d = NULL;\n", ind, varcount);
+  push_linef(c, "%schar *msg%d = NULL;\n", ind, lnumber);
 
   char *s = strstr(con, "===");
 
   if (s == NULL)
   {
-    push_linef(c, "%sint r%d = %s", ind, varcount, con);
+    push_linef(c, "%sint r%d = %s", ind, lnumber, con);
   }
   else
   {
@@ -418,16 +414,16 @@ int push_ensure(
 
     push_linef(
       c, "%schar *result%d = %s);\n",
-      ind, varcount, left);
+      ind, lnumber, left);
     push_linef(
       c, "%schar *expected%d = %s;\n",
-      ind, varcount, right);
+      ind, lnumber, right);
     push_linef(
       c, "%smsg%d = rdz_compare_strings(result%d, expected%d);\n",
-      ind, varcount, varcount, varcount);
+      ind, lnumber, lnumber, lnumber);
     push_linef(
       c, "%sint r%d = (msg%d == NULL);\n",
-      ind, varcount, varcount);
+      ind, lnumber, lnumber);
 
     free(left);
     free(right);
@@ -435,10 +431,10 @@ int push_ensure(
 
   push_linef(
     c, "%s  rdz_record(r%d, msg%d, %d, %d, %d); ",
-    ind, varcount, varcount, c->node->nodenumber, lnumber, c->loffset + lnumber);
+    ind, lnumber, lnumber, c->node->nodenumber, lnumber, c->loffset + lnumber);
   push_linef(
     c, "if ( ! r%d) goto _over;\n",
-    varcount);
+    lnumber);
 
   free(ind);
   free(con);
@@ -454,8 +450,6 @@ void process_lines(context_s *c, char *path)
 
   FILE *in = fopen(path, "r");
   if (in == NULL) return;
-
-  int varcount = 0;
 
   int lnumber = 0;
   char *line = NULL;
@@ -510,7 +504,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "ensure") == 0)
     {
-      lnumber = push_ensure(c, in, indent, lnumber, varcount++, line);
+      lnumber = push_ensure(c, in, indent, lnumber, line);
     }
     else
     {
