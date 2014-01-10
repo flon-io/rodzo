@@ -127,13 +127,21 @@ TODO
 
 TODO
 
+### running with Valgrind (vspec)
+
+As seen in [test4/tmp/Makefile](test4/tmp/Makefile) there is a ```vspec``` target. It's meant for running the specs with Valgrind as the host.
+
+Extra care has been taken for rodzo to generate a spec infrastructure which Valgrind flags as "0 leaks 0 errors" so that one can focus on cleaning leaks and errors from his code.
+
+Beware leaks introduced by the spec themselves, generating a string, comparing it with some string literal, then not freeing the generated string... ```before each``` and ```after each``` can help in those cases, to prevent cluttering the specs with free() calls.
+
 
 ## Writing specs
 
 TODO
 
 ### ensure
-### streq / === / whatever
+### ensure and ===
 ### before all / after all
 ### before each / after each
 ### before each / after each offline
