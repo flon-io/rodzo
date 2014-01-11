@@ -122,7 +122,21 @@ Running ```make spec``` from test4/ should yield something like:
 
 ### specifying lines with L=
 
-TODO
+When one wants to only run one example, it's OK to add ```L={lnumber}``` when running the specs:
+
+```
+$ make spec L=45
+```
+
+It's OK to pass multiple line numbers, separated by commas:
+
+```
+$ make spec L=45,72
+```
+
+The line numbers are the ones given by the coloured output of rodzo. If one has more than 1 file, line numbers for the second file will start at line_count(first file)...
+
+Pointing to the line number of a ```describe``` or a ```context``` will run all the examples in that branch.
 
 ### specifying a pattern with E=
 
