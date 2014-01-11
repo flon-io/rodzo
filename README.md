@@ -13,6 +13,7 @@ This readme is split between [Usage](#usage), [Writing specs](#writing-specs), a
 
 * [https://github.com/arnaudbrejeon/cspec](https://github.com/arnaudbrejeon/cspec)
 * [https://github.com/nebularis/cspec](https://github.com/nebularis/cspec)
+* [https://github.com/ViliusLuneckas/CSpec](https://github.com/ViliusLuneckas/CSpec)
 
 
 ## Usage
