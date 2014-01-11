@@ -136,11 +136,21 @@ $ make spec L=45,72
 
 The line numbers are the ones given by the coloured output of rodzo. If one has more than 1 file, line numbers for the second file will start at line_count(first file)...
 
-Pointing to the line number of a ```describe``` or a ```context``` will run all the examples in that branch.
+Pointing to the line number directly to a ```describe``` or to a ```context``` will run all the examples in that branch.
 
 ### specifying a pattern with E=
 
-TODO
+The E command line argument is used to run any branch/example that contains the given string.
+
+For example:
+```
+$ make spec E=string
+```
+will run all the ```describe```, ```context``` or ```it``` whose text contains the string "string".
+
+The pattern is a plain pattern, no fancy regular expression matching.
+
+If a ```describe``` or a ```context``` matches, all the examples in its branch will be run.
 
 ### running with Valgrind (vspec)
 
