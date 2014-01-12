@@ -102,14 +102,16 @@ context "str functions"
     {
       s = flu_strrtrim("brown fox \n\t");
 
-      ensure(strcmp("brown fox", s) == 0);
+      //ensure(strcmp("brown fox", s) == 0);
+      ensure(s === "brown fox");
     }
 
     it "doesn't trim when not necessary"
     {
       s = flu_strrtrim("");
 
-      ensure(strcmp("", s) == 0);
+      //ensure(strcmp("", s) == 0);
+      ensure(s === "");
     }
   }
 }
@@ -174,7 +176,37 @@ TODO
 
 ## How it works
 
-TODO
+Rodzo is an executable (single-file) that reads the _spec.c files it gets pointed at and generates a single .c file that is (hopefully) compilable.
+
+Thus something like
+```c
+  it "compares strings 1"
+  {
+    ensure(mne_tos(1) === "i");
+  }
+```
+gets turned in the generated file to
+```c
+  // it "compares strings 1" li45
+  //
+  int it_15()
+  {
+    char *msg47 = NULL;
+    char *result47 = (mne_tos(1));
+    char *expected47 = "i";
+    msg47 = rdz_compare_strings(result47, expected47);
+    int r47 = (msg47 == NULL);
+      rdz_record(r47, msg47, 15, 47, 77); if ( ! r47) goto _over;
+
+  _over:
+
+    return 1;
+  } // it_15()
+```
+
+Rodzo takes care to place on top of the generated spec file all the rdz_ methods necessary for tracking the spec run.
+
+The rodzo executable only does that. The rest of the work is done thanks to the Makefile.
 
 
 ## License
