@@ -26,6 +26,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h>
+#include <regex.h>
 #include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
@@ -386,6 +387,8 @@ int count_lines(char *s)
   return count;
 }
 
+regex_t ensure_operator_rex;
+
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
   l = strpbrk(l, "e");
@@ -397,19 +400,20 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 
   push_linef(c, "%schar *msg%d = NULL;\n", ind, lnumber);
 
-  char *s = strstr(con, "===");
+  regmatch_t ms[2];
 
-  if (s == NULL)
+  if (regexec(&ensure_operator_rex, con, 2, ms, 0)) // no match
   {
     push_linef(c, "%sint r%d = %s", ind, lnumber, con);
   }
-  else
+  else // match
   {
     //if (right[0] == '"') {} // for now it only works with strings
+    char *operator = strndup(con + ms[1].rm_so, ms[1].rm_eo - ms[1].rm_so);
 
-    s[0] = '\0';
+    con[ms[1].rm_so] = '\0';
     char *left = flu_strtrim(con);
-    char *right = flu_strtrim(s + 3);
+    char *right = flu_strtrim(con + ms[1].rm_eo);
     right[strlen(right) - 2] = '\0'; // remove trailing ;
 
     push_linef(
@@ -419,12 +423,13 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
       c, "%schar *expected%d = %s;\n",
       ind, lnumber, right);
     push_linef(
-      c, "%smsg%d = rdz_compare_strings(result%d, expected%d);\n",
-      ind, lnumber, lnumber, lnumber);
+      c, "%smsg%d = rdz_compare_strings(\"%s\", result%d, expected%d);\n",
+      ind, lnumber, operator, lnumber, lnumber);
     push_linef(
       c, "%sint r%d = (msg%d == NULL);\n",
       ind, lnumber, lnumber);
 
+    free(operator);
     free(left);
     free(right);
   }
@@ -801,6 +806,8 @@ int print_usage()
 
 int main(int argc, char *argv[])
 {
+  regcomp(&ensure_operator_rex, " ([!=]==) ", REG_EXTENDED);
+
   // deal with arguments
 
   context_s *c = malloc_context();
@@ -852,6 +859,8 @@ int main(int argc, char *argv[])
   printf(". wrote %s\n", c->out_fname);
 
   free_context(c);
+
+  regfree(&ensure_operator_rex);
 
   return 0;
 }
