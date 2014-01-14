@@ -165,10 +165,48 @@ Beware leaks introduced by the spec themselves, generating a string, comparing i
 
 ## Writing specs
 
-TODO
+Since rodzo follows [rspec](http://rspec.info) for many things, a person used to write rspec specs should easily grasp rodzo specs.
+
+A single test is encpsulated in an "example", it's a block of C code introduce by an "it" and a description:
+
+```c
+  it "trims on the right"
+  {
+    ensure(flu_strrtrim("brown fox \n\t") === "brown fox");
+  }
+```
+
+One could chain "its" and be done, testing every relevant aspect of his piece of software, but introducing hierarchy does help the author and the readers.
+
+As seen, spec leaves are introduced thanks to "it". Branches are created thanks to "describe" and "context". From the point of view of rodzo, they are equivalent. What matters is how it is read, by humans.
+
+In the following piece of spec, the str functions are gathered in a "context" and each function gets a "describe". Key aspects of each functions are challenged via an "it" example:
+```c
+#include "flutil.h"
+
+context "str functions"
+{
+  describe "flu_strrtrim(char *s)"
+  {
+    it "trims on the right"
+    {
+      ensure(flu_strrtrim("brown fox \n\t") === "brown fox");
+    }
+
+    it "doesn't trim when not necessary"
+    {
+      ensure(flu_strrtrim("") === "");
+    }
+  }
+}
+```
+
+This hierachy is followed when the specs are run and their output is presented:
+<img src="doc/output0.png" />
 
 ### ensure
 ### ensure and ===
+### ===f and ===F
 ### before all / after all
 ### before each / after each
 ### before each / after each offline
