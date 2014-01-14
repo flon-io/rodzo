@@ -162,6 +162,8 @@ Extra care has been taken for rodzo to generate a spec infrastructure which Valg
 
 Beware leaks introduced by the spec themselves, generating a string, comparing it with some string literal, then not freeing the generated string... ```before each``` and ```after each``` can help in those cases, to prevent cluttering the specs with free() calls.
 
+Another tool for dealing with memory leaks is [===f / ===F](#f-and-f). When comparing strings it tells rodzo to free the left side (f) or both (F) after comparison. That may spare a few lines.
+
 
 ## Writing specs
 
