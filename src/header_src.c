@@ -392,7 +392,15 @@ char *rdz_read_line(char *fname, int lnumber)
 {
   char *l = calloc(1024, sizeof(char));
   char *ll = l;
+
   FILE *in = fopen(fname, "r");
+
+  if (in == NULL)
+  {
+    fprintf(stderr, "cannot find source file %s\n", fname);
+    exit(1);
+  }
+
   while(1)
   {
     if (lnumber < 1) break;
@@ -402,6 +410,7 @@ char *rdz_read_line(char *fname, int lnumber)
     if (lnumber == 1) *(ll++) = c;
   }
   fclose(in);
+
   return l;
 }
 
