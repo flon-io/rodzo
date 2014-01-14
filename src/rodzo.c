@@ -433,6 +433,19 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
       c, "%sint r%d = (msg%d == NULL);\n",
       ind, lnumber, lnumber);
 
+    if (index(operator, 'f'))
+    {
+      push_linef(
+        c, "%sfree(result%d);\n",
+        ind, lnumber);
+    }
+    else if (index(operator, 'F'))
+    {
+      push_linef(
+        c, "%sfree(result%d); free(expected%d);\n",
+        ind, lnumber, lnumber);
+    }
+
     free(operator);
     free(left);
     free(right);
@@ -810,7 +823,7 @@ int print_usage()
 
 int main(int argc, char *argv[])
 {
-  regcomp(&ensure_operator_rex, " ([!=]==) ", REG_EXTENDED);
+  regcomp(&ensure_operator_rex, " ([!=]==[fF]?) ", REG_EXTENDED);
 
   // deal with arguments
 

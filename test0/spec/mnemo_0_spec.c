@@ -64,6 +64,10 @@ describe "mne_tos()"
     {
       ensure(mne_tos(47) !== "ia");
     }
+    it "frees strings 1"
+    {
+      ensure(mne_tos(47) ===f "ia");
+    }
   }
 }
 
