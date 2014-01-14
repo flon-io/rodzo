@@ -181,22 +181,35 @@ void rdz_print_result(rdz_result *p, rdz_result *r)
   rdz_do_print_result(p);
 }
 
-char *rdz_compare_strings(char *operator, char *result, char *expected)
+char *rdz_string_eq(char *operator, char *result, char *expected)
 {
-  // TODO: deal with operators other than "==="
-
   if (strcmp(result, expected) == 0) return NULL;
 
   size_t le = strlen(expected);
   size_t lr = strlen(result);
 
-  char *s = calloc(lr + le + 15 + 17 + 1, sizeof(char));
+  char *s = calloc(lr + le + 15 + 17 + 1 + 1, sizeof(char));
 
   strcpy(s, "     expected \"");
   strcpy(s + 15, expected);
   strcpy(s + 15 + le, "\"\n          got \"");
   strcpy(s + 15 + le + 17, result);
   strcpy(s + 15 + le + 17 + lr, "\"");
+
+  return s;
+}
+
+char *rdz_string_neq(char *operator, char *result, char *not_expected)
+{
+  if (strcmp(result, not_expected) != 0) return NULL;
+
+  size_t lne = strlen(not_expected);
+
+  char *s = calloc(lne + 20 + 1 + 1, sizeof(char));
+
+  strcpy(s, "     didn't expect \"");
+  strcpy(s + 20, not_expected);
+  strcpy(s + 20 + lne, "\"");
 
   return s;
 }

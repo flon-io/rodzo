@@ -409,12 +409,16 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   else // match
   {
     //if (right[0] == '"') {} // for now it only works with strings
+
     char *operator = strndup(con + ms[1].rm_so, ms[1].rm_eo - ms[1].rm_so);
 
     con[ms[1].rm_so] = '\0';
     char *left = flu_strtrim(con);
     char *right = flu_strtrim(con + ms[1].rm_eo);
     right[strlen(right) - 2] = '\0'; // remove trailing ;
+
+    char *fun = "rdz_string_eq";
+    if (operator[0] == '!') fun = "rdz_string_neq";
 
     push_linef(
       c, "%schar *result%d = %s);\n",
@@ -423,8 +427,8 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
       c, "%schar *expected%d = %s;\n",
       ind, lnumber, right);
     push_linef(
-      c, "%smsg%d = rdz_compare_strings(\"%s\", result%d, expected%d);\n",
-      ind, lnumber, operator, lnumber, lnumber);
+      c, "%smsg%d = %s(\"%s\", result%d, expected%d);\n",
+      ind, lnumber, fun, operator, lnumber, lnumber);
     push_linef(
       c, "%sint r%d = (msg%d == NULL);\n",
       ind, lnumber, lnumber);

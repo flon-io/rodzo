@@ -12,11 +12,11 @@
 [o] allow "describe title SPACE {"
 [o] ensure it's ok to define function at the head of spec files
 [o] move away perror(), look for a die() ?
+[o] implement ensure (s0 !== s1)
 
 [ ] before|after each offline...
 [ ] cat .rspec --> ```--colour --format documentation```
 [ ] spec1 comes before spec0, why?
-[ ] implement ensure (s0 !== s1)
 [ ] better error message than "segfault" when spec executable doesn't find
     _spec.c when it wants to read the fault line...
 

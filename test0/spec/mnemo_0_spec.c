@@ -56,6 +56,14 @@ describe "mne_tos()"
         mne_tos(47) === "ia"
       );
     }
+    it "expects strings to differ 1"
+    {
+      ensure(mne_tos(47) !== "nada");
+    }
+    it "expects strings to differ 2"
+    {
+      ensure(mne_tos(47) !== "ia");
+    }
   }
 }
 
