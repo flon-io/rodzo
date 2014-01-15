@@ -785,6 +785,11 @@ void add_spec_files(int *count, char **names, char *path)
   closedir(dir);
 }
 
+int _strcmp(const void *s0, const void *s1)
+{
+  return strcmp(*(char * const *)s0, *(char * const *)s1);
+}
+
 char **list_spec_files(int argc, char *argv[])
 {
   char **r = calloc(512, sizeof(char *));
@@ -811,6 +816,8 @@ char **list_spec_files(int argc, char *argv[])
   }
 
   if (args_seen < 1) add_spec_files(&c, r, ".");
+
+  qsort(r, c, sizeof(char *), _strcmp);
 
   return r;
 }
