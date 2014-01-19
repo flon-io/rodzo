@@ -169,7 +169,7 @@ Another tool for dealing with memory leaks is [===f / ===F](#f-and-f). When comp
 
 Since rodzo follows [rspec](http://rspec.info) for many things, a person used to write rspec specs should easily grasp rodzo specs.
 
-A single test is encpsulated in an "example", it's a block of C code introduce by an "it" and a description:
+A single test is encapsulated in an "example", it's a block of C code introduced by an "it" and a description:
 
 ```c
   it "trims on the right"
@@ -178,9 +178,9 @@ A single test is encpsulated in an "example", it's a block of C code introduce b
   }
 ```
 
-One could chain "its" and be done, testing every relevant aspect of his piece of software, but introducing hierarchy does help the author and the readers.
+One could chain the "its" and be done, testing every relevant aspect of his piece of software, but introducing hierarchy does help the author and the readers (of the specs and of their output).
 
-As seen, spec leaves are introduced thanks to "it". Branches are created thanks to "describe" and "context". From the point of view of rodzo, they are equivalent. What matters is how it is read, by humans.
+As seen, spec leaves are introduced by "it". Branches are created thanks to "describe" and "context". From the point of view of rodzo, they are equivalent. What matters is how it is read, by humans.
 
 In the following piece of spec, the str functions are gathered in a "context" and each function gets a "describe". Key aspects of each functions are challenged via an "it" example:
 ```c
@@ -207,7 +207,43 @@ This hierachy is followed when the specs are run and their output is presented:
 <img src="doc/output0.png" />
 
 ### ensure
+
+"ensure" is a pseudo-function that wraps a boolean condition. When the spec is run, the condition must return a true value for the ensure to be considered green.
+
+```c
+  it "checks various things"
+  {
+    ensure(1 + 1 == 2);
+    ensure(1 + 3 != 2);
+    ensure(strlen("petit bateau") == 12);
+    // ...
+  }
+```
+
 ### ensure and ===
+
+To compare two strings, it's easy to write:
+```c
+  it "picks the right animal"
+  {
+    char *s = pick_animal("grey", "africa");
+
+    ensure(strcmp(s, "elephant") == 0);
+  }
+```
+
+There is a "===" string-friendly construct available within "ensure":
+```c
+    ensure(s === "elephant");
+```
+
+This construct considers its left-side element as the "computed" value and the right-side one as the "expected" value. It'll deliver a nicely formatted error message in case of mismatch.
+
+Ensure understands "!==" as well:
+```c
+    ensure(s !== "parrot");
+```
+
 ### ===f and ===F
 ### before all / after all
 ### before each / after each
