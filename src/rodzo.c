@@ -433,13 +433,13 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
       c, "%sint r%d = (msg%d == NULL);\n",
       ind, lnumber, lnumber);
 
-    if (index(operator, 'f'))
+    if (strchr(operator, 'f'))
     {
       push_linef(
         c, "%sfree(result%d);\n",
         ind, lnumber);
     }
-    else if (index(operator, 'F'))
+    else if (strchr(operator, 'F'))
     {
       push_linef(
         c, "%sfree(result%d); free(expected%d);\n",
