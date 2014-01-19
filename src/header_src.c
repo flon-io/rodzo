@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h> // for isatty()
 
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
@@ -125,14 +126,14 @@ int rdz_count = 0;
 int rdz_fail_count = 0;
 rdz_result **rdz_results = NULL;
 
-void rdz_red() { printf("[31m"); }
-void rdz_green() { printf("[32m"); }
-//void rdz_yellow() { printf("[33m"); }
-//void rdz_blue() { printf("[34m"); }
-//void rdz_magenta() { printf("[35m"); }
-void rdz_cyan() { printf("[36m"); }
-//void rdz_white() { printf("[37m"); }
-void rdz_clear() { printf("[0m"); }
+void rdz_red() { if (isatty(1)) printf("[31m"); }
+void rdz_green() { if (isatty(1)) printf("[32m"); }
+//void rdz_yellow() { if (isatty(1)) printf("[33m"); }
+//void rdz_blue() { if (isatty(1)) printf("[34m"); }
+//void rdz_magenta() { if (isatty(1)) printf("[35m"); }
+void rdz_cyan() { if (isatty(1)) printf("[36m"); }
+//void rdz_white() { if (isatty(1)) printf("[37m"); }
+void rdz_clear() { if (isatty(1)) printf("[0m"); }
 
 void rdz_print_level(int nodenumber, int min)
 {
