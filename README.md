@@ -245,6 +245,50 @@ Ensure understands "!==" as well:
 ```
 
 ### ===f and ===F
+
+When testing functions that return newly allocated strings, it's advantageous to immediately free the returned value.
+
+```c
+  describe "smult(char *text, size_t count)"
+  {
+    it "multiplies the text"
+    {
+      char *s = smult("ab", 3);
+      ensure(s === "ababab");
+      free(s);
+
+      s = smult("", 3);
+      ensure(s === "");
+      free(s);
+
+      s = smult("ab", 0);
+      ensure(s === "");
+      free(s);
+
+      s = smult("ab", -1);
+      ensure(s === "");
+      free(s);
+    }
+  }
+```
+
+"===f" says roughly "compare and free the computed value (left) before returning". It lets us shrink the above to:
+
+```c
+  describe "smult(char *text, size_t count)"
+  {
+    it "multiplies the text"
+    {
+      ensure(smult("ab", 3) ===f "ababab");
+      ensure(smult("", 3) ===f "");
+      ensure(smult("ab", 0) ===f "");
+      ensure(smult("ab", -1) ===f "");
+    }
+  }
+```
+
+"===F" like "===f" frees the left char array, but also frees the right one.
+
 ### before all / after all
 ### before each / after each
 ### before each / after each offline
