@@ -272,7 +272,7 @@ When testing functions that return newly allocated strings, it's advantageous to
   }
 ```
 
-"===f" says roughly "compare and free the computed value (left) before returning". It lets us shrink the above to:
+```===f``` says roughly "compare and free the computed value (left) before returning". It lets us shrink the above to:
 
 ```c
   describe "smult(char *text, size_t count)"
@@ -287,7 +287,7 @@ When testing functions that return newly allocated strings, it's advantageous to
   }
 ```
 
-"===F" like "===f" frees the left char array, but also frees the right one.
+```===F``` like ```===f``` frees the left char array, but also frees the right one.
 
 ### before all / after all
 ### before each / after each
