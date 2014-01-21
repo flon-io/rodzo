@@ -452,7 +452,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   }
 
   push_linef(
-    c, "%s  rdz_record(r%d, msg%d, %d, %d, %d); ",
+    c, "%srdz_record(r%d, msg%d, %d, %d, %d); ",
     ind, lnumber, lnumber, c->node->nodenumber, lnumber, c->loffset + lnumber);
   push_linef(
     c, "if ( ! r%d) goto _over;\n",
