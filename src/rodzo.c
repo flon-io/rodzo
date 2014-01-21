@@ -508,10 +508,6 @@ void process_lines(context_s *c, char *path)
       push(c, indent, t, tline, path, lnumber);
       free(tline);
     }
-    else if (strcmp(head, "after") == 0)
-    {
-      // ...
-    }
     else if (strcmp(head, "describe") == 0)
     {
       push(c, indent, 'd', text, path, lnumber);
