@@ -289,9 +289,92 @@ When testing functions that return newly allocated strings, it's advantageous to
 
 ```===F``` like ```===f``` frees the left char array, but also frees the right one.
 
+### before and after
+
+Those two block markers let one run code before or after examples (```it``` blocks). It is very important to understand the difference between the "all" and the "each" (and "each offline") flavours.
+
+Those blocks can be placed at any level. It is common to place more generic ones near the root of the spec tree and ones specifics to some examples along with them wrapped in a describe/context.
+
 ### before all / after all
+
+```before all``` and ```after all``` are turned into functions by rodzo and those functions are called before
+
+```c
+  describe "smult(char *text, size_t count)"
+  {
+    before all
+    {
+      printf("enter smult...");
+    }
+    after all
+    {
+      printf("exeunt.");
+    }
+    it "multiplies the text (0)"
+    {
+      ensure(smult("ab", 3) ===f "ababab");
+    }
+    it "multiplies the text (1)"
+    {
+      ensure(smult("", 3) ===f "");
+    }
+  }
+```
+
+From the code above, the resulting spec will call the ```before all``` function before running the examples and then will call the ```after all``` after the two examples.
+
 ### before each / after each
+
+Whereas ```before all``` and ```after all``` wrap a whole set of examples, ```before each``` and ```after each``` are repeated before and after each of the examples at the level they are set (or at the below levels).
+
+Whereas ```{before|after} all``` is turned into a function and called, ```{before|after} each``` is inlined at the beginning or the end respectively of each example.
+
+Thus
+```c
+  before each
+  {
+    printf("before each\n");
+  }
+  after each
+  {
+    printf("after each\n");
+  }
+  describe "the flux capacitator"
+  {
+    it "flips burgers"
+    {
+      ensure(1 == 2);
+    }
+  }
+```
+
+becomes
+```c
+  // describe "the flux capacitator" li39
+
+    // it "flips burgers" li41
+    //
+    int it_10()
+    {
+      // before each li23
+    printf("before each\n");
+
+      char *msg43 = NULL;
+      int r43 = (1 == 2);
+        rdz_record(r43, msg43, 10, 43, 43); if ( ! r43) goto _over;
+
+    _over:
+
+      // after each li27
+    printf("after each\n");
+
+      return 1;
+    } // it_10()
+```
+
 ### before each / after each offline
+
+TODO
 
 
 ## How it works
