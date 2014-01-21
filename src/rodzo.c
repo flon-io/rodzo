@@ -70,8 +70,10 @@ char *type_to_string(char t)
   if (t == 'c') return "context";
   if (t == 'i') return "it";
   if (t == 'b') return "before each";
+  if (t == 'y') return "before each offline";
   if (t == 'B') return "before all";
   if (t == 'a') return "after each";
+  if (t == 'z') return "after each offline";
   if (t == 'A') return "after all";
   if (t == 'g') return "g";
   if (t == 'G') return "G";
@@ -503,6 +505,8 @@ void process_lines(context_s *c, char *path)
       char *tline = flu_strtrim(line);
       char t = 'b'; // "before each"
       if (strncmp(tline, "before all", 10) == 0) t = 'B';
+      else if (strncmp(tline, "before each off", 15) == 0) t = 'y';
+      else if (strncmp(tline, "after each off", 14) == 0) t = 'z';
       else if (strncmp(tline, "after each", 10) == 0) t = 'a';
       else if (strncmp(tline, "after all", 9) == 0) t = 'A';
       push(c, indent, t, tline, path, lnumber);
@@ -569,7 +573,7 @@ void print_node(FILE *out, node_s *n)
 {
   char t = n->type;
 
-  if (t == 'a' || t == 'b') return;
+  if (t == 'b' || t == 'a') return;
 
   char *ind;
   if (n->indent > 0)
@@ -596,6 +600,8 @@ void print_node(FILE *out, node_s *n)
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
 
+  int offline = (t == 'B' || t == 'A' || t == 'y' || t == 'z');
+
   if (t == 'i')
   {
     char *_s = list_texts_as_literal(n);
@@ -605,9 +611,13 @@ void print_node(FILE *out, node_s *n)
 
     print_eaches(out, ind, 'b', n->parent);
   }
-  else if (t == 'B' || t == 'A')
+  else if (offline)
   {
-    char *type = t == 'B' ? "before_all" : "after_all";
+    char *type = "before_all";
+    if (t == 'A') type = "after_all";
+    else if (t == 'y') type = "before_all_offline";
+    else if (t == 'z') type = "after_all_offline";
+
     fprintf(out, "\n");
     fprintf(out, "%sint %s_%d()", ind, type, n->nodenumber);
     fprintf(out, " // li%d\n", n->lstart);
@@ -630,7 +640,7 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "%s  return 1;\n", ind);
     fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
   }
-  else if (t == 'B' || t == 'A')
+  else if (offline)
   {
     fprintf(out, "%s}\n", ind);
   }

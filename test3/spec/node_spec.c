@@ -53,6 +53,14 @@ describe "abr_node"
     {
       printf("1 after each\n");
     }
+    before each offline
+    {
+      printf("1 before each offline\n");
+    }
+    after each offline
+    {
+      printf("1 after each offline\n");
+    }
     it "returns a string representation of the node"
     {
       //abr_node *n = abr_malloc_node("nada", 0);

@@ -371,20 +371,20 @@ void rdz_dorun(rdz_node *n)
     for (size_t i = 0; n->children[i] > -1; i++) // before all
     {
       rdz_node *nn = rdz_nodes[n->children[i]];
-      if (nn->type != 'B') continue;
-      nn->func();
+      if (nn->type == 'B') nn->func();
     }
     for (size_t i = 0; n->children[i] > -1; i++) // children
     {
       rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'd' && nn->type != 'c' && nn->type != 'i') continue;
+      // TODO: run the "before each offline" functions
       rdz_dorun(nn);
+      // TODO: run the "after each offline" functions
     }
     for (size_t i = 0; n->children[i] > -1; i++) // after all
     {
       rdz_node *nn = rdz_nodes[n->children[i]];
-      if (nn->type != 'A') continue;
-      nn->func();
+      if (nn->type == 'A') nn->func();
     }
   }
 }
