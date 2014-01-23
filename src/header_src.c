@@ -356,6 +356,24 @@ void rdz_determine_dorun()
   }
 }
 
+void rdz_run_offlines(int nodenumber, char type)
+{
+  if (nodenumber == -1) return;
+  rdz_node *n = rdz_nodes[nodenumber];
+
+  // before each offline
+  if (type == 'y') rdz_run_offlines(n->parentnumber, type);
+
+  for (size_t i = 0; n->children[i] > -1; i++)
+  {
+    rdz_node *nn = rdz_nodes[n->children[i]];
+    if (nn->type == type) nn->func();
+  }
+
+  // after each offline
+  if (type == 'z') rdz_run_offlines(n->parentnumber, type);
+}
+
 void rdz_dorun(rdz_node *n)
 {
   if ( ! n->dorun) return;
@@ -378,8 +396,10 @@ void rdz_dorun(rdz_node *n)
       rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'd' && nn->type != 'c' && nn->type != 'i') continue;
       // TODO: run the "before each offline" functions
+      rdz_run_offlines(n->nodenumber, 'y'); // before each offline
       rdz_dorun(nn);
       // TODO: run the "after each offline" functions
+      rdz_run_offlines(n->nodenumber, 'z'); // after each offline
     }
     for (size_t i = 0; n->children[i] > -1; i++) // after all
     {

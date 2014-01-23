@@ -22,11 +22,11 @@ describe "abr_node"
 {
   before all
   {
-    printf("1 BEFORE ALL\n");
+    printf("0 BEFORE ALL\n");
   }
   after all
   {
-    printf("1 AFTER ALL\n");
+    printf("0 AFTER ALL\n");
   }
   before each
   {
@@ -47,19 +47,19 @@ describe "abr_node"
   {
     before each
     {
-      printf("1 before each\n");
+      printf("0.1 before each\n");
     }
     after each
     {
-      printf("1 after each\n");
+      printf("0.1 after each\n");
     }
     before each offline
     {
-      printf("1 before each offline\n");
+      printf("0.1 before each offline\n");
     }
     after each offline
     {
-      printf("1 after each offline\n");
+      printf("0.1 after each offline\n");
     }
     it "returns a string representation of the node"
     {

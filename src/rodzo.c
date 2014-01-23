@@ -615,8 +615,8 @@ void print_node(FILE *out, node_s *n)
   {
     char *type = "before_all";
     if (t == 'A') type = "after_all";
-    else if (t == 'y') type = "before_all_offline";
-    else if (t == 'z') type = "after_all_offline";
+    else if (t == 'y') type = "before_each_offline";
+    else if (t == 'z') type = "after_each_offline";
 
     fprintf(out, "\n");
     fprintf(out, "%sint %s_%d()", ind, type, n->nodenumber);
@@ -681,6 +681,8 @@ void print_nodes(FILE *out, node_s *n)
   if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
   else if (t == 'B') func = flu_sprintf("before_all_%d", n->nodenumber);
   else if (t == 'A') func = flu_sprintf("after_all_%d", n->nodenumber);
+  else if (t == 'y') func = flu_sprintf("before_each_offline_%d", n->nodenumber);
+  else if (t == 'z') func = flu_sprintf("after_each_offline_%d", n->nodenumber);
   else func = strdup("NULL");
 
   char *ss;
