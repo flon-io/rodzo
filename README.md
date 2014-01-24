@@ -295,6 +295,8 @@ Those two block markers let one run code before or after examples (```it``` bloc
 
 Those blocks can be placed at any level. It is common to place more generic ones near the root of the spec tree and ones specifics to some examples along with them wrapped in a describe/context.
 
+The code placed in an offline block ("{before|after} each offline" or "{before|after} all") is wrapped in a function that is called at the appropriate moment, it thus runs in its own function scope. The code is an inline block ("{before|after} each") runs in the example's function scope.
+
 ### before all / after all
 
 ```before all``` and ```after all``` are turned into functions by rodzo and those functions are called before
@@ -374,8 +376,11 @@ becomes
 
 ### before each / after each offline
 
-TODO
+```before each``` and ```after each``` are inlined within the examples (the ```it```) they wrap. When flagged with ```offline```, the block instead becomes a function that is called before/after the example.
 
+As a consequence, all the matching ```before each offline``` are called before the (inlined) ```before each``` are run. Same for the ```after each offline```, tey get called after any ```after each```.
+
+Remember, offline scope is not the same as inline scope.
 
 ## How it works
 
