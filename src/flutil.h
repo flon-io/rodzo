@@ -1,6 +1,6 @@
 
 //
-// Copyright (c) 2013-2014, John Mettraux, jmettraux@gmail.com
+// Copyright (c) 2013-2014, John Mettraux, jmettraux+flon@gmail.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,9 @@
 //
 
 // flutil.h
+
+#ifndef FLON_FLUTIL_H
+#define FLON_FLUTIL_H
 
 #include <stdarg.h>
 #include <string.h>
@@ -116,4 +119,7 @@ char *flu_sprintf(const char *format, ...);
  * and arguments.
  */
 void flu_die(int exit_value, const char *format, ...);
+
+
+#endif // FLON_FLUTIL_H
 
