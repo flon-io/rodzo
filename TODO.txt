@@ -20,3 +20,6 @@
 
 [ ] cat .rspec --> ```--colour --format documentation```
 
+[ ] implement "pending"
+[ ] don't crash when (ensure x === "xxx") and x is NULL
+
