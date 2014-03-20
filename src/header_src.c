@@ -184,6 +184,11 @@ void rdz_print_result(rdz_result *p, rdz_result *r)
 
 char *rdz_string_eq(char *operator, char *result, char *expected)
 {
+  if (expected == NULL && result == NULL) return NULL;
+
+  if (expected == NULL) return strdup("     expected NULL");
+  if (result == NULL) return strdup("     result is NULL");
+
   if (strcmp(result, expected) == 0) return NULL;
 
   size_t le = strlen(expected);

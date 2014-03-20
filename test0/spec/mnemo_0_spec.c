@@ -68,6 +68,10 @@ describe "mne_tos()"
     {
       ensure(mne_tos(47) ===f "ia");
     }
+    it "doesn't crash when strings are NULL"
+    {
+      ensure(NULL === "ia");
+    }
   }
 }
 
