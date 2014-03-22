@@ -186,8 +186,8 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
 {
   if (expected == NULL && result == NULL) return NULL;
 
-  if (expected == NULL) return strdup("     expected NULL");
-  if (result == NULL) return strdup("     result is NULL");
+  if (expected == NULL) return rdz_strdup("     expected NULL");
+  if (result == NULL) return rdz_strdup("     result is NULL");
 
   if (strcmp(result, expected) == 0) return NULL;
 
