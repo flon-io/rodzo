@@ -69,6 +69,7 @@ char *type_to_string(char t)
   if (t == 'd') return "describe";
   if (t == 'c') return "context";
   if (t == 'i') return "it";
+  if (t == 'p') return "pending";
   if (t == 'b') return "before each";
   if (t == 'y') return "before each offline";
   if (t == 'B') return "before all";
@@ -166,6 +167,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
   }
 
   c->node = n;
+  if (type == 'p') c->node = cn;
 
   if (type == 'i') c->itcount++;
 }
@@ -389,10 +391,6 @@ int count_lines(char *s)
   return count;
 }
 
-void push_pending(context_s *c, char *t)
-{
-}
-
 regex_t ensure_operator_rex;
 
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
@@ -534,7 +532,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "pending") == 0)
     {
-      push_pending(c, text);
+      push(c, indent, 'p', text, path, lnumber);
     }
     else
     {

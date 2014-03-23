@@ -86,12 +86,12 @@ describe "mne_tos()"
       //
     it "accepts explicitely pending stuff"
     {
-      //pending();
+      pending();
     }
       //
     it "accepts explicitely pending stuff with text"
     {
-      //pending("nada");
+      pending("nada");
     }
       //
     //it "accepts explicitely pending stuff with multiline text"

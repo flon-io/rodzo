@@ -124,11 +124,12 @@ char *rdz_example = NULL;
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
+int rdz_pending_count = 0;
 rdz_result **rdz_results = NULL;
 
 void rdz_red() { if (isatty(1)) printf("[31m"); }
 void rdz_green() { if (isatty(1)) printf("[32m"); }
-//void rdz_yellow() { if (isatty(1)) printf("[33m"); }
+void rdz_yellow() { if (isatty(1)) printf("[33m"); }
 //void rdz_blue() { if (isatty(1)) printf("[34m"); }
 //void rdz_magenta() { if (isatty(1)) printf("[35m"); }
 void rdz_cyan() { if (isatty(1)) printf("[36m"); }
@@ -167,10 +168,18 @@ void rdz_do_print_result(rdz_result *r)
   rdz_node *rit = rdz_nodes[r->itnumber];
 
   for (int ii = 0; ii < r->stackc - 1; ii++) printf("  "); // indent
-  if (r->success) rdz_green(); else rdz_red();
+
+  if (r->success == -1) rdz_yellow();
+  else if (r->success == 0) rdz_red();
+  else rdz_green();
+
   printf("%s", rit->stack[r->stackc - 1]);
-  if ( ! r->success) printf(" (FAILED)");
+
+  if (r->success == -1) printf(" (PENDING)");
+  if (r->success == 0) printf(" (FAILED)");
+
   rdz_clear();
+
   printf(" (%d)", r->ltnumber);
   printf("\n");
 }
@@ -239,7 +248,9 @@ void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
   rdz_do_record(result);
 
   rdz_results[rdz_count++] = result;
-  if ( ! success) rdz_fail_count++;
+
+  if (success == -1) rdz_pending_count++;
+  if (success == 0) rdz_fail_count++;
 }
 
 void rdz_extract_arguments()
@@ -383,7 +394,11 @@ void rdz_run_pending(int nodenumber)
 {
   rdz_node *n = rdz_nodes[nodenumber];
 
-  printf("PENDING...\n");
+  char *s = NULL;
+  //if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
+  // TODO: use stackc... or find the text... probably in rodzo.c
+
+  rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
 }
 
 void rdz_dorun(rdz_node *n)
@@ -419,10 +434,8 @@ void rdz_dorun(rdz_node *n)
     {
       rdz_node *nn = rdz_nodes[n->children[i]];
       if (nn->type != 'd' && nn->type != 'c' && nn->type != 'i') continue;
-      // TODO: run the "before each offline" functions
       rdz_run_offlines(n->nodenumber, 'y'); // before each offline
       rdz_dorun(nn);
-      // TODO: run the "after each offline" functions
       rdz_run_offlines(n->nodenumber, 'z'); // after each offline
     }
     for (size_t i = 0; n->children[i] > -1; i++) // after all
@@ -465,34 +478,67 @@ void rdz_summary(int itcount)
 
   printf("\n");
 
+  if (rdz_pending_count > 0)
+  {
+    printf("Pending:\n");
+
+    for (size_t i = 0, j = 0; i < rdz_count; i++)
+    {
+      rdz_result *r = rdz_results[i];
+
+      if (r->success != -1) continue;
+
+      rdz_node *rit = rdz_nodes[r->itnumber];
+
+      rdz_yellow(); printf("  %s\n", r->title); rdz_clear();
+      rdz_cyan(); printf("   # %s\n", r->message); rdz_clear();
+      rdz_cyan(); printf("   # %s:%d\n", rit->fname, r->lnumber); rdz_clear();
+
+      //char *line = rdz_read_line(rit->fname, r->lnumber);
+      //printf("  %zu) %s\n", ++j, r->title);
+      //if (r->message) { rdz_red(); puts(r->message); rdz_clear(); }
+      //printf("     >");
+      //rdz_red(); printf("%s", line); rdz_clear();
+      //printf("<\n");
+      //rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
+      //printf(" (%d)\n", r->ltnumber);
+      //free(line);
+    }
+
+    printf("\n");
+  }
+
   if (rdz_fail_count > 0)
   {
     printf("Failures:\n\n");
-  }
 
-  for (size_t i = 0, j = 0; i < rdz_count; i++)
-  {
-    rdz_result *r = rdz_results[i];
-    rdz_node *rit = rdz_nodes[r->itnumber];
+    for (size_t i = 0, j = 0; i < rdz_count; i++)
+    {
+      rdz_result *r = rdz_results[i];
 
-    if (r->success) continue;
+      if (r->success != 0) continue;
 
-    char *line = rdz_read_line(rit->fname, r->lnumber);
-    printf("  %zu) %s\n", ++j, r->title);
-    if (r->message) { rdz_red(); puts(r->message); rdz_clear(); }
-    printf("     >");
-    rdz_red(); printf("%s", line); rdz_clear();
-    printf("<\n");
-    rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
-    printf(" (%d)\n", r->ltnumber);
-    free(line);
+      rdz_node *rit = rdz_nodes[r->itnumber];
+
+      char *line = rdz_read_line(rit->fname, r->lnumber);
+      printf("  %zu) %s\n", ++j, r->title);
+      if (r->message) { rdz_red(); puts(r->message); rdz_clear(); }
+      printf("     >");
+      rdz_red(); printf("%s", line); rdz_clear();
+      printf("<\n");
+      rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
+      printf(" (%d)\n", r->ltnumber);
+      free(line);
+    }
   }
 
   printf("\n");
   if (rdz_fail_count > 0) rdz_red(); else rdz_green();
   printf("%d examples, ", itcount);
   printf("%d tests seen, ", rdz_count);
-  printf("%d failures\n", rdz_fail_count);
+  printf("%d failures", rdz_fail_count);
+  if (rdz_pending_count > 0) printf(", %d pending", rdz_pending_count);
+  printf("\n");
   rdz_clear();
   printf("\n");
 
@@ -504,7 +550,7 @@ void rdz_summary(int itcount)
     {
       rdz_result *r = rdz_results[i];
 
-      if (r->success) continue;
+      if (r->success != 0) continue;
 
       rdz_red(); printf("make spec L=%d", r->ltnumber);
       rdz_cyan(); printf(" # %s\n", r->title);
