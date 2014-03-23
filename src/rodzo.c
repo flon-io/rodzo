@@ -389,6 +389,10 @@ int count_lines(char *s)
   return count;
 }
 
+void push_pending(context_s *c, char *t)
+{
+}
+
 regex_t ensure_operator_rex;
 
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
@@ -527,6 +531,10 @@ void process_lines(context_s *c, char *path)
     else if (strcmp(head, "ensure") == 0)
     {
       lnumber = push_ensure(c, in, indent, lnumber, line);
+    }
+    else if (strcmp(head, "pending") == 0)
+    {
+      push_pending(c, text);
     }
     else
     {

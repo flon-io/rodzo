@@ -379,6 +379,13 @@ void rdz_run_offlines(int nodenumber, char type)
   if (type == 'z') rdz_run_offlines(n->parentnumber, type);
 }
 
+void rdz_run_pending(int nodenumber)
+{
+  rdz_node *n = rdz_nodes[nodenumber];
+
+  printf("PENDING...\n");
+}
+
 void rdz_dorun(rdz_node *n)
 {
   if ( ! n->dorun) return;
@@ -387,6 +394,7 @@ void rdz_dorun(rdz_node *n)
 
   if (t == 'i')
   {
+    if (n->children[0] > -1) return rdz_run_pending(n->children[0]);
     n->func();
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')

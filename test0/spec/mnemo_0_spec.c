@@ -72,6 +72,35 @@ describe "mne_tos()"
     {
       ensure(NULL === "ia");
     }
+
+    it "accepts empty specs"
+    {
+      // has to be green
+    }
+
+    //it "accepts pending stuff"
+      //
+    //pending "accepts implicitely pending stuff"
+    //{
+    //}
+      //
+    it "accepts explicitely pending stuff"
+    {
+      //pending();
+    }
+      //
+    it "accepts explicitely pending stuff with text"
+    {
+      //pending("nada");
+    }
+      //
+    //it "accepts explicitely pending stuff with multiline text"
+    //{
+    //  pending(
+    //    "nada "
+    //    "paloma"
+    //  );
+    //}
   }
 }
 
