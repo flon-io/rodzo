@@ -394,8 +394,19 @@ void rdz_dorun(rdz_node *n)
 
   if (t == 'i')
   {
-    if (n->children[0] > -1) return rdz_run_pending(n->children[0]);
+    if (n->children[0] > -1)
+    {
+      return rdz_run_pending(n->children[0]);
+    }
+
+    int rc = rdz_count;
+
     n->func();
+
+    if (rdz_count == rc)
+    {
+      rdz_record(1, NULL, n->nodenumber, n->lstart, n->ltstart);
+    }
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
