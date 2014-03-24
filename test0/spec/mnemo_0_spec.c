@@ -78,11 +78,14 @@ describe "mne_tos()"
       // has to be green
     }
 
-    //it "accepts pending stuff"
+    it "accepts pending stuff" // not yet implemented
       //
-    //pending "accepts implicitely pending stuff"
+    //pending "accepts pending nodes"
     //{
+    //  printf("whatever...\n");
     //}
+      //
+    //pending "accepts pending nodes without body"
       //
     it "accepts explicitely pending stuff"
     {

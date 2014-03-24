@@ -147,6 +147,12 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   node_s *cn = c->node;
 
+  if (cn && cn->type == 'i' && type != 'p') // "it" without bodies
+  {
+    push(c, ind, 'p', "not yet implemented", fn, cn->lstart);
+    cn = cn->parent;
+  }
+
   node_s *n = malloc(sizeof(node_s));
   n->parent = cn;
   n->nodenumber = c->nodecount++;
