@@ -329,7 +329,7 @@ void rdz_determine_dorun()
 
     //if (t == 'B' || t == 'b' || t == 'A' || t == 'a') continue;
     if (t == 'G' || t == 'g') n->dorun = 1;
-    if (t != 'd' && t != 'c' && t != 'i') continue;
+    if (t != 'd' && t != 'c' && t != 'i' && t != 'p') continue;
 
     int rl = -1;
     int re = -1;
@@ -390,17 +390,6 @@ void rdz_run_offlines(int nodenumber, char type)
   if (type == 'z') rdz_run_offlines(n->parentnumber, type);
 }
 
-void rdz_run_pending(int nodenumber)
-{
-  rdz_node *n = rdz_nodes[nodenumber];
-
-  char *s = NULL;
-  if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
-  s = rdz_strdup(s);
-
-  rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
-}
-
 void rdz_dorun(rdz_node *n)
 {
   if ( ! n->dorun) return;
@@ -411,7 +400,7 @@ void rdz_dorun(rdz_node *n)
   {
     if (n->children[0] > -1)
     {
-      return rdz_run_pending(n->children[0]);
+      return rdz_dorun(rdz_nodes[n->children[0]]);
     }
 
     int rc = rdz_count;
@@ -422,6 +411,14 @@ void rdz_dorun(rdz_node *n)
     {
       rdz_record(1, NULL, n->nodenumber, n->lstart, n->ltstart);
     }
+  }
+  else if (t == 'p')
+  {
+    char *s = NULL;
+    if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
+    s = rdz_strdup(s);
+
+    rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
