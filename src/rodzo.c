@@ -137,7 +137,9 @@ void push_linef(context_s *c, const char *format, ...)
 
 void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 {
+  if (text == NULL && type == 'p') text = "no reason given";
   if (text != NULL) text = strdup(text);
+
   if (fn != NULL) fn = strdup(fn);
 
   if (ind == 0) while (c->node->parent != NULL) c->node = c->node->parent;
@@ -168,6 +170,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   c->node = n;
   if (type == 'p') c->node = cn;
+  //if (type == 'p' && cn->type == 'i') c->node = cn;
 
   if (type == 'i') c->itcount++;
 }
@@ -692,7 +695,7 @@ void print_nodes(FILE *out, node_s *n)
   else func = strdup("NULL");
 
   char *ss;
-  if (t == 'i' || t == 'd' || t == 'c') {
+  if (t == 'i' || t == 'd' || t == 'c' || t == 'p') {
     char *ls = list_texts_as_literal(n);
     ss = flu_sprintf("(char *[])%s", ls);
     free(ls);

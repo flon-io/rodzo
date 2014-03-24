@@ -175,7 +175,7 @@ void rdz_do_print_result(rdz_result *r)
 
   printf("%s", rit->stack[r->stackc - 1]);
 
-  if (r->success == -1) printf(" (PENDING)");
+  if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
 
   rdz_clear();
@@ -395,8 +395,8 @@ void rdz_run_pending(int nodenumber)
   rdz_node *n = rdz_nodes[nodenumber];
 
   char *s = NULL;
-  //if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
-  // TODO: use stackc... or find the text... probably in rodzo.c
+  if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
+  s = rdz_strdup(s);
 
   rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
 }
