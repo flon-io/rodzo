@@ -87,12 +87,12 @@ describe "mne_tos()"
       //
     //pending "accepts pending nodes without body"
       //
-    it "accepts explicitely pending stuff"
+    it "accepts explicitely pending stuff" // no reason given
     {
       pending();
     }
       //
-    it "accepts explicitely pending stuff with text"
+    it "accepts explicitely pending stuff with text" // nada
     {
       pending("nada");
     }
