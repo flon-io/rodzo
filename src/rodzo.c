@@ -176,7 +176,6 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   c->node = n;
   if (type == 'p') c->node = cn;
-  //if (type == 'p' && cn->type == 'i') c->node = cn;
 
   if (type == 'i') c->itcount++;
 }
@@ -479,6 +478,20 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   return lnumber;
 }
 
+void push_pending(context_s *c, int ind, char *text, char *fn, int lstart)
+{
+  node_s *cn = c->node;
+  if (cn->type == 'i' && cn->indent < ind)
+  {
+    push(c, ind, 'p', text, fn, lstart);
+  }
+  else // lonely p
+  {
+    push(c, ind, 'i', text, fn, lstart);
+    push(c, ind + 2, 'p', text, fn, lstart);
+  }
+}
+
 void process_lines(context_s *c, char *path)
 {
   push(c, 0, 'g', NULL, path, 0);
@@ -541,7 +554,8 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "pending") == 0)
     {
-      push(c, indent, 'p', text, path, lnumber);
+      //push(c, indent, 'p', text, path, lnumber);
+      push_pending(c, indent, text, path, lnumber);
     }
     else
     {
