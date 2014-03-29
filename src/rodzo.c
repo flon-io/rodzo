@@ -149,7 +149,10 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   if (cn && cn->type == 'i' && type != 'p') // "it" without bodies
   {
-    push(c, ind, 'p', "not yet implemented", fn, cn->lstart);
+    if (cn->children[0] == NULL)
+    {
+      push(c, ind, 'p', "not yet implemented", fn, cn->lstart);
+    }
     cn = cn->parent;
   }
 
