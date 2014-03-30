@@ -79,7 +79,7 @@ describe "mne_tos()"
     }
 
     it "accepts pending stuff" // not yet implemented
-    //it "accepts pending stuff 2" // not yet implemented
+    it "accepts pending stuff 2" // not yet implemented
       //
     pending "accepts pending nodes" // no reason given
     {

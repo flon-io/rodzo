@@ -28,6 +28,6 @@ vspec: build build-spec
 
 # this target is for the rodzo-development only
 #
-rvspec: lib
-	valgrind --leak-check=full -v ../../bin/rodzo -o spec2.c ../spec
+rvspec: lib$(NAME).so
+	valgrind --leak-check=full -v ../../bin/rodzo ../spec
 
