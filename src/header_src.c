@@ -479,7 +479,8 @@ void rdz_summary(int itcount)
   {
     printf("Pending:\n");
 
-    for (size_t i = 0, j = 0; i < rdz_count; i++)
+    //for (size_t i = 0, j = 0; i < rdz_count; i++)
+    for (size_t i = 0; i < rdz_count; i++)
     {
       rdz_result *r = rdz_results[i];
 
