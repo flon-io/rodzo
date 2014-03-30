@@ -491,7 +491,7 @@ void push_pending(context_s *c, int ind, char *text, char *fn, int lstart)
   else // lonely p
   {
     push(c, ind, 'i', text, fn, lstart);
-    push(c, ind + 2, 'p', text, fn, lstart);
+    push(c, ind + 2, 'p', NULL, fn, lstart); // "no reason given"
   }
 }
 
