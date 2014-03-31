@@ -206,6 +206,37 @@ context "str functions"
 This hierachy is followed when the specs are run and their output is presented:
 <img src="doc/output0.png" />
 
+### pending
+
+An example (`it`) without a body will be considered pending.
+Replacing `it` with `pending` will mark the example as pending.
+Inserting a `pending();` in the body of an example will flag the example as pending.
+
+Pending example are not run, they're simply reported as "pending" (in yellow).
+
+These are all pending:
+```c
+  it "accepts pending stuff" // not yet implemented
+
+  pending "accepts pending nodes" // no reason given
+  {
+    printf("whatever...\n");
+  }
+
+  pending "accepts pending nodes without body" // no reason given
+
+  it "accepts explicitely pending stuff" // no reason given
+  {
+    pending();
+  }
+
+  it "accepts explicitely pending stuff with text" // no time yet
+  {
+    pending("no time yet");
+  }
+```
+In comment are the pending texts derived in each situation.
+
 ### ensure
 
 "ensure" is a pseudo-function that wraps a boolean condition. When the spec is run, the condition must return a true value for the ensure to be considered green.

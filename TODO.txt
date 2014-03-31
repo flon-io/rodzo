@@ -17,13 +17,10 @@
     _spec.c when it wants to read the fault line...
 [o] spec1 comes before spec0, sort
 [o] before|after each offline...
+[o] don't crash when (ensure x === "xxx") and x is NULL
+[o] implement "pending"
+  [o] fix the it + pending + pending for pending without bodies
+  [o] document
 
 [ ] cat .rspec --> ```--colour --format documentation```
-
-[o] don't crash when (ensure x === "xxx") and x is NULL
-
-[ ] implement "pending"
-  [o] fix the it + pending + pending for pending without bodies
-  [ ] document
-
 
