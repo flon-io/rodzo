@@ -533,7 +533,7 @@ void rdz_summary(int itcount)
   printf("\n");
   if (rdz_fail_count > 0) rdz_red(); else rdz_green();
   printf("%d examples, ", itcount);
-  printf("%d tests seen, ", rdz_count);
+  printf("%d tests seen, ", rdz_count - rdz_pending_count);
   printf("%d failures", rdz_fail_count);
   if (rdz_pending_count > 0) printf(", %d pending", rdz_pending_count);
   printf("\n");

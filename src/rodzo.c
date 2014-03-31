@@ -770,7 +770,10 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "    NULL };\n");
   fprintf(out, "\n");
 
-  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", c->encount);
+  int count = c->encount;
+  if (count < c->itcount) count = c->itcount;
+  //
+  fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", count);
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_determine_dorun();\n");

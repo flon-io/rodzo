@@ -23,6 +23,7 @@
 [o] don't crash when (ensure x === "xxx") and x is NULL
 
 [ ] implement "pending"
-  [ ] fix the it + pending + pending for pending without bodies
+  [o] fix the it + pending + pending for pending without bodies
+  [ ] document
 
 
