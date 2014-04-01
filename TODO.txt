@@ -24,3 +24,9 @@
 
 [ ] cat .rspec --> ```--colour --format documentation```
 
+[ ] allow for
+  ensure(s ===f
+    "abr_rep(\n"
+    "  abr_string(\"xy\"),"
+    "  1, 2)");
+
