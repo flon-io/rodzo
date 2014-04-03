@@ -39,5 +39,19 @@ context "pending everything"
   //    "paloma"
   //  );
   //}
+
+  //context "with before/after"
+  //{
+  //  //before each
+  //  //{
+  //  //  printf("before\n");
+  //  //}
+  //  //after each
+  //  //{
+  //  //  printf("each\n");
+  //  //}
+  //  it "flips burgers"
+  //  pending "flies kites"
+  //}
 }
 
