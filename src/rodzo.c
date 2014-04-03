@@ -606,6 +606,7 @@ void print_node(FILE *out, node_s *n)
   char t = n->type;
 
   if (t == 'b' || t == 'a') return;
+  if (t == 'i' && n->children[0] != NULL) return;
 
   char *ind;
   if (n->indent > 0)
@@ -710,7 +711,8 @@ void print_nodes(FILE *out, node_s *n)
   char *children = flu_sbuffer_to_string(b);
 
   char *func;
-  if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
+  if (t == 'i' && n->children[0] != NULL) func = strdup("NULL");
+  else if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
   else if (t == 'B') func = flu_sprintf("before_all_%d", n->nodenumber);
   else if (t == 'A') func = flu_sprintf("after_all_%d", n->nodenumber);
   else if (t == 'y') func = flu_sprintf("before_each_offline_%d", n->nodenumber);
