@@ -40,18 +40,22 @@ context "pending everything"
   //  );
   //}
 
-  //context "with before/after"
-  //{
-  //  //before each
-  //  //{
-  //  //  printf("before\n");
-  //  //}
-  //  //after each
-  //  //{
-  //  //  printf("each\n");
-  //  //}
-  //  it "flips burgers"
-  //  pending "flies kites"
-  //}
+  context "with before/after"
+  {
+    before each
+    {
+      printf("before\n");
+    }
+    after each
+    {
+      printf("each\n");
+    }
+    it "flips burgers"
+    pending "flies kites"
+    it "flings stones"
+    {
+      pending "too archaic"
+    }
+  }
 }
 
