@@ -149,6 +149,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   if (cn && cn->type == 'i' && type != 'p') // "it" without bodies
   {
+    // TODO: find a way to let pull() deal with the 5 next lines
     if (cn->children[0] == NULL)
     {
       push(c, ind, 'p', "not yet implemented", fn, cn->lstart);
@@ -230,15 +231,23 @@ void free_context(context_s *c)
   free(c);
 }
 
-void pull(context_s *c, int lnumber)
+void pull(context_s *c, int indent, int lnumber)
 {
   node_s *n = c->node;
 
   n->llength = lnumber - n->lstart;
 
+  if (n->type == 'i' && n->children[0] == NULL && indent <= n->indent)
+  {
+    push(c, indent, 'p', "not yet implemented", n->fname, lnumber);
+  }
+
   c->node = n->parent;
 
-  if (c->node->type == 'G') push(c, 0, 'g', NULL, n->fname, lnumber + 1);
+  if (c->node->type == 'G')
+  {
+    push(c, 0, 'g', NULL, n->fname, lnumber + 1);
+  }
 }
 
 int current_indent(context_s *c)
@@ -514,6 +523,7 @@ void process_lines(context_s *c, char *path)
     char *head = extract_head(line);
     char *text = extract_text(line);
 
+    //printf("line: >%s<\n", line);
     //printf("head: >%s<\n", head);
     //printf("  text: >%s<\n", text);
 
@@ -523,9 +533,9 @@ void process_lines(context_s *c, char *path)
     {
       // do nothing
     }
-    else if (strcmp(head, "}") == 0 && indent == cindent)
+    else if (strcmp(head, "}") == 0 && indent <= cindent)
     {
-      pull(c, lnumber);
+      pull(c, indent, lnumber);
     }
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {

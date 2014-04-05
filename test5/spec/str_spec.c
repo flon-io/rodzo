@@ -56,6 +56,7 @@ context "pending everything"
     {
       pending "too archaic"
     }
+    it "floats safely"
   }
 }
 
