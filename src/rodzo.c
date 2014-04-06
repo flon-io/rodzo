@@ -237,7 +237,7 @@ void pull(context_s *c, int indent, int lnumber)
 
   n->llength = lnumber - n->lstart;
 
-  if (n->type == 'i' && n->children[0] == NULL && indent <= n->indent)
+  if (n->type == 'i' && n->children[0] == NULL && indent < n->indent)
   {
     push(c, indent, 'p', "not yet implemented", n->fname, lnumber);
   }

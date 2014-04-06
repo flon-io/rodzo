@@ -44,11 +44,11 @@ context "pending everything"
   {
     before each
     {
-      printf("before\n");
+      printf("before each\n");
     }
     after each
     {
-      printf("each\n");
+      printf("after each\n");
     }
     it "flips burgers"
     pending "flies kites"
@@ -57,6 +57,11 @@ context "pending everything"
       pending "too archaic"
     }
     it "floats safely"
+
+    //it "is not pending"
+    //{
+    //  ensure(1 == 1);
+    //}
   }
 }
 
