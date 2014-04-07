@@ -631,7 +631,8 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'g' && n->lstart == 0)
   {
-    fprintf(out, "// file %s\n", n->fname);
+    fprintf(
+      out, "// file %s\n", n->fname);
   }
   else if (t == 'd' || t == 'c' || t == 'i')
   {
@@ -639,6 +640,8 @@ void print_node(FILE *out, node_s *n)
       out, "\n");
     fprintf(
       out, "%s// %s \"%s\" li%d\n", ind, type_to_string(t), n->text, n->lstart);
+    fprintf(
+      out, "%s// file %s\n", ind, n->fname);
 
     if (t == 'i') fprintf(out, "%s//\n", ind);
   }
