@@ -275,6 +275,14 @@ Ensure understands "!==" as well:
     ensure(s !== "parrot");
 ```
 
+### ~==
+
+Match with a regular expression:
+
+```c
+    ensure(s ~== "^[Pp]arrots?$");
+```
+
 ### ===f and ===F
 
 When testing functions that return newly allocated strings, it's advantageous to immediately free the returned value.
@@ -319,6 +327,8 @@ When testing functions that return newly allocated strings, it's advantageous to
 ```
 
 ```===F``` like ```===f``` frees the left char array, but also frees the right one.
+
+```~==f``` should work as expected.
 
 ### before and after
 
