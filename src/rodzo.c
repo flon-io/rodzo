@@ -443,6 +443,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 
     char *fun = "rdz_string_eq";
     if (operator[0] == '!') fun = "rdz_string_neq";
+    else if (operator[0] == '~') fun = "rdz_string_match";
 
     push_linef(
       c, "%schar *result%d = %s);\n",
@@ -888,7 +889,7 @@ int print_usage()
 
 int main(int argc, char *argv[])
 {
-  regcomp(&ensure_operator_rex, " ([!=]==[fF]?) ", REG_EXTENDED);
+  regcomp(&ensure_operator_rex, " ([!=~]==[fF]?) ", REG_EXTENDED);
 
   // deal with arguments
 

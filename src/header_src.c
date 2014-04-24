@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h> // for isatty()
+#include <regex.h>
 
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
@@ -226,6 +227,29 @@ char *rdz_string_neq(char *operator, char *result, char *not_expected)
   strcpy(s + 20, not_expected);
   strcpy(s + 20 + lne, "\"");
 
+  return s;
+}
+
+char *rdz_string_match(char *operator, char *result, char *expected)
+{
+  char *s = NULL;
+  regex_t *r = calloc(1, sizeof(regex_t));
+  regcomp(r, expected, REG_EXTENDED);
+  regmatch_t ms[0];
+  if (regexec(r, result, 0, ms, 0)) // no match
+  {
+    size_t le = strlen(expected);
+    size_t lr = strlen(result);
+
+    s = calloc(15 + lr + 17 + le + 1 + 1, sizeof(char));
+
+    strcpy(s, "     expected \"");
+    strcpy(s + 15, result);
+    strcpy(s + 15 + lr, "\"\n     to match \"");
+    strcpy(s + 15 + lr + 17, expected);
+    strcpy(s + 15 + lr + 17 + le, "\"");
+  }
+  regfree(r);
   return s;
 }
 

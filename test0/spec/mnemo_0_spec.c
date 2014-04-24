@@ -77,6 +77,15 @@ describe "mne_tos()"
     {
       // has to be green
     }
+
+    it "matches strings 1"
+    {
+      ensure(mne_tos(47) ~== "[iI]a");
+    }
+    it "matches strings 2 (fail)"
+    {
+      ensure(mne_tos(47) ~== "[xy]a");
+    }
   }
 }
 
