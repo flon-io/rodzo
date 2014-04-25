@@ -249,7 +249,7 @@ char *rdz_string_match(char *operator, char *result, char *expected)
     strcpy(s + 15 + lr + 17, expected);
     strcpy(s + 15 + lr + 17 + le, "\"");
   }
-  regfree(r);
+  regfree(r); free(r);
   return s;
 }
 
