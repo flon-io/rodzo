@@ -10,5 +10,5 @@ spec:
 .PHONY: clean spec
 
 clean:
-	rm -f tmp/*.o tmp/*.so tmp/*.c tmp/mnemo.h
+	rm -f tmp/*.o tmp/*.so tmp/*.c tmp/mnemo.h tmp/a.out
 
