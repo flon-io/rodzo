@@ -558,7 +558,7 @@ void process_lines(context_s *c, char *path)
     {
       push(c, indent, 'c', text, path, lnumber);
     }
-    else if (strcmp(head, "it") == 0)
+    else if (strcmp(head, "it") == 0 || strcmp(head, "they") == 0)
     {
       push(c, indent, 'i', text, path, lnumber);
     }
