@@ -63,5 +63,13 @@ context "pending everything"
     //  ensure(1 == 1);
     //}
   }
+
+  describe "x"
+  {
+    it "is not included in the 'with before/after' context"
+    //{
+    //  ensure(1 == 1);
+    //}
+  }
 }
 
