@@ -45,6 +45,7 @@ typedef struct node_s {
   struct node_s *parent;
   int nodenumber;
   int indent;
+  short hasbody;
   char type;
   char *text;
   char *fname;
@@ -157,10 +158,11 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
     cn = cn->parent;
   }
 
-  node_s *n = malloc(sizeof(node_s));
+  node_s *n = calloc(1, sizeof(node_s));
   n->parent = cn;
   n->nodenumber = c->nodecount++;
   n->indent = ind;
+  n->hasbody = 0;
   n->type = type;
   n->text = text;
   n->fname = fn;
@@ -186,7 +188,7 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
 context_s *malloc_context()
 {
-  context_s *c = malloc(sizeof(context_s));
+  context_s *c = calloc(1, sizeof(context_s));
   c->loffset = 0;
   c->nodecount = 0;
   c->itcount = 0;
@@ -237,9 +239,10 @@ void pull(context_s *c, int indent, int lnumber)
 
   n->llength = lnumber - n->lstart;
 
-  if (n->type == 'i' && n->children[0] == NULL && indent < n->indent)
+  if (n->type == 'i' && n->hasbody == 0)
   {
     push(c, indent, 'p', "not yet implemented", n->fname, lnumber);
+    c->node = n->parent->parent; n = n->parent;
   }
 
   c->node = n->parent;
@@ -250,15 +253,9 @@ void pull(context_s *c, int indent, int lnumber)
   }
 }
 
-int current_indent(context_s *c)
-{
-  if (c->node == NULL) return -1;
-  return c->node->indent;
-}
-
 char **list_texts(node_s *node)
 {
-  char **a = malloc(256 * sizeof(char *));
+  char **a = calloc(256, sizeof(char *));
   size_t c = 0;
   node_s *n = node;
   while (n != NULL)
@@ -528,13 +525,14 @@ void process_lines(context_s *c, char *path)
     //printf("head: >%s<\n", head);
     //printf("  text: >%s<\n", text);
 
-    int cindent = current_indent(c);
+    char ctype = 'X'; int cindent = -1;
+    if (c->node != NULL) { ctype = c->node->type; cindent = c->node->indent; }
 
     if (strcmp(head, "{") == 0 && indent == cindent)
     {
-      // do nothing
+      c->node->hasbody = 1;
     }
-    else if (strcmp(head, "}") == 0 && indent <= cindent)
+    else if (strcmp(head, "}") == 0 && (indent <= cindent || ctype != 'i'))
     {
       pull(c, indent, lnumber);
     }

@@ -71,5 +71,12 @@ context "pending everything"
     //  ensure(1 == 1);
     //}
   }
+  describe "y"
+  {
+    it "works"
+    //{
+    //  ensure(1 == 1);
+    //}
+  }
 }
 
