@@ -704,9 +704,16 @@ void print_body(FILE *out, context_s *c)
 {
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
-  char *s = node_to_string(n); puts("\n"); puts(s); free(s); // prints tree
-
   print_node(out, n);
+
+  // print tree to ./spec_tree.txt
+
+  FILE *f = fopen("spec_tree.txt", "wb");
+  char *s = node_to_string(n);
+  fputs("\n", f); fputs(s, f); fputs("\n", f);
+  puts("\n"); puts(s); // print to stdout as well
+  free(s);
+  fclose(f);
 }
 
 void print_nodes(FILE *out, node_s *n)
