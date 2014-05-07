@@ -97,7 +97,7 @@ void node_to_s(flu_sbuffer *b, int level, node_s *n)
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
     flu_sbprintf(b, "|-- %s", type_to_string(t));
     flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
-    flu_sbprintf(b, "fn:%s ls:%d ", n->fname);
+    flu_sbprintf(b, "fn:%s ", n->fname);
     flu_sbprintf(b, "ls:%d lts:%d ll:%d ", n->lstart, n->ltstart, n->llength);
     flu_sbprintf(b, "p:%d\n", p);
     for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
