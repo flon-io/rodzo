@@ -503,7 +503,6 @@ void rdz_summary(int itcount)
   {
     printf("Pending:\n");
 
-    //for (size_t i = 0, j = 0; i < rdz_count; i++)
     for (size_t i = 0; i < rdz_count; i++)
     {
       rdz_result *r = rdz_results[i];
@@ -515,16 +514,6 @@ void rdz_summary(int itcount)
       rdz_yellow(); printf("  %s\n", r->title); rdz_clear();
       rdz_cyan(); printf("   # %s\n", r->message); rdz_clear();
       rdz_cyan(); printf("   # %s:%d\n", rit->fname, r->lnumber); rdz_clear();
-
-      //char *line = rdz_read_line(rit->fname, r->lnumber);
-      //printf("  %zu) %s\n", ++j, r->title);
-      //if (r->message) { rdz_red(); puts(r->message); rdz_clear(); }
-      //printf("     >");
-      //rdz_red(); printf("%s", line); rdz_clear();
-      //printf("<\n");
-      //rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
-      //printf(" (%d)\n", r->ltnumber);
-      //free(line);
     }
 
     printf("\n");
