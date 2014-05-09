@@ -84,31 +84,26 @@ char *type_to_string(char t)
 
 void node_to_s(flu_sbuffer *b, int level, node_s *n)
 {
-  if (n == NULL)
+  if (n == NULL) { flu_sbprintf(b, "*** (nil)"); return; }
+
+  int p = n->parent == NULL ? -1 : n->parent->nodenumber;
+  char t = n->type;
+  char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
+
+  for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+  flu_sbprintf(b, "|-- %s", type_to_string(t));
+  flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
+  flu_sbprintf(b, "fn:%s ", n->fname);
+  flu_sbprintf(b, "ls:%d lts:%d ll:%d ", n->lstart, n->ltstart, n->llength);
+  flu_sbprintf(b, "p:%d\n", p);
+  for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+  flu_sbprintf(b, "|   te: >%s<\n", te);
+
+  free(te);
+
+  for (size_t i = 0; n->children[i] != NULL; i++)
   {
-    flu_sbprintf(b, "*** (nil)");
-  }
-  else
-  {
-    int p = n->parent == NULL ? -1 : n->parent->nodenumber;
-    char t = n->type;
-    char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
-
-    for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
-    flu_sbprintf(b, "|-- %s", type_to_string(t));
-    flu_sbprintf(b, " n:%d i:%d ", n->nodenumber, n->indent);
-    flu_sbprintf(b, "fn:%s ", n->fname);
-    flu_sbprintf(b, "ls:%d lts:%d ll:%d ", n->lstart, n->ltstart, n->llength);
-    flu_sbprintf(b, "p:%d\n", p);
-    for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
-    flu_sbprintf(b, "|   te: >%s<\n", te);
-
-    free(te);
-
-    for (size_t i = 0; n->children[i] != NULL; i++)
-    {
-      node_to_s(b, level + 1, n->children[i]);
-    }
+    node_to_s(b, level + 1, n->children[i]);
   }
 }
 
@@ -116,6 +111,53 @@ char *node_to_string(node_s *n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
   node_to_s(b, 0, n);
+
+  return flu_sbuffer_to_string(b);
+}
+
+void node_to_p(flu_sbuffer *b, int level, node_s *n)
+{
+  if (n == NULL) { flu_sbprintf(b, "// NULL"); return; }
+
+  char t = n->type;
+  int notg = (t != 'g' && t != 'G');
+  int notba = (t != 'b' && t != 'B' && t != 'a' && t != 'A');
+
+  if (notg)
+  {
+    char *te = flu_strrtrim(n->text != NULL ? n->text : "(nil)");
+
+    for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+    flu_sbprintf(b, "%s \"%s\"\n", type_to_string(n->type), te);
+
+    free(te);
+  }
+
+  if (t != 'p')
+  {
+    if (notg && notba)
+    {
+      for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+      flu_sbprintf(b, "{\n");
+    }
+
+    for (size_t i = 0; n->children[i] != NULL; i++)
+    {
+      node_to_p(b, level + 1, n->children[i]);
+    }
+
+    if (notg && notba)
+    {
+      for (int i = 0; i < level; i++) flu_sbputs(b, "  ");
+      flu_sbprintf(b, "}\n");
+    }
+  }
+}
+
+char *node_to_pseudo(node_s *n)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+  node_to_p(b, 0, n);
 
   return flu_sbuffer_to_string(b);
 }
@@ -711,7 +753,15 @@ void print_body(FILE *out, context_s *c)
   FILE *f = fopen("spec_tree.txt", "wb");
   char *s = node_to_string(n);
   fputs("\n", f); fputs(s, f); fputs("\n", f);
-  puts("\n"); puts(s); // print to stdout as well
+  //puts("\n"); puts(s); // print to stdout as well
+  free(s);
+  fclose(f);
+
+  // print pseudo to ./spec_pseudo.txt
+
+  f = fopen("spec_pseudo.txt", "wb");
+  s = node_to_pseudo(n);
+  fputs("\n", f); fputs(s, f); fputs("\n", f);
   free(s);
   fclose(f);
 }
@@ -889,6 +939,7 @@ char **list_spec_files(int argc, char *argv[])
 int print_usage()
 {
   printf("rodzo usage...");
+  // TODO: write usage
   return 1;
 }
 
@@ -904,7 +955,7 @@ int main(int argc, char *argv[])
   {
     char *a = argv[i];
     if (strcmp(a, "-o") == 0) {
-      if (i + 1 >= argc) return print_usage(); // TODO: replace with die()
+      if (i + 1 >= argc) return print_usage(); // TODO: print then die?
       c->out_fname = strdup(argv[++i]);
     }
   }
