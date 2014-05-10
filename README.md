@@ -43,10 +43,12 @@ NAME=flutil
 
 default: $(NAME).o
 
-.DEFAULT spec clean:
-        $(MAKE) -C tmp/ $@ NAME=$(NAME)
+SPECS=../spec
 
-        .PHONY: spec clean
+.DEFAULT spec clean:
+	$(MAKE) -C tmp/ $@ NAME=$(NAME) SPECS="$(SPECS)"
+
+.PHONY: spec clean
 ```
 
 test4/tmp/Makefile:
@@ -64,7 +66,7 @@ endif
 
 
 s.c: ../spec/*_spec.c
-	$(RODZO) ../spec -o s.c
+	$(RODZO) $(SPECS) -o s.c
 
 s: $(NAME).o
 
@@ -153,6 +155,14 @@ will run all the ```describe```, ```context``` or ```it``` whose text contains t
 The pattern is a plain pattern, no fancy regular expression matching.
 
 If a ```describe``` or a ```context``` matches, all the examples in its branch will be run.
+
+### specifying a set of spec files to run with SPEC=
+
+By default, rodzo is run against a whole ../spec dir. The SPECS makefile env variable can be used to declare what spec files to take into account.
+
+```
+$ make spec SPECS="../spec/strings_spec.c ../spec/integers_spec.c"
+```
 
 ### running with Valgrind (vspec)
 

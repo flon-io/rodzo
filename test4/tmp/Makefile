@@ -11,7 +11,7 @@ endif
 
 
 s.c: ../spec/*_spec.c
-	$(RODZO) ../spec -o s.c
+	$(RODZO) $(SPECS) -o s.c
 
 s: $(NAME).o
 
