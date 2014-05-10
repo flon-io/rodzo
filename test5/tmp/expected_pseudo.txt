@@ -1,0 +1,72 @@
+
+  context "pending everything"
+  {
+    it "accepts pending stuff"
+    {
+      pending "not yet implemented"
+    }
+    it "accepts pending stuff 2"
+    {
+      pending "not yet implemented"
+    }
+    it "accepts pending nodes"
+    {
+      pending "no reason given"
+    }
+    it "accepts pending nodes without body"
+    {
+      pending "no reason given"
+    }
+    it "accepts explicitely pending stuff"
+    {
+      pending "no reason given"
+    }
+    it "accepts explicitely pending stuff with text"
+    {
+      pending "nada"
+    }
+    context "with before/after"
+    {
+      before each "before each"
+      after each "after each"
+      it "flips burgers"
+      {
+        pending "not yet implemented"
+      }
+      it "flies kites"
+      {
+        pending "no reason given"
+      }
+      it "flings stones"
+      {
+        pending "too archaic"
+      }
+      it "floats safely"
+      {
+        pending "not yet implemented"
+      }
+    }
+    describe "x"
+    {
+      it "is not included in the 'with before/after' context"
+      {
+        pending "not yet implemented"
+      }
+    }
+    describe "y"
+    {
+      it "works"
+      {
+        pending "not yet implemented"
+      }
+    }
+  }
+  context "lonely pending"
+  {
+    before all "before all"
+    it "is pending"
+    {
+      pending "not yet implemented"
+    }
+  }
+

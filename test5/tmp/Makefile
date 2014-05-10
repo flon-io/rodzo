@@ -17,6 +17,9 @@ s: $(NAME).o
 
 spec: s
 	time ./s
+	@echo "[31m"
+	-diff -u spec_pseudo.txt expected_pseudo.txt
+	@echo "[0m"
 
 vspec: s
 	valgrind --leak-check=full -v ./s
