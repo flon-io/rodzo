@@ -192,9 +192,9 @@ void push(context_s *c, int ind, char type, char *text, char *fn, int lstart)
 
   if (cn && cn->type == 'i' && type != 'p') // "it" without bodies
   {
-    // TODO: find a way to let pull() deal with the 5 next lines
     if (cn->children[0] == NULL)
     {
+      //push(c, ind, 'p', "not yet implemented 2", fn, cn->lstart);
       push(c, ind, 'p', "not yet implemented", fn, cn->lstart);
     }
     cn = cn->parent;
@@ -283,7 +283,7 @@ void pull(context_s *c, int indent, int lnumber)
 
   if (n->type == 'i' && n->hasbody == 0)
   {
-    push(c, indent, 'p', "not yet implemented", n->fname, lnumber);
+    push(c, n->indent, 'p', "not yet implemented", n->fname, lnumber);
     c->node = n->parent->parent; n = n->parent;
   }
 
