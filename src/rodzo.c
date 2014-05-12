@@ -841,8 +841,7 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "    NULL };\n");
   fprintf(out, "\n");
 
-  int count = c->encount;
-  if (count < c->itcount) count = c->itcount;
+  int count = c->encount + c->itcount;
   //
   fprintf(out, "  rdz_results = calloc(%d, sizeof(rdz_result *));\n", count);
   fprintf(out, "\n");
