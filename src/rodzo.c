@@ -63,6 +63,7 @@ typedef struct context_s {
   int encount; // ensure count
   node_s *node;
   char *out_fname;
+  int debug;
 } context_s;
 
 char *type_to_string(char t)
@@ -237,6 +238,7 @@ context_s *malloc_context()
   c->encount = 0;
   c->node = NULL;
   c->out_fname = NULL;
+  c->debug = 0;
 
   push(c, -1, 'G', NULL, NULL, -1);
 
@@ -748,6 +750,8 @@ void print_body(FILE *out, context_s *c)
 
   print_node(out, n);
 
+  if (c->debug == 0) return; // -d or return
+
   // print tree to ./spec_tree.txt
 
   FILE *f = fopen("spec_tree.txt", "wb");
@@ -956,6 +960,9 @@ int main(int argc, char *argv[])
     if (strcmp(a, "-o") == 0) {
       if (i + 1 >= argc) return print_usage(); // TODO: print then die?
       c->out_fname = strdup(argv[++i]);
+    }
+    else if (strcmp(a, "-d") == 0) {
+      c->debug = 1;
     }
   }
 

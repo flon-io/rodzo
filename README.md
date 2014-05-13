@@ -174,6 +174,12 @@ Beware leaks introduced by the spec themselves, generating a string, comparing i
 
 Another tool for dealing with memory leaks is [===f / ===F](#f-and-f). When comparing strings it tells rodzo to free the left side (f) or both (F) after comparison. That may spare a few lines.
 
+### running with -d
+
+When running rodzo with `-d`, two files are emitted along the spec source file and its compiled executable, those two files are `spec_tree.txt` and `spec_pseudo.txt`. They both represent the tree of spec as seen by rodzo. The tree one is very detailed, with line numbers and levels, while the second one is a rendition of the spec in pseudo rodzo spec idiom.
+
+These `-d` files are used for debugging / developping rodzo.
+
 
 ## Writing specs
 

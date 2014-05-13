@@ -10,7 +10,7 @@ ifeq ($(RODZO),)
 endif
 
 s.c: ../spec/*_spec.c
-	$(RODZO) $(SPECS) -o s.c
+	$(RODZO) -d $(SPECS) -o s.c
 
 s: $(NAME).o
 
@@ -24,7 +24,7 @@ vspec: s
 	valgrind --leak-check=full -v ./s
 
 clean:
-	rm -f *.o *.so *.c s
+	rm -f *.o *.so *.c s spec_*.txt
 
 .PHONY: spec vspec clean
 
