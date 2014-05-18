@@ -690,6 +690,7 @@ void print_node(FILE *out, node_s *n)
   }
 
   int offline = (t == 'B' || t == 'A' || t == 'y' || t == 'z');
+  char *type = "none";
 
   if (t == 'i')
   {
@@ -702,7 +703,7 @@ void print_node(FILE *out, node_s *n)
   }
   else if (offline)
   {
-    char *type = "before_all";
+    type = "before_all";
     if (t == 'A') type = "after_all";
     else if (t == 'y') type = "before_each_offline";
     else if (t == 'z') type = "after_each_offline";
@@ -731,7 +732,8 @@ void print_node(FILE *out, node_s *n)
   }
   else if (offline)
   {
-    fprintf(out, "%s}\n", ind);
+    fprintf(out, "%s  return 1;\n", ind);
+    fprintf(out, "%s} // %s_%d()\n", ind, type, n->nodenumber);
   }
 
   free(ind);
