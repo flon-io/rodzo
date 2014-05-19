@@ -78,5 +78,9 @@ context "pending everything"
     //  ensure(1 == 1);
     //}
   }
+
+  it "has no ensures"
+  {
+  }
 }
 

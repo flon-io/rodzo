@@ -723,7 +723,12 @@ void print_node(FILE *out, node_s *n)
   if (t == 'i')
   {
     fprintf(out, "\n");
-    fprintf(out, "%s_over:\n", ind);
+
+    if (n->lines != NULL && strstr(n->lines->string, ") goto _over;\n"))
+    {
+      fprintf(out, "%s_over:\n", ind);
+    }
+
     print_eaches(out, ind, 'a', n->parent);
 
     fprintf(out, "\n");

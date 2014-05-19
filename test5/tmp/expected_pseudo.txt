@@ -60,6 +60,9 @@
         pending "not yet implemented"
       }
     }
+    it "has no ensures"
+    {
+    }
   }
   context "lonely pending"
   {
