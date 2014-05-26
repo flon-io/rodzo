@@ -21,5 +21,10 @@ clean:
 	rm -f bin/rodzo
 	$(foreach t, $(TS), $(MAKE) -C $(t) clean;)
 
-.PHONY: clean test vtest
+# copy updated version of dep libs into src/
+#
+upgrade:
+	cp -v ../flutil/src/flutil.* src/
+
+.PHONY: clean test vtest upgrade
 
