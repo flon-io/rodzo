@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <string.h>
 
 #include "flutil.h"
 
@@ -81,7 +81,7 @@ char *flu_strtrim(char *s)
 
 flu_sbuffer *flu_sbuffer_malloc()
 {
-  flu_sbuffer *b = malloc(sizeof(flu_sbuffer));
+  flu_sbuffer *b = calloc(1, sizeof(flu_sbuffer));
   b->stream = open_memstream(&b->string, &b->len);
   return b;
 }

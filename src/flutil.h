@@ -29,7 +29,6 @@
 #define FLON_FLUTIL_H
 
 #include <stdarg.h>
-#include <string.h>
 
 
 #define FLU_VERSION "1.0.0"
