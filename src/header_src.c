@@ -100,7 +100,7 @@ rdz_result *rdz_result_malloc(
     if (i < sc - 1) *(t++) = ' ';
   }
 
-  rdz_result *r = malloc(sizeof(rdz_result));
+  rdz_result *r = calloc(1, sizeof(rdz_result));
   r->success = success;
   r->message = msg;
   r->title = title;
@@ -283,7 +283,7 @@ void rdz_extract_arguments()
 
   rdz_example = getenv("E");
 
-  rdz_lines = malloc(64 * sizeof(int));
+  rdz_lines = calloc(64, sizeof(int));
   for (size_t i = 0; i < 64; i++) rdz_lines[i] = -1;
 
   // L=12,67

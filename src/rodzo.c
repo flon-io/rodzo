@@ -419,7 +419,7 @@ int ends_in_semicolon(char *line)
 
 char *extract_condition(FILE *in, char *line)
 {
-  char *r = malloc(147 * 80 * sizeof(char));
+  char *r = calloc(147 * 80, sizeof(char));
   char *rr = r;
 
   strcpy(rr, line);
@@ -437,7 +437,7 @@ char *extract_condition(FILE *in, char *line)
     rr += strlen(lin);
     if (ends_in_semicolon(lin)) break;
   }
-  *rr = '\0';
+  //*rr = '\0'; // thanks calloc
 
   free(lin);
 

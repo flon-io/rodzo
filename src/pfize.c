@@ -33,7 +33,7 @@ char *escape(char *line)
 {
   int len = strlen(line) - 1;
   line[len] = '\0';
-  char *l = malloc(2 * 1024 * sizeof(char));
+  char *l = calloc(2 * 1024, sizeof(char));
   char *ll = l;
   for (int i = 0; i < len; i++)
   {
@@ -41,7 +41,7 @@ char *escape(char *line)
     if (c == '"' || c == '%' || c == '\\') *(ll++) = '\\';
     *(ll++) = c;
   }
-  *(ll++) = '\0';
+  //*(ll++) = '\0'; // thanks calloc
   return l;
 }
 
