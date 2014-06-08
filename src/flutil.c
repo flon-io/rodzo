@@ -111,6 +111,11 @@ int flu_sbprintf(flu_sbuffer *b, const char *format, ...)
   return r;
 }
 
+int flu_sbputc(flu_sbuffer *b, int c)
+{
+  return putc(c, b->stream);
+}
+
 int flu_sbputs(flu_sbuffer *b, char *s)
 {
   return fputs(s, b->stream);

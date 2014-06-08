@@ -82,6 +82,11 @@ int flu_sbvprintf(flu_sbuffer *b, const char *format, va_list ap);
 int flu_sbprintf(flu_sbuffer *b, const char *format, ...);
 
 /*
+ * Puts a single char to the buffer. It's the equivalent of putc.
+ */
+int flu_sbputc(flu_sbuffer *b, int c);
+
+/*
  * The equivalent of fputs(). Warning: the buffer is the first argument.
  */
 int flu_sbputs(flu_sbuffer *b, char *s);
