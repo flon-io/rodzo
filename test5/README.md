@@ -1,5 +1,9 @@
 
-## rodzo test4
+## rodzo test5
 
-More an example than a test.
+To run it, stay in `rodzo/` and do
+
+```
+make test T=6
+```
 
