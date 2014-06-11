@@ -281,6 +281,8 @@ void pull(context_s *c, int indent, int lnumber)
 {
   node_s *n = c->node;
 
+  //printf("0 pull() from %d to %d\n", n->indent, n->parent->indent);
+
   n->llength = lnumber - n->lstart;
 
   if (n->type == 'i' && n->hasbody == 0)
@@ -288,6 +290,8 @@ void pull(context_s *c, int indent, int lnumber)
     push(c, n->indent, 'p', "not yet implemented", n->fname, lnumber);
     c->node = n->parent->parent; n = n->parent;
   }
+
+  //printf("1 pull() from %d to %d\n", n->indent, n->parent->indent);
 
   c->node = n->parent;
 
@@ -546,6 +550,12 @@ void push_pending(context_s *c, int ind, char *text, char *fn, int lstart)
   }
 }
 
+char *rtrim(char *s)
+{
+  // TODO: chop comments
+  return flu_strrtrim(s);
+}
+
 void process_lines(context_s *c, char *path)
 {
   push(c, 0, 'g', NULL, path, 0);
@@ -576,8 +586,10 @@ void process_lines(context_s *c, char *path)
     {
       c->node->hasbody = 1;
     }
-    else if (strcmp(head, "}") == 0 && (indent <= cindent || ctype != 'i'))
+    //else if (strcmp(head, "}") == 0 && (indent <= cindent || ctype != 'i'))
+    else if (strcmp(head, "}") == 0 && indent <= cindent)
     {
+      //printf("i: %d, ci: %d, ct: %c\n", indent, cindent, ctype);
       pull(c, indent, lnumber);
     }
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
@@ -603,6 +615,9 @@ void process_lines(context_s *c, char *path)
     else if (strcmp(head, "it") == 0 || strcmp(head, "they") == 0)
     {
       push(c, indent, 'i', text, path, lnumber);
+      char *l = rtrim(line);
+      if (flu_strends(l, "{")) c->node->hasbody = 1;
+      free(l);
     }
     else if (strcmp(head, "ensure") == 0)
     {
@@ -610,7 +625,6 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "pending") == 0)
     {
-      //push(c, indent, 'p', text, path, lnumber);
       push_pending(c, indent, text, path, lnumber);
     }
     else

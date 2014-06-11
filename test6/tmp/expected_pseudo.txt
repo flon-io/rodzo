@@ -1,0 +1,8 @@
+
+  context "functions defined within the specs"
+  {
+    it "calls get_name()"
+    {
+    }
+  }
+

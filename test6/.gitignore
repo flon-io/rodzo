@@ -1,0 +1,6 @@
+tmp/*.o
+tmp/*.so
+tmp/*.c
+tmp/s
+tmp/spec_tree.txt
+tmp/spec_pseudo.txt
