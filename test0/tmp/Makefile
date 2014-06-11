@@ -15,13 +15,16 @@ lib$(NAME).so: $(NAME).o
 	$(CC) -shared -Wl,-soname,lib$(NAME).so $^ -o $@
 
 spec.c:
-	../../bin/rodzo ../spec
+	../../bin/rodzo -d ../spec
 
 build-spec: spec.c
 	$(CC) -L. -lmnemo $<
 
 spec: build build-spec
 	LD_LIBRARY_PATH=. time ./a.out
+	@echo "[31m"
+	-diff -u expected_pseudo.txt spec_pseudo.txt
+	@echo "[0m"
 
 vspec: build build-spec
 	LD_LIBRARY_PATH=. valgrind --leak-check=full -v ./a.out

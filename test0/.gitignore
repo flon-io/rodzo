@@ -4,4 +4,6 @@ tmp/*.so
 tmp/*.h
 tmp/*.c
 tmp/a.out
+tmp/spec_tree.txt
+tmp/spec_pseudo.txt
 

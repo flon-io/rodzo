@@ -1,0 +1,62 @@
+
+  describe "mne_tos()"
+  {
+    context "cows are flying"
+    {
+      it "turns longs to mnemonic (hopefully) strings"
+      {
+      }
+      it "flips \"burgers\""
+      {
+      }
+      it "compares strings 1"
+      {
+      }
+      it "compares strings 2"
+      {
+      }
+      it "compares strings 2"
+      {
+      }
+      it "expects strings to differ 1"
+      {
+      }
+      it "expects strings to differ 2"
+      {
+      }
+      it "frees strings 1"
+      {
+      }
+      it "doesn't crash when strings are NULL"
+      {
+      }
+      it "accepts empty specs"
+      {
+      }
+      it "matches strings 1"
+      {
+      }
+      it "matches strings 2 (fail)"
+      {
+      }
+    }
+  }
+  describe "mne_tos()"
+  {
+    context "birds are flying"
+    {
+      it "finds the コンビニ convenient"
+      {
+      }
+      it "does not care about \n"
+      {
+      }
+    }
+  }
+  describe "mne_toi()"
+  {
+    it "flips burgers"
+    {
+    }
+  }
+
