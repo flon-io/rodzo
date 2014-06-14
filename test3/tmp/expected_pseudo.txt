@@ -1,0 +1,34 @@
+
+  before all "before all"
+  after all "after all"
+  describe "abr_node"
+  {
+    before all "before all"
+    after all "after all"
+    before each "before each"
+    after each "after each"
+    describe "abr_malloc_node()"
+    {
+      it "creates a node"
+      {
+      }
+    }
+    describe "abr_node_to_string(n)"
+    {
+      before each "before each"
+      after each "after each"
+      before each offline "before each offline"
+      {
+      }
+      after each offline "after each offline"
+      {
+      }
+      it "returns a string representation of the node"
+      {
+      }
+      it "returns a string representation of the node"
+      {
+      }
+    }
+  }
+

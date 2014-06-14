@@ -11,12 +11,15 @@ endif
 
 
 s.c: ../spec/*_spec.c
-	$(RODZO) ../spec -o s.c
+	$(RODZO) -d ../spec -o s.c
 
 s: $(NAME).o
 
 spec: s
 	time ./s
+	@echo "[31m"
+	-diff -u expected_pseudo.txt spec_pseudo.txt
+	@echo "[0m"
 
 vspec: s
 	valgrind --leak-check=full -v ./s

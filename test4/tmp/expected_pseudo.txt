@@ -1,0 +1,28 @@
+
+  context "str functions"
+  {
+    before each "before each"
+    after each "after each"
+    describe "flu_strrtrim(char *s)"
+    {
+      it "trims on the right"
+      {
+      }
+      it "doesn't trim when not necessary"
+      {
+      }
+      it "returns a new string"
+      {
+      }
+    }
+    describe "flu_strends(char *s, char *ending)"
+    {
+      it "returns 1 if the s ends with ending"
+      {
+      }
+      it "returns 0 else"
+      {
+      }
+    }
+  }
+
