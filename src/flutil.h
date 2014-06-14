@@ -92,6 +92,13 @@ int flu_sbputc(flu_sbuffer *b, int c);
 int flu_sbputs(flu_sbuffer *b, char *s);
 
 /*
+ * Puts the n first chars of s to the buffer. Return a non-negative int
+ * on success, EOF in case of error.
+ * Stops upon encountering a \0.
+ */
+int flu_sbputs_n(flu_sbuffer *b, char *s, size_t n);
+
+/*
  * Closes the buffer (stream) which causes the string to be made available.
  *
  * Doesn't not free the buffer, it still is around for further reading
@@ -124,6 +131,23 @@ char *flu_sprintf(const char *format, ...);
  */
 void flu_die(int exit_value, const char *format, ...);
 
+
+//
+// escape
+
+/*
+ * Returns an escaped copy of the given string.
+ * Only escapes \ " \b \f \n \r \t. It doesn't escape UTF-8 chars (the
+ * ones above ASCII).
+ */
+char *flu_escape(char *s);
+char *flu_n_escape(char *s, size_t n);
+
+/*
+ * Returns an unescaped copy of the given string.
+ */
+char *flu_unescape(char *s);
+char *flu_n_unescape(char *s, size_t n);
 
 #endif // FLON_FLUTIL_H
 
