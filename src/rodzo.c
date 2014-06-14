@@ -320,19 +320,6 @@ char **list_texts(node_s *node)
   return r;
 }
 
-char *str_neuter(char *s)
-{
-  for (size_t i = 0, j = 0; ; i++)
-  {
-    char c = s[i];
-    if (c == '\\') { i++; continue; }
-    s[j++] = c;
-    if (c == '\0') break;
-  }
-
-  return s;
-}
-
 char *list_texts_as_literal(node_s *n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
@@ -344,7 +331,7 @@ char *list_texts_as_literal(node_s *n)
 
   while (*t != NULL)
   {
-    flu_sbprintf(b, "\"%s\", ", str_neuter(*t));
+    flu_sbprintf(b, "\"%s\", ", flu_escape(*t));
     free(*t);
     t++;
   }

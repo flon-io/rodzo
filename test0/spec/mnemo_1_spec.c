@@ -10,8 +10,14 @@ describe "mne_tos()" {
     {
       ensure(1 == 1);
     }
+    it "is OK with \"double quotes\" and \tabs"
+    {
+      ensure(1 == 2);
+        // force text to appear in summary
+    }
     it "does not care about \n" {
       ensure(1 == 2);
+        // force text to appear in summary
     }
 
     // that's all folks

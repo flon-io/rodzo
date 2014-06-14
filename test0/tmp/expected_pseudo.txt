@@ -48,6 +48,9 @@
       it "finds the コンビニ convenient"
       {
       }
+      it "is OK with \"double quotes\" and \tabs"
+      {
+      }
       it "does not care about \n"
       {
       }
