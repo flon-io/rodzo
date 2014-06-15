@@ -19,5 +19,20 @@ context "functions defined within the specs"
   {
     ensure(get_name(1) === "Kurt");
   }
+
+  // fighting gh-10
+  //
+  it "is ok with comments after an ensure"
+  {
+    ensure("1" === "1"); // easy
+  }
+  it "does that thing"
+  {
+    ensure(2 == 2); // peasy
+  }
+  it "does it again"
+  {
+    ensure(1 == 1);
+  }
 }
 
