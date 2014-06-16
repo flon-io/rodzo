@@ -396,16 +396,31 @@ char *extract_text(char *line)
   return extract_string(start + 1);
 }
 
+size_t last_relevant_char(char *line)
+{
+  size_t i = 0;
+  int instring = 0;
+
+  for (; i < strlen(line); i++)
+  {
+    char c = line[i];
+    if ( ! instring && c == '"') instring = 1;
+    else if (c == '\\') i++;
+    else if (instring && c == '"') instring = 0;
+    else if ( ! instring && c == '/' && line[i + 1] == '/') break;
+  }
+  for (--i; i >= 0; i--)
+  {
+    char c = line[i];
+    if (c != ' ' && c != '\t' && c != '\n') break;
+  }
+
+  return i;
+}
+
 int ends_in_semicolon(char *line)
 {
-  for (int l = strlen(line); l > 1; l--)
-  {
-    char c = line[l - 1];
-    if (c == ';') return 1;
-    if (c == ' ' || c == '\t' || c == '\n') continue;
-    return 0;
-  }
-  return 0;
+  return (line[last_relevant_char(line)] == ';');
 }
 
 char *extract_condition(FILE *in, char *line)
@@ -450,6 +465,8 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   l = strpbrk(l, "e");
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
+
+  //printf("con >%s<\n", con);
 
   char *ind = calloc(indent + 1, sizeof(char));
   for (size_t i = 0; i < indent; i++) ind[i] = ' ';
