@@ -425,13 +425,11 @@ int ends_in_semicolon(char *line)
 
 char *extract_condition(FILE *in, char *line)
 {
-  char *r = calloc(147 * 80, sizeof(char));
-  char *rr = r;
+  flu_sbuffer *b = flu_sbuffer_malloc();
 
-  strcpy(rr, line);
-  rr += strlen(line);
+  flu_sbprintf(b, line);
 
-  if (ends_in_semicolon(line)) return r;
+  if (ends_in_semicolon(line)) return flu_sbuffer_to_string(b);
 
   char *lin = NULL;
   size_t len = 0;
@@ -439,15 +437,13 @@ char *extract_condition(FILE *in, char *line)
   while (1)
   {
     if (getline(&lin, &len, in) == -1) break;
-    strcpy(rr, lin);
-    rr += strlen(lin);
+    flu_sbprintf(b, lin);
     if (ends_in_semicolon(lin)) break;
   }
-  //*rr = '\0'; // thanks calloc
 
   free(lin);
 
-  return r;
+  return flu_sbuffer_to_string(b);
 }
 
 int count_lines(char *s)
