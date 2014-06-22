@@ -331,7 +331,8 @@ char *list_texts_as_literal(node_s *n)
 
   while (*t != NULL)
   {
-    flu_sbprintf(b, "\"%s\", ", flu_escape(*t));
+    //flu_sbprintf(b, "\"%s\", ", flu_escape(*t));
+    flu_sbprintf(b, "\"%s\", ", *t);
     free(*t);
     t++;
   }
