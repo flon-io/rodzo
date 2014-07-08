@@ -37,7 +37,7 @@
 //
 // str functions
 
-int flu_strends(char *s, char *end)
+int flu_strends(const char *s, const char *end)
 {
   size_t ls = strlen(s);
   size_t le = strlen(end);
@@ -47,7 +47,7 @@ int flu_strends(char *s, char *end)
   return (strncmp(s + ls - le, end, le) == 0);
 }
 
-char *flu_strrtrim(char *s)
+char *flu_strrtrim(const char *s)
 {
   char *r = strdup(s);
   for (size_t l = strlen(r); l > 0; l--)
@@ -60,7 +60,7 @@ char *flu_strrtrim(char *s)
   return r;
 }
 
-char *flu_strtrim(char *s)
+char *flu_strtrim(const char *s)
 {
   char *s1 = flu_strrtrim(s);
   char *s2 = s1;
@@ -116,12 +116,12 @@ int flu_sbputc(flu_sbuffer *b, int c)
   return putc(c, b->stream);
 }
 
-int flu_sbputs(flu_sbuffer *b, char *s)
+int flu_sbputs(flu_sbuffer *b, const char *s)
 {
   return fputs(s, b->stream);
 }
 
-int flu_sbputs_n(flu_sbuffer *b, char *s, size_t n)
+int flu_sbputs_n(flu_sbuffer *b, const char *s, size_t n)
 {
   int r = 1;
   for (size_t i = 0; i < n; i++)
@@ -197,12 +197,12 @@ void flu_die(int exit_value, const char *format, ...)
 //
 // escape
 
-char *flu_escape(char *s)
+char *flu_escape(const char *s)
 {
   return flu_n_escape(s, strlen(s));
 }
 
-char *flu_n_escape(char *s, size_t n)
+char *flu_n_escape(const char *s, size_t n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
@@ -223,14 +223,14 @@ char *flu_n_escape(char *s, size_t n)
   return flu_sbuffer_to_string(b);
 }
 
-char *flu_unescape(char *s)
+char *flu_unescape(const char *s)
 {
   return flu_n_unescape(s, strlen(s));
 }
 
 // based on cutef8 by Jeff Bezanson
 //
-char *flu_n_unescape(char *s, size_t n)
+char *flu_n_unescape(const char *s, size_t n)
 {
   char *d = calloc(n + 1, sizeof(char));
 
@@ -276,5 +276,137 @@ char *flu_n_unescape(char *s, size_t n)
   }
 
   return d;
+}
+
+
+//
+// colls
+
+static flu_node *flu_node_malloc(void *item)
+{
+  flu_node *n = calloc(1, sizeof(flu_node));
+  n->item = item;
+  n->next = NULL;
+  //n->key = ...
+
+  return n;
+}
+
+void flu_node_free(flu_node *n)
+{
+  //if (n->key != NULL) free(n->key)
+  free(n);
+}
+
+flu_list *flu_list_malloc()
+{
+  flu_list *l = calloc(1, sizeof(flu_list));
+
+  l->first = NULL;
+  l->last = NULL;
+  l->size = 0;
+
+  return l;
+}
+
+void flu_list_free(flu_list *l)
+{
+  for (flu_node *n = l->first; n != NULL; )
+  {
+    flu_node *next = n->next;
+    flu_node_free(n);
+    n = next;
+  }
+  free(l);
+}
+
+void flu_list_and_items_free(flu_list *l, void (*free_item)(void *))
+{
+  for (flu_node *n = l->first; n != NULL; n = n->next) free_item(n->item);
+  flu_list_free(l);
+}
+
+void *flu_list_at(const flu_list *l, size_t n)
+{
+  size_t i = 0;
+  for (flu_node *no = l->first; no != NULL; no = no->next)
+  {
+    if (i == n) return no->item;
+    ++i;
+  }
+  return NULL;
+}
+
+void flu_list_add(flu_list *l, void *item)
+{
+  flu_node *n = flu_node_malloc(item);
+
+  if (l->first == NULL) l->first = n;
+  if (l->last != NULL) l->last->next = n;
+  l->last = n;
+  l->size++;
+}
+
+int flu_list_add_unique(flu_list *l, void *item)
+{
+  for (flu_node *n = l->first; n != NULL; n = n->next)
+  {
+    if (n->item == item) return 0; // not added
+  }
+
+  flu_list_add(l, item);
+  return 1; // added
+}
+
+void flu_list_unshift(flu_list *l, void *item)
+{
+  flu_node *n = flu_node_malloc(item);
+  n->next = l->first;
+  l->first = n;
+  if (l->last == NULL) l->last = n;
+  l->size++;
+}
+
+void *flu_list_shift(flu_list *l)
+{
+  if (l->size == 0) return NULL;
+
+  flu_node *n = l->first;
+  void *item = n->item;
+  l->first = n->next;
+  free(n);
+  if (l->first == NULL) l->last = NULL;
+  l->size--;
+
+  return item;
+}
+
+void **flu_list_to_array(const flu_list *l)
+{
+  void **a = calloc(l->size, sizeof(void *));
+  size_t i = 0;
+  for (flu_node *n = l->first; n != NULL; n = n->next) a[i++] = n->item;
+  return a;
+}
+
+void **flu_list_to_array_n(const flu_list *l)
+{
+  void **a = calloc(l->size + 1, sizeof(void *));
+  size_t i = 0;
+  for (flu_node *n = l->first; n != NULL; n = n->next) a[i++] = n->item;
+  a[i] = NULL;
+  return a;
+}
+
+
+//
+// misc
+
+char *flu_strdup(char *s)
+{
+  int l = strlen(s);
+  char *r = calloc(l + 1, sizeof(char));
+  strcpy(r, s);
+  return r;
 }
 
