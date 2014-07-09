@@ -1,16 +1,17 @@
 
 CFLAGS=-g -Wall -O3
-LDLIBS=flutil.o
+LDLIBS=flutil.o aabro.o
 CC=c99
 
 SRC=../src
 VPATH=$(SRC)
 
 
-build: rodzo
-	cp rodzo ../bin/
+build: rodzo r2
+	cp rodzo r2 ../bin/
 
 rodzo.o: rodzo.c header.c flutil.o
+r2.o: r2.c flutil.o aabro.o
 
 header.c: pfize header_src.c
 	./pfize print_header $(SRC)/header_src.c > $(SRC)/header.c
