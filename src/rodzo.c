@@ -457,6 +457,20 @@ int count_lines(char *s)
 
 regex_t ensure_operator_rex;
 
+char *chop_right(char *s)
+{
+  // TODO: too naive, have to survive comments... // and /*
+
+  size_t l = strlen(s);
+  for (size_t i = l - 1; i > 0; i--)
+  {
+    char c = s[i];
+    s[i] = '\0';
+    if (c == ')') break;
+  }
+  return s;
+}
+
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
   l = strpbrk(l, "e");
@@ -484,8 +498,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 
     con[ms[1].rm_so] = '\0';
     char *left = flu_strtrim(con);
-    char *right = flu_strtrim(con + ms[1].rm_eo);
-    right[strlen(right) - 2] = '\0'; // remove trailing ;
+    char *right = chop_right(flu_strtrim(con + ms[1].rm_eo));
 
     char *fun = "rdz_string_eq";
     if (operator[0] == '!') fun = "rdz_string_neq";

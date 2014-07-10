@@ -4,5 +4,14 @@
     it "calls get_name()"
     {
     }
+    it "is ok with comments after an ensure"
+    {
+    }
+    it "does that thing"
+    {
+    }
+    it "does it again"
+    {
+    }
   }
 
