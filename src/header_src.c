@@ -280,9 +280,9 @@ void rdz_run_all_children(rdz_node *n)
   {
     rdz_node *cn = rdz_nodes[n->children[i]];
     char ct = cn->type;
-    if (ct != 'd' && ct != 'c' && ct != 'i') continue;
+    if (ct != 'd' && ct != 'c' && ct != 'i' && ct != 'p') continue;
     if (cn->dorun < 1) cn->dorun = 1;
-    if (ct != 'i') rdz_run_all_children(cn);
+    if (ct != 'i' || ct != 'p') rdz_run_all_children(cn);
   }
 }
 void rdz_run_all_parents(int parentnumber)
