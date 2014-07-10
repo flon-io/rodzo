@@ -580,8 +580,13 @@ void process_lines(context_s *c, char *path)
     //printf("head: >%s<\n", head);
     //printf("  text: >%s<\n", text);
 
-    char ctype = 'X'; int cindent = -1;
-    if (c->node != NULL) { ctype = c->node->type; cindent = c->node->indent; }
+    //char ctype = 'X';
+    int cindent = -1;
+    if (c->node != NULL)
+    {
+      //ctype = c->node->type;
+      cindent = c->node->indent;
+    }
 
     if (strcmp(head, "{") == 0 && indent == cindent)
     {
