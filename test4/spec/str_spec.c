@@ -38,6 +38,7 @@ context "str functions"
 
     it "returns a new string"
     {
+      puts(">>returns a new string");
       char *s0 = strdup("");
       s = flu_strrtrim(s0);
 

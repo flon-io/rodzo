@@ -137,15 +137,12 @@ void rdz_cyan() { if (isatty(1)) printf("[36m"); }
 //void rdz_white() { if (isatty(1)) printf("[37m"); }
 void rdz_clear() { if (isatty(1)) printf("[0m"); }
 
-void rdz_print_level(int nodenumber, int min)
+void rdz_print_level(int nodenumber)//, int min)
 {
   if (nodenumber < 0) return;
-  if (nodenumber < min) return;
 
   rdz_node *n = rdz_nodes[nodenumber];
   if (n->stack == NULL) return;
-
-  rdz_print_level(n->parentnumber, min);
 
   size_t i; for (i = 0; n->stack[i] != NULL; i++)
   for (size_t ii = 0; ii < i; ii++) printf("  ");
@@ -154,15 +151,8 @@ void rdz_print_level(int nodenumber, int min)
   printf(" (%d)", n->ltstart);
   printf("\n");
 }
-void rdz_print_context(rdz_result *p, rdz_result *r)
-{
-  if (r == NULL) return;
 
-  rdz_node *rit = rdz_nodes[r->itnumber];
-  rdz_print_level(rit->parentnumber, p != NULL ? p->itnumber : -1);
-}
-
-void rdz_do_print_result(rdz_result *r)
+void rdz_print_result(rdz_result *r)
 {
   if (r == NULL) return;
 
@@ -183,13 +173,6 @@ void rdz_do_print_result(rdz_result *r)
 
   printf(" (%d)", r->ltnumber);
   printf("\n");
-}
-
-void rdz_print_result(rdz_result *p, rdz_result *r)
-{
-  if (r != NULL && (p == NULL || p->itnumber == r->itnumber)) return;
-
-  rdz_do_print_result(p);
 }
 
 char *rdz_string_eq(char *operator, char *result, char *expected)
@@ -253,25 +236,14 @@ char *rdz_string_match(char *operator, char *result, char *expected)
   return s;
 }
 
-void rdz_do_record(rdz_result *r)
-{
-  rdz_result *prev = NULL;
-  if (rdz_count > 0) prev = rdz_results[rdz_count - 1];
-
-  if (prev == NULL) printf("\n"); // initial blank line
-
-  rdz_print_result(prev, r);
-  rdz_print_context(prev, r);
-}
-
 void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
 {
   rdz_result *result =
     rdz_result_malloc(success, msg, itnumber, lnumber, ltnumber);
 
-  rdz_do_record(result);
-
   rdz_results[rdz_count++] = result;
+
+  rdz_print_result(result);
 
   if (success == -1) rdz_pending_count++;
   if (success == 0) rdz_fail_count++;
@@ -416,6 +388,8 @@ void rdz_run_offlines(int nodenumber, char type)
 
 void rdz_dorun(rdz_node *n)
 {
+  if (n->nodenumber == 0) printf("\n"); // initial blank line
+
   if ( ! n->dorun) return;
 
   char t = n->type;
@@ -446,6 +420,7 @@ void rdz_dorun(rdz_node *n)
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
+    rdz_print_level(n->nodenumber);
     for (size_t i = 0; n->children[i] > -1; i++) // before all
     {
       rdz_node *nn = rdz_nodes[n->children[i]];
@@ -495,8 +470,6 @@ char *rdz_read_line(char *fname, int lnumber)
 
 void rdz_summary(int itcount)
 {
-  rdz_do_record(NULL);
-
   printf("\n");
 
   if (rdz_pending_count > 0)
