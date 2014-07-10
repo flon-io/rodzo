@@ -727,10 +727,8 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    char *_s = list_texts_as_literal(n);
     fprintf(out, "%sint it_%d()\n", ind, n->nodenumber);
     fprintf(out, "%s{\n", ind);
-    free(_s);
 
     print_eaches(out, ind, 'b', n->parent);
   }
