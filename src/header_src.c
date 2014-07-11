@@ -48,14 +48,15 @@ typedef struct rdz_node {
   int dorun;
   int nodenumber;
   int parentnumber;
+  size_t depth;
   int *children;
-  int indent;
+  //int indent;
   char type;
   char *fname;
   int lstart;
   int ltstart;
   int llength;
-  char **stack;
+  char *text;
   rdz_func *func;
 } rdz_node;
 
@@ -79,33 +80,47 @@ typedef struct rdz_result {
   char *message;
   char *title;
   int itnumber;
-  size_t stackc;
   int lnumber;
   int ltnumber;
 } rdz_result;
 
+char *rdz_determine_title(rdz_node *n)
+{
+  char **texts = calloc(128, sizeof(char *));
+  rdz_node *nn = n;
+  size_t i = 0;
+  size_t l = 0;
+  while (1)
+  {
+    texts[i++] = nn->text;
+    l = l + strlen(nn->text) + 1;
+    if (nn->parentnumber < 1) break;
+    nn = rdz_nodes[nn->parentnumber];
+  }
+  char *title = calloc(l + 1, sizeof(char));
+  char *t = title;
+  for (size_t ii = i - 1; ; ii--)
+  {
+    l = strlen(texts[ii]);
+    strncpy(t, texts[ii], l);
+    t = t + l;
+    strcpy(t, " ");
+    t = t + 1;
+    if (ii == 0) break;
+  }
+  return title;
+}
+
 rdz_result *rdz_result_malloc(
-  int success, char *msg, int itnumber, int lnumber, int ltnumber
-)
+  int success, char *msg, int itnumber, int lnumber, int ltnumber)
 {
   rdz_node *n = rdz_nodes[itnumber];
-
-  size_t sc; for (sc = 0; ; sc++) { if (n->stack[sc] == NULL) break; }
-
-  char *title = calloc(sc * 160, sizeof(char));
-  char *t = title;
-
-  for (int i = 0; i < sc; i++) {
-    strcpy(t, n->stack[i]); t += strlen(n->stack[i]);
-    if (i < sc - 1) *(t++) = ' ';
-  }
 
   rdz_result *r = calloc(1, sizeof(rdz_result));
   r->success = success;
   r->message = msg;
-  r->title = title;
+  r->title = rdz_determine_title(n);
   r->itnumber = itnumber;
-  r->stackc = sc;
   r->lnumber = lnumber;
   r->ltnumber = ltnumber;
 
@@ -142,12 +157,11 @@ void rdz_print_level(int nodenumber)//, int min)
   if (nodenumber < 0) return;
 
   rdz_node *n = rdz_nodes[nodenumber];
-  if (n->stack == NULL) return;
+  if (n->depth == 0) return;
 
-  size_t i; for (i = 0; n->stack[i] != NULL; i++)
-  for (size_t ii = 0; ii < i; ii++) printf("  ");
+  for (int i = 0; i < n->depth - 1; i++) printf("  "); // indent
 
-  printf("%s", n->stack[i - 1]);
+  printf("%s", n->text);
   printf(" (%d)", n->ltstart);
   printf("\n");
 }
@@ -158,13 +172,13 @@ void rdz_print_result(rdz_result *r)
 
   rdz_node *rit = rdz_nodes[r->itnumber];
 
-  for (int ii = 0; ii < r->stackc - 1; ii++) printf("  "); // indent
+  for (int i = 0; i < rit->depth - 1; i++) printf("  "); // indent
 
   if (r->success == -1) rdz_yellow();
   else if (r->success == 0) rdz_red();
   else rdz_green();
 
-  printf("%s", rit->stack[r->stackc - 1]);
+  printf("%s", rit->text);
 
   if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
@@ -308,10 +322,7 @@ int rdz_determine_dorun_l(rdz_node *n)
 
 int rdz_determine_dorun_e(rdz_node *n)
 {
-  char *s = NULL;
-  for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
-
-  return (strstr(s, rdz_example) != NULL);
+  return (strstr(n->text, rdz_example) != NULL);
 }
 
 void rdz_determine_dorun()
@@ -412,9 +423,7 @@ void rdz_dorun(rdz_node *n)
   }
   else if (t == 'p')
   {
-    char *s = NULL;
-    if (n->stack) for (size_t i = 0; n->stack[i] != NULL; i++) s = n->stack[i];
-    s = rdz_strdup(s);
+    char *s = rdz_strdup(n->text);
 
     rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
   }

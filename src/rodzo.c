@@ -301,49 +301,6 @@ void pull(context_s *c, int indent, int lnumber)
   }
 }
 
-char **list_texts(node_s *node)
-{
-  char **a = calloc(256, sizeof(char *));
-  size_t c = 0;
-  node_s *n = node;
-  while (n != NULL)
-  {
-    if (n->text != NULL) a[c++] = strdup(n->text);
-    n = n->parent;
-  }
-
-  char **r = calloc(c + 1, sizeof(char *));
-  for (size_t i = 0; c > 0; ) r[i++] = a[--c];
-
-  free(a);
-
-  return r;
-}
-
-char *list_texts_as_literal(node_s *n)
-{
-  flu_sbuffer *b = flu_sbuffer_malloc();
-
-  char **texts = list_texts(n);
-  char **t = texts;
-
-  flu_sbprintf(b, "{ ");
-
-  while (*t != NULL)
-  {
-    //flu_sbprintf(b, "\"%s\", ", flu_escape(*t));
-    flu_sbprintf(b, "\"%s\", ", *t);
-    free(*t);
-    t++;
-  }
-
-  free(texts);
-
-  flu_sbprintf(b, "NULL }");
-
-  return flu_sbuffer_to_string(b);
-}
-
 //
 // processing work
 
@@ -808,7 +765,7 @@ void print_body(FILE *out, context_s *c)
   fclose(f);
 }
 
-void print_nodes(FILE *out, node_s *n)
+void print_nodes(FILE *out, size_t depth, node_s *n)
 {
   char t = n->type;
 
@@ -830,36 +787,27 @@ void print_nodes(FILE *out, node_s *n)
   else if (t == 'z') func = flu_sprintf("after_each_offline_%d", n->nodenumber);
   else func = strdup("NULL");
 
-  char *ss;
-  if (t == 'i' || t == 'd' || t == 'c' || t == 'p') {
-    char *ls = list_texts_as_literal(n);
-    ss = flu_sprintf("(char *[])%s", ls);
-    free(ls);
-  }
-  else
-  {
-    ss = strdup("NULL");
-  }
+  char *tx = "NULL";
+  if (t == 'i' || t == 'd' || t == 'c' || t == 'p') tx = n->text;
 
   fprintf(
     out,
     "    &(rdz_node)"
-    "{ 0, %d, %d, %s, %d, '%c', \"%s\", %d, %d, %d, %s, %s },\n",
+    "{ 0, %d, %d, %zu, %s, '%c', \"%s\", %d, %d, %d, \"%s\", %s },\n",
     n->nodenumber,
     n->parent != NULL ? n->parent->nodenumber : -1,
+    depth,
     children,
-    n->indent,
     t,
     n->fname,
-    n->lstart, n->ltstart, n->llength, ss, func);
+    n->lstart, n->ltstart, n->llength, tx, func);
 
   free(children);
-  free(ss);
   free(func);
 
   for (size_t i = 0; n->children[i] != NULL; i++)
   {
-    print_nodes(out, n->children[i]);
+    print_nodes(out, depth + 1, n->children[i]);
   }
 }
 
@@ -879,7 +827,7 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_nodes = (rdz_node *[]){\n");
-  print_nodes(out, n);
+  print_nodes(out, 0, n);
   fprintf(out, "    NULL };\n");
   fprintf(out, "\n");
 
