@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <unistd.h> // for isatty()
 #include <regex.h>
+#include <wordexp.h>
 
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
@@ -137,6 +138,7 @@ void rdz_result_free(rdz_result *r)
 
 int *rdz_lines = NULL;
 char *rdz_example = NULL;
+char **rdz_files = NULL;
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
@@ -269,22 +271,44 @@ void rdz_extract_arguments()
 
   rdz_example = getenv("E");
 
+  // L=12,67
+
   rdz_lines = calloc(64, sizeof(int));
   for (size_t i = 0; i < 64; i++) rdz_lines[i] = -1;
 
-  // L=12,67
-
   char *l = getenv("L");
 
-  if (l == NULL) return;
-
-  for (size_t i = 0; ; i++)
+  if (l != NULL) for (size_t i = 0; ; i++)
   {
     char *c = strpbrk(l, ",");
     if (c != NULL) *c = '\0';
     rdz_lines[i] = atoi(l);
     if (c == NULL) break;
     l = c + 1;
+  }
+
+  // F=fname
+
+  char *f = getenv("F");
+
+  if (f != NULL)
+  {
+    char *ff = calloc(strlen(f) + 9, sizeof(char));
+    strcpy(ff, "../spec/");
+    strcpy(ff + 8, f);
+
+    wordexp_t we;
+    wordexp(ff, &we, 0);
+
+    rdz_files = calloc(we.we_wordc + 1, sizeof(char *));
+
+    for (int i = 0; i < we.we_wordc; i++)
+    {
+      rdz_files[i] = rdz_strdup(we.we_wordv[i]);
+    }
+
+    wordfree(&we);
+    free(ff);
   }
 }
 
@@ -311,6 +335,8 @@ void rdz_run_all_parents(int parentnumber)
 
 int rdz_determine_dorun_l(rdz_node *n)
 {
+  if (rdz_lines[0] < 0) return -1;
+
   for (size_t i = 0; rdz_lines[i] > -1; i++)
   {
     int l = rdz_lines[i];
@@ -322,7 +348,22 @@ int rdz_determine_dorun_l(rdz_node *n)
 
 int rdz_determine_dorun_e(rdz_node *n)
 {
+  if (rdz_example == NULL) return -1;
   return (strstr(n->text, rdz_example) != NULL);
+}
+
+int rdz_determine_dorun_f(rdz_node *n)
+{
+  if (rdz_files == NULL) return -1;
+
+  for (size_t i = 0; ; i++)
+  {
+    char *fn = rdz_files[i];
+    if (fn == NULL) break;
+    if (strcmp(fn, n->fname) == 0) return 1;
+  }
+
+  return 0;
 }
 
 void rdz_determine_dorun()
@@ -338,14 +379,18 @@ void rdz_determine_dorun()
     if (t == 'G' || t == 'g') n->dorun = 1;
     if (t != 'd' && t != 'c' && t != 'i' && t != 'p') continue;
 
-    int rl = -1;
-    int re = -1;
-    if (rdz_example != NULL) re = rdz_determine_dorun_e(n);
-    if (rdz_lines[0] > -1) rl = rdz_determine_dorun_l(n);
+    int re = rdz_determine_dorun_e(n);
+    int rl = rdz_determine_dorun_l(n);
+    int rf = rdz_determine_dorun_f(n);
 
-    if (rl < 0 && re < 0) n->dorun = 1;
+    if (rl < 0 && re < 0 && rf < 0) n->dorun = 1;
+    if (rf > 0) n->dorun = 1;
     if (rl > 0) n->dorun = 2; // all children if they're all 0
     if (re > 0) n->dorun = 3; // ancestors and all children
+
+    //printf(
+    //  "%zu) re: %d, rl: %d, rf: %d n->dorun: %d\n",
+    //  i, re, rl, rf, n->dorun);
   }
 
   // second pass, ancestors and children are brought in
