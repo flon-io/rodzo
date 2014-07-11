@@ -91,6 +91,7 @@ char *rdz_determine_title(rdz_node *n)
   rdz_node *nn = n;
   size_t i = 0;
   size_t l = 0;
+
   while (1)
   {
     texts[i++] = nn->text;
@@ -98,8 +99,10 @@ char *rdz_determine_title(rdz_node *n)
     if (nn->parentnumber < 1) break;
     nn = rdz_nodes[nn->parentnumber];
   }
+
   char *title = calloc(l + 1, sizeof(char));
   char *t = title;
+
   for (size_t ii = i - 1; ; ii--)
   {
     l = strlen(texts[ii]);
@@ -109,6 +112,9 @@ char *rdz_determine_title(rdz_node *n)
     t = t + 1;
     if (ii == 0) break;
   }
+
+  free(texts);
+
   return title;
 }
 
