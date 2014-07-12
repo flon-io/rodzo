@@ -142,6 +142,7 @@ void rdz_result_free(rdz_result *r)
   free(r);
 }
 
+#define RDZ_LINES_MAX 16
 int *rdz_lines = NULL;
 char *rdz_example = NULL;
 char **rdz_files = NULL;
@@ -279,18 +280,23 @@ void rdz_extract_arguments()
 
   // L=12,67
 
-  rdz_lines = calloc(64, sizeof(int));
-  for (size_t i = 0; i < 64; i++) rdz_lines[i] = -1;
-
   char *l = getenv("L");
 
-  if (l != NULL) for (size_t i = 0; ; i++)
+  if (l != NULL)
   {
-    char *c = strpbrk(l, ",");
-    if (c != NULL) *c = '\0';
-    rdz_lines[i] = atoi(l);
-    if (c == NULL) break;
-    l = c + 1;
+    rdz_lines = calloc(RDZ_LINES_MAX, sizeof(int));
+
+    for (size_t i = 0; i < RDZ_LINES_MAX; i++)
+    {
+      if (l == NULL) { rdz_lines[i] = -1; continue; }
+
+      char *c = strpbrk(l, ",");
+      rdz_lines[i] = atoi(l);
+
+      if (c == NULL) { l = NULL; continue; }
+
+      l = c + 1;
+    }
   }
 
   // F=fname
@@ -341,7 +347,7 @@ void rdz_run_all_parents(int parentnumber)
 
 int rdz_determine_dorun_l(rdz_node *n)
 {
-  if (rdz_lines[0] < 0) return -1;
+  if (rdz_lines == NULL) return -1;
 
   for (size_t i = 0; rdz_lines[i] > -1; i++)
   {
