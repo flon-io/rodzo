@@ -266,8 +266,6 @@ void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
 
   rdz_results[rdz_count++] = result;
 
-  rdz_print_result(result);
-
   if (success == -1) rdz_pending_count++;
   if (success == 0) rdz_fail_count++;
 }
@@ -464,25 +462,17 @@ void rdz_dorun(rdz_node *n)
 
   if (t == 'i')
   {
-    if (n->children[0] > -1)
-    {
-      return rdz_dorun(rdz_nodes[n->children[0]]);
-    }
+    if (n->children[0] > -1) return rdz_dorun(rdz_nodes[n->children[0]]);
 
-    int rc = rdz_count;
+    n->func(); // run the "it"
 
-    n->func();
-
-    if (rdz_count == rc)
-    {
-      rdz_record(1, NULL, n->nodenumber, n->lstart, n->ltstart);
-    }
+    rdz_print_result(rdz_results[rdz_count - 1]);
   }
   else if (t == 'p')
   {
-    char *s = rdz_strdup(n->text);
+    rdz_record(-1, rdz_strdup(n->text), n->parentnumber, n->lstart, n->ltstart);
 
-    rdz_record(-1, s, n->parentnumber, n->lstart, n->ltstart);
+    rdz_print_result(rdz_results[rdz_count - 1]);
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
