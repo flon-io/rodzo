@@ -30,6 +30,9 @@
       it "doesn't crash when strings are NULL"
       {
       }
+      it "compares empty strings"
+      {
+      }
       it "accepts empty specs"
       {
       }
