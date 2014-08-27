@@ -22,6 +22,9 @@ describe "mne_tos()"
 {
   context "cows are flying"
   {
+    it "used to crash when the 1st it had no ensure"
+    {
+    }
     it "turns longs to mnemonic (hopefully) strings"
     {
       for (int i = 0; i < 10; i++)

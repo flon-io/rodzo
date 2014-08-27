@@ -464,7 +464,14 @@ void rdz_dorun(rdz_node *n)
   {
     if (n->children[0] > -1) return rdz_dorun(rdz_nodes[n->children[0]]);
 
+    int rc = rdz_count;
+
     n->func(); // run the "it"
+
+    if (rdz_count == rc) // no ensure in the example, record a success...
+    {
+      rdz_record(1, rdz_strdup(n->text), n->nodenumber, n->lstart, n->ltstart);
+    }
 
     rdz_print_result(rdz_results[rdz_count - 1]);
   }
