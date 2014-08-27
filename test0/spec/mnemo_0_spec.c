@@ -73,6 +73,20 @@ describe "mne_tos()"
       ensure(NULL === "ia");
     }
 
+    it "compares empty strings"
+    {
+      ensure("" === "");
+    }
+    //it "compares empty strings (2)"
+    //{
+    //  ensure(NULL === "");
+    //}
+    //it "compares empty strings (3)"
+    //{
+    //  void *a = NULL;
+    //  ensure(a === "");
+    //}
+
     it "accepts empty specs"
     {
       // has to be green
