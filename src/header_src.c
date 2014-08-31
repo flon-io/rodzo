@@ -152,14 +152,22 @@ int rdz_fail_count = 0;
 int rdz_pending_count = 0;
 rdz_result **rdz_results = NULL;
 
-void rdz_red() { if (isatty(1)) printf("[31m"); }
-void rdz_green() { if (isatty(1)) printf("[32m"); }
-void rdz_yellow() { if (isatty(1)) printf("[33m"); }
-//void rdz_blue() { if (isatty(1)) printf("[34m"); }
-//void rdz_magenta() { if (isatty(1)) printf("[35m"); }
-void rdz_cyan() { if (isatty(1)) printf("[36m"); }
-//void rdz_white() { if (isatty(1)) printf("[37m"); }
-void rdz_clear() { if (isatty(1)) printf("[0m"); }
+// PS1="\[\033[1;34m\][\$(date +%H%M)][\u@\h:\w]$\[\033[0m\] "
+//
+// Black       0;30     Dark Gray     1;30
+// Blue        0;34     Light Blue    1;34
+// Green       0;32     Light Green   1;32
+// Cyan        0;36     Light Cyan    1;36
+// Red         0;31     Light Red     1;31
+// Purple      0;35     Light Purple  1;35
+// Brown       0;33     Yellow        1;33
+// Light Gray  0;37     White         1;37
+
+void rdz_red() { if (isatty(1)) printf("[0;31m"); }
+void rdz_green() { if (isatty(1)) printf("[0;32m"); }
+void rdz_yellow() { if (isatty(1)) printf("[0;33m"); }
+void rdz_cyan() { if (isatty(1)) printf("[0;36m"); }
+void rdz_clear() { if (isatty(1)) printf("[0;0m"); }
 
 void rdz_print_level(int nodenumber)//, int min)
 {
