@@ -45,6 +45,18 @@
       it "matches strings 2 (fail)"
       {
       }
+      it "starts with (success)"
+      {
+      }
+      it "starts with (failure)"
+      {
+      }
+      it "ends with (success)"
+      {
+      }
+      it "ends with (failure)"
+      {
+      }
     }
   }
   describe "mne_tos()"
