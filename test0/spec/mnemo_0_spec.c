@@ -103,6 +103,24 @@ describe "mne_tos()"
     {
       ensure(mne_tos(47) ~== "[xy]a");
     }
+
+    it "starts with (success)"
+    {
+      ensure("this is true" ^== "this ");
+    }
+    it "starts with (failure)"
+    {
+      ensure("this is true" ^== "that ");
+    }
+
+    it "ends with (success)"
+    {
+      ensure("this is true" $== " true");
+    }
+    it "ends with (failure)"
+    {
+      ensure("this is true" $== " false");
+    }
   }
 }
 

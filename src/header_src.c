@@ -43,6 +43,13 @@ char *rdz_strdup(char *s)
   return r;
 }
 
+char *rdz_strndup(char *s, size_t n)
+{
+  char *r = calloc(n + 1, sizeof(char));
+  for (size_t i = 0; i < n; i++) r[i] = s[i];
+  return r;
+}
+
 typedef int rdz_func();
 
 typedef struct rdz_node {
@@ -264,6 +271,34 @@ char *rdz_string_match(char *operator, char *result, char *expected)
     strcpy(s + 15 + lr + 17 + le, "\"");
   }
   regfree(r); free(r);
+  return s;
+}
+
+char *rdz_string_start(char *operator, char *result, char *expected)
+{
+  size_t le = strlen(expected);
+
+  if (strncmp(result, expected, le) == 0) return NULL;
+
+  char *start = rdz_strndup(result, 63);
+  size_t ls = strlen(start);
+
+  char *s = calloc(15 + ls + 17 + le + 1 + 1, sizeof(char));
+
+  strcpy(s, "     expected \"");
+  strcpy(s + 15, start);
+  strcpy(s + 15 + ls, "\"\n     to start with \"");
+  strcpy(s + 15 + ls + 22, expected);
+  strcpy(s + 15 + ls + 22 + le, "\"");
+
+  return s;
+}
+
+char *rdz_string_end(char *operator, char *result, char *expected)
+{
+  size_t l = strlen(expected);
+  //
+  char *s = rdz_strdup("FAIL!");
   return s;
 }
 
