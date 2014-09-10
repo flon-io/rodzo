@@ -239,13 +239,10 @@ char *rdz_string_neq(char *operator, char *result, char *not_expected)
 {
   if (strcmp(result, not_expected) != 0) return NULL;
 
-  size_t lne = strlen(not_expected);
+  size_t l = strlen(not_expected) + 22;
 
-  char *s = calloc(lne + 20 + 1 + 1, sizeof(char));
-
-  strcpy(s, "     didn't expect \"");
-  strcpy(s + 20, not_expected);
-  strcpy(s + 20 + lne, "\"");
+  char *s = calloc(l, sizeof(char));
+  snprintf(s, l, "     didn't expect \"%s\"", not_expected);
 
   return s;
 }
