@@ -330,8 +330,7 @@ void rdz_extract_arguments()
   if (f != NULL)
   {
     char *ff = calloc(strlen(f) + 9, sizeof(char));
-    strcpy(ff, "../spec/");
-    strcpy(ff + 8, f);
+    sprintf(ff, "../spec/%s", f);
 
     wordexp_t we;
     wordexp(ff, &we, 0);
