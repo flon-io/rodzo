@@ -266,9 +266,8 @@ char *rdz_string_match(char *operator, char *result, char *expected)
 
 char *rdz_string_start(char *operator, char *result, char *expected)
 {
-  size_t le = strlen(expected);
-
-  if (strncmp(result, expected, le) == 0) return NULL;
+  if (strncmp(result, expected, strlen(expected)) == 0)
+    return NULL;
 
   char *start = rdz_strndup(result, 49);
   char *s = rdz_string_expected(start, "to start with", expected);
@@ -279,10 +278,10 @@ char *rdz_string_start(char *operator, char *result, char *expected)
 
 char *rdz_string_end(char *operator, char *result, char *expected)
 {
-  size_t l = strlen(expected);
-  //
-  char *s = rdz_strdup("FAIL!");
-  return s;
+  if (strcmp(result + strlen(result) - strlen(expected), expected) == 0)
+    return NULL;
+
+  return rdz_string_expected(result, "to end with", expected);
 }
 
 void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
