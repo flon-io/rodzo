@@ -212,41 +212,6 @@ void rdz_print_result(rdz_result *r)
   printf("\n");
 }
 
-char *rdz_string_eq(char *operator, char *result, char *expected)
-{
-  if (expected == NULL && result == NULL) return NULL;
-
-  if (expected == NULL) return rdz_strdup("     expected NULL");
-  if (result == NULL) return rdz_strdup("     result is NULL");
-
-  if (strcmp(result, expected) == 0) return NULL;
-
-  size_t le = strlen(expected);
-  size_t lr = strlen(result);
-
-  char *s = calloc(lr + le + 15 + 17 + 1 + 1, sizeof(char));
-
-  strcpy(s, "     expected \"");
-  strcpy(s + 15, expected);
-  strcpy(s + 15 + le, "\"\n          got \"");
-  strcpy(s + 15 + le + 17, result);
-  strcpy(s + 15 + le + 17 + lr, "\"");
-
-  return s;
-}
-
-char *rdz_string_neq(char *operator, char *result, char *not_expected)
-{
-  if (strcmp(result, not_expected) != 0) return NULL;
-
-  size_t l = strlen(not_expected) + 22;
-
-  char *s = calloc(l, sizeof(char));
-  snprintf(s, l, "     didn't expect \"%s\"", not_expected);
-
-  return s;
-}
-
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
   size_t l = strlen(verb); if (l < 8) l = 8;
@@ -257,6 +222,30 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
     "     %*s \"%s\"\n"
     "     %*s \"%s\"",
     l, "expected", result, l, verb, expected);
+
+  return s;
+}
+
+char *rdz_string_eq(char *operator, char *result, char *expected)
+{
+  if (expected == NULL && result == NULL) return NULL;
+
+  if (expected == NULL) return rdz_strdup("     expected NULL");
+  if (result == NULL) return rdz_strdup("     result is NULL");
+
+  if (strcmp(result, expected) == 0) return NULL;
+
+  return rdz_string_expected(result, "got", expected);
+}
+
+char *rdz_string_neq(char *operator, char *result, char *not_expected)
+{
+  if (strcmp(result, not_expected) != 0) return NULL;
+
+  size_t l = strlen(not_expected) + 22;
+
+  char *s = calloc(l, sizeof(char));
+  snprintf(s, l, "     didn't expect \"%s\"", not_expected);
 
   return s;
 }
