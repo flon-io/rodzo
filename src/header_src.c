@@ -214,7 +214,7 @@ void rdz_print_result(rdz_result *r)
 
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
-  size_t l = strlen(verb); if (l < 8) l = 8;
+  int l = strlen(verb); if (l < 8) l = 8;
 
   char *s = calloc(2048, sizeof(char));
 
