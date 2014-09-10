@@ -42,7 +42,6 @@ char *rdz_strdup(char *s)
   strcpy(r, s);
   return r;
 }
-
 char *rdz_strndup(char *s, size_t n)
 {
   char *r = calloc(n + 1, sizeof(char));
@@ -253,19 +252,14 @@ char *rdz_string_neq(char *operator, char *result, char *not_expected)
 
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
-  size_t lr = strlen(result);
-  size_t lv = strlen(verb);
-  size_t le = strlen(expected);
+  size_t l = strlen(verb); if (l < 8) l = 8;
 
-  char *s = calloc(20 + lr + 10 + lv + 2 + le + 2, sizeof(char));
+  char *s = calloc(2048, sizeof(char));
 
-  strcpy(s, "     expected      \"");
-  strcpy(s + 20, result);
-  strcpy(s + 20 + lr, "\"\n     to ");
-  strcpy(s + 20 + lr + 10, verb);
-  strcpy(s + 20 + lr + 10 + lv, " \"");
-  strcpy(s + 20 + lr + 10 + lv + 2, expected);
-  strcpy(s + 20 + lr + 10 + lv + 2 + le, "\"");
+  snprintf(s, 2048, ""
+    "     %*s \"%s\"\n"
+    "     %*s \"%s\"",
+    l, "expected", result, l, verb, expected);
 
   return s;
 }
@@ -278,7 +272,7 @@ char *rdz_string_match(char *operator, char *result, char *expected)
   regmatch_t ms[0];
   if (regexec(r, result, 0, ms, 0)) // no match
   {
-    s = rdz_string_expected(result, "match     ", expected);
+    s = rdz_string_expected(result, "to match", expected);
   }
   regfree(r); free(r);
   return s;
@@ -291,7 +285,7 @@ char *rdz_string_start(char *operator, char *result, char *expected)
   if (strncmp(result, expected, le) == 0) return NULL;
 
   char *start = rdz_strndup(result, 49);
-  char *s = rdz_string_expected(start, "start with", expected);
+  char *s = rdz_string_expected(start, "to start with", expected);
   free(start);
 
   return s;
