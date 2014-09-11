@@ -235,7 +235,7 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
 
   if (strcmp(result, expected) == 0) return NULL;
 
-  return rdz_string_expected(result, "got", expected);
+  return rdz_string_expected(expected, "got", result);
 }
 
 char *rdz_string_neq(char *operator, char *result, char *not_expected)
