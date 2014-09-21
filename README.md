@@ -43,10 +43,8 @@ NAME=flutil
 
 default: $(NAME).o
 
-SPECS=../spec
-
 .DEFAULT spec clean:
-	$(MAKE) -C tmp/ $@ NAME=$(NAME) SPECS="$(SPECS)"
+	$(MAKE) -C tmp/ $@ NAME=$(NAME)
 
 .PHONY: spec clean
 ```
@@ -66,7 +64,7 @@ endif
 
 
 s.c: ../spec/*_spec.c
-	$(RODZO) $(SPECS) -o s.c
+	$(RODZO) ../spec -o s.c
 
 s: $(NAME).o
 
