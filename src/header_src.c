@@ -152,6 +152,7 @@ void rdz_result_free(rdz_result *r)
 int *rdz_lines = NULL;
 char *rdz_example = NULL;
 char **rdz_files = NULL;
+int rdz_it = -1;
 
 int rdz_count = 0;
 int rdz_fail_count = 0;
@@ -322,6 +323,15 @@ void rdz_extract_arguments()
     }
   }
 
+  // I=6
+
+  char *i = getenv("I");
+
+  if (i != NULL)
+  {
+    rdz_it = atoi(i);
+  }
+
   // F=fname
 
   char *f = getenv("F");
@@ -380,6 +390,13 @@ int rdz_determine_dorun_l(rdz_node *n)
   return 0;
 }
 
+int rdz_determine_dorun_i(rdz_node *n)
+{
+  if (rdz_it < 0) return -1;
+
+  return n->nodenumber == rdz_it;
+}
+
 int rdz_determine_dorun_e(rdz_node *n)
 {
   if (rdz_example == NULL) return -1;
@@ -416,11 +433,13 @@ void rdz_determine_dorun()
     int re = rdz_determine_dorun_e(n);
     int rl = rdz_determine_dorun_l(n);
     int rf = rdz_determine_dorun_f(n);
+    int ri = rdz_determine_dorun_i(n);
 
-    if (rl < 0 && re < 0 && rf < 0) n->dorun = 1;
+    if (rl < 0 && re < 0 && rf < 0 && ri < 0) n->dorun = 1;
     if (rf > 0) n->dorun = 1;
     if (rl > 0) n->dorun = 2; // all children if they're all 0
     if (re > 0) n->dorun = 3; // ancestors and all children
+    if (ri > 0) n->dorun = 3;
 
     //printf(
     //  "%zu) re: %d, rl: %d, rf: %d n->dorun: %d\n",
