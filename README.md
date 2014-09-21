@@ -156,12 +156,12 @@ The pattern is a plain pattern, no fancy regular expression matching.
 
 If a ```describe``` or a ```context``` matches, all the examples in its branch will be run.
 
-### specifying a set of spec files to run with SPEC=
+### specifying a set of spec files to run with F=
 
-By default, rodzo is run against a whole ../spec dir. The SPECS makefile env variable can be used to declare what spec files to take into account.
+By default, rodzo is run against a whole ../spec dir. The F makefile env variable can be used to declare what spec files to take into account.
 
 ```
-$ make spec SPECS="../spec/strings_spec.c ../spec/integers_spec.c"
+$ make spec F=strings_spec.c
 ```
 
 ### running with Valgrind (vspec)
