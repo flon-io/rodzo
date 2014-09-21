@@ -162,6 +162,17 @@ By default, rodzo is run against a whole ../spec dir. The F makefile env variabl
 $ make spec F=strings_spec.c
 ```
 
+### specifying an example (it) to run with I=
+
+Sometimes, one gets stuck with a segfault in some piece of code. Running with Valgrind (see below) indicates that, the error occurs in `it_6 (s.c:640)`. That points to an example automatically numbered `6`. There is no easy way to infer a line number or an example text to run just that example, so rodzo lets one ask for it directly:
+
+```
+$ make spec I=6
+```
+
+and only that example will get run.
+
+
 ### running with Valgrind (vspec)
 
 As seen in [test4/tmp/Makefile](test4/tmp/Makefile) there is a ```vspec``` target. It's meant for running the specs with Valgrind as the host.
