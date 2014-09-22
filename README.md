@@ -157,10 +157,16 @@ If a ```describe``` or a ```context``` matches, all the examples in its branch w
 ### specifying a set of spec files to run with F=
 
 By default, rodzo is run against a whole ../spec dir. The F makefile env variable can be used to declare what spec files to take into account.
-
 ```
 $ make spec F=strings_spec.c
 ```
+
+It's OK to pass multiple files, thanks to double quotes:
+```
+$ make spec F="strings_spec.c int_*_spec.c"
+```
+
+(Yes, classical file globbing is OK).
 
 ### specifying an example (it) to run with I=
 

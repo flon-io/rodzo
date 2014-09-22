@@ -148,9 +148,10 @@ void rdz_result_free(rdz_result *r)
   free(r);
 }
 
-#define RDZ_LINES_MAX 16
+#define RDZ_LINES_MAX 32
 int *rdz_lines = NULL;
 char *rdz_example = NULL;
+#define RDZ_FILES_MAX 16
 char **rdz_files = NULL;
 int rdz_it = -1;
 
@@ -308,7 +309,7 @@ void rdz_extract_arguments()
 
   if (l != NULL)
   {
-    rdz_lines = calloc(RDZ_LINES_MAX, sizeof(int));
+    rdz_lines = calloc(RDZ_LINES_MAX + 1, sizeof(int));
 
     for (size_t i = 0; i < RDZ_LINES_MAX; i++)
     {
@@ -338,21 +339,34 @@ void rdz_extract_arguments()
 
   if (f != NULL)
   {
-    char *ff = calloc(strlen(f) + 9, sizeof(char));
-    sprintf(ff, "../spec/%s", f);
+    rdz_files = calloc(RDZ_FILES_MAX + 1, sizeof(char *));
 
-    wordexp_t we;
-    wordexp(ff, &we, 0);
-
-    rdz_files = calloc(we.we_wordc + 1, sizeof(char *));
-
-    for (int i = 0; i < we.we_wordc; i++)
+    for (size_t i = 0; i < RDZ_FILES_MAX; ++i)
     {
-      rdz_files[i] = rdz_strdup(we.we_wordv[i]);
-    }
+      char *ff = strpbrk(f, " \t");
+      size_t l = ff ? ff - f : strlen(f);
+      char *fn = NULL;
+      if (f[0] == '.')
+      {
+        fn = rdz_strndup(f, l);
+      }
+      else
+      {
+        fn = calloc(l + 9, sizeof(char));
+        strcpy(fn, "../spec/"); strncpy(fn + 8, f, l);
+      }
 
-    wordfree(&we);
-    free(ff);
+      wordexp_t we;
+      wordexp(fn, &we, 0);
+
+      rdz_files[i] = rdz_strdup(we.we_wordv[0]);
+
+      wordfree(&we);
+      free(fn);
+
+      f = ff; if (f == NULL) break;
+      while (1) if (f[0] != ' ' && f[0] != '\t') break; else ++f;
+    }
   }
 }
 
