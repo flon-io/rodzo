@@ -74,6 +74,9 @@ spec: s
 vspec: s
 	valgrind --leak-check=full -v ./s
 
+tspec: s
+	strace -r ./s
+
 clean:
 	rm -f *.o *.so *.c s
 
