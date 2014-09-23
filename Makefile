@@ -21,7 +21,7 @@ clean:
 	rm -f bin/rodzo
 	$(foreach t, $(TS), $(MAKE) -C $(t) clean;)
 
-# copy updated version of dep libs into src/
+# copy up-to-date versions of dep libs into src/
 #
 upgrade:
 	cp -v ../flutil/src/flutil.* src/
