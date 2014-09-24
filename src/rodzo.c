@@ -855,22 +855,17 @@ void print_footer(FILE *out, context_s *c)
   fputs("\n", out);
 }
 
-int add_spec_file(int *count, char **names, char *fname)
-{
-  if ( ! flu_strends(fname, "_spec.c")) return 0;
+//int _strcmp(const void *s0, const void *s1)
+//{
+//  return strcmp(*(char * const *)s0, *(char * const *)s1);
+//}
 
-  for (int i = 0; i < *count; i++)
-  {
-    if (strcmp(names[i], fname) == 0) return 1; // prevent duplicates
+void add_spec_path(flu_list *l, char *path)
+{
+  if (flu_strends(path, "_spec.c")) {
+    flu_list_add_unique(l, strdup(path));
+    return;
   }
-
-  names[(*count)++] = strdup(fname);
-  return 1;
-}
-
-void add_spec_files(int *count, char **names, char *path)
-{
-  if (add_spec_file(count, names, path)) return;
 
   DIR *dir = opendir(path);
 
@@ -882,49 +877,39 @@ void add_spec_files(int *count, char **names, char *path)
     char *fn = flu_sprintf(
       path[strlen(path) - 1] == '/' ? "%s%s" : "%s/%s", path, ep->d_name);
 
-    add_spec_file(count, names, fn);
-
-    free(fn);
+    flu_list_add_unique(l, fn);
   }
 
   closedir(dir);
 }
 
-int _strcmp(const void *s0, const void *s1)
+flu_list *list_spec_files(int argc, char *argv[])
 {
-  return strcmp(*(char * const *)s0, *(char * const *)s1);
-}
-
-char **list_spec_files(int argc, char *argv[])
-{
-  char **r = calloc(512, sizeof(char *));
-  int c = 0;
-  int args_seen = 0;
+  flu_list *l = flu_list_malloc();
 
   for (int i = 1; i < argc; i++)
   {
     char *arg = argv[i];
 
-    if (strncmp(arg, "-", 1) == 0) continue;
-
-    args_seen++;
+    if (arg[0] == '-') continue;
 
     wordexp_t we;
     wordexp(arg, &we, 0);
 
     for (int j = 0; j < we.we_wordc; j++)
     {
-      add_spec_files(&c, r, we.we_wordv[j]);
+      add_spec_path(l, we.we_wordv[j]);
     }
 
     wordfree(&we);
   }
 
-  if (args_seen < 1) add_spec_files(&c, r, ".");
+  if (l->size < 1) add_spec_path(l, ".");
 
-  qsort(r, c, sizeof(char *), _strcmp);
+  //qsort(r, c, sizeof(char *), _strcmp);
+    // no sorting for now
 
-  return r;
+  return l;
 }
 
 int print_usage()
@@ -958,19 +943,15 @@ int main(int argc, char *argv[])
 
   // reads specs, grow tree
 
-  char **fnames = list_spec_files(argc, argv);
+  flu_list *fnames = list_spec_files(argc, argv);
 
-  for (int i = 0; ; i++)
+  for (flu_node *n = fnames->first; n != NULL; n = n->next)
   {
-    if (fnames[i] == NULL) break;
-
-    printf(". processing %s\n", fnames[i]);
-
-    process_lines(c, fnames[i]);
-
-    free(fnames[i]);
+    char *fname = (char *)n->item;
+    printf(". processing %s\n", fname);
+    process_lines(c, fname);
   }
-  free(fnames);
+  flu_list_free_all(fnames);
 
   // write
 
