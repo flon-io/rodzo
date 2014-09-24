@@ -25,9 +25,10 @@
 
 #define _POSIX_C_SOURCE 200809L
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "flutil.h"
 
@@ -37,7 +38,7 @@
 //
 // str functions
 
-int flu_strends(char *s, char *end)
+int flu_strends(const char *s, const char *end)
 {
   size_t ls = strlen(s);
   size_t le = strlen(end);
@@ -47,7 +48,7 @@ int flu_strends(char *s, char *end)
   return (strncmp(s + ls - le, end, le) == 0);
 }
 
-char *flu_strrtrim(char *s)
+char *flu_strrtrim(const char *s)
 {
   char *r = strdup(s);
   for (size_t l = strlen(r); l > 0; l--)
@@ -60,7 +61,7 @@ char *flu_strrtrim(char *s)
   return r;
 }
 
-char *flu_strtrim(char *s)
+char *flu_strtrim(const char *s)
 {
   char *s1 = flu_strrtrim(s);
   char *s2 = s1;
@@ -74,6 +75,28 @@ char *flu_strtrim(char *s)
   free(s1);
 
   return r;
+}
+
+ssize_t flu_index(const char *s, size_t off, char c)
+{
+  for (size_t i = off; ; ++i)
+  {
+    char cc = s[i];
+    if (cc == '\0') break;
+    if (cc == c) return i;
+  }
+  return -1;
+}
+
+ssize_t flu_rindex(const char *s, ssize_t off, char c)
+{
+  off = (off == -1) ? strlen(s) - 1 : off;
+  for (size_t i = off; ; --i)
+  {
+    if (s[i] == c) return i;
+    if (i < 1) break;
+  }
+  return -1;
 }
 
 //
@@ -91,7 +114,7 @@ void flu_sbuffer_free(flu_sbuffer *b)
   if (b == NULL) return;
 
   if (b->stream != NULL) fclose(b->stream);
-  free(b->string);
+  if (b->string != NULL) free(b->string);
   free(b);
 }
 
@@ -116,12 +139,12 @@ int flu_sbputc(flu_sbuffer *b, int c)
   return putc(c, b->stream);
 }
 
-int flu_sbputs(flu_sbuffer *b, char *s)
+int flu_sbputs(flu_sbuffer *b, const char *s)
 {
   return fputs(s, b->stream);
 }
 
-int flu_sbputs_n(flu_sbuffer *b, char *s, size_t n)
+int flu_sbputs_n(flu_sbuffer *b, const char *s, size_t n)
 {
   int r = 1;
   for (size_t i = 0; i < n; i++)
@@ -132,6 +155,16 @@ int flu_sbputs_n(flu_sbuffer *b, char *s, size_t n)
   }
 
   return r;
+}
+
+size_t flu_sbwrite(flu_sbuffer *b, const char *s, size_t n)
+{
+  return fwrite(s, sizeof(char), n, b->stream);
+}
+
+size_t flu_sbfwrite(flu_sbuffer *b, const void *s, size_t l, size_t n)
+{
+  return fwrite(s, l, n, b->stream);
 }
 
 int flu_sbuffer_close(flu_sbuffer *b)
@@ -152,57 +185,270 @@ char *flu_sbuffer_to_string(flu_sbuffer *b)
     // the string should be NULL, let flow and reach free(b)
 
   char *s = b->string;
+  b->string = NULL;
+
   free(b);
 
   return s;
 }
 
-char *flu_sprintf(const char *format, ...)
+char *flu_svprintf(const char *format, va_list ap)
 {
-  va_list ap;
-  va_start(ap, format);
-
   flu_sbuffer *b = flu_sbuffer_malloc();
   flu_sbvprintf(b, format, ap);
-  char *s = flu_sbuffer_to_string(b);
+
+  return flu_sbuffer_to_string(b);
+}
+
+char *flu_sprintf(const char *format, ...)
+{
+  va_list ap; va_start(ap, format);
+
+  char *s = flu_svprintf(format, ap);
 
   va_end(ap);
 
   return s;
 }
 
-
 //
-// die
+// readall
 
-void flu_die(int exit_value, const char *format, ...)
+char *flu_readall(const char *path)
 {
-  va_list ap;
-  va_start(ap, format);
+  FILE *in = fopen(path, "r");
+
+  if (in == NULL) return NULL;
+
+  char *s = flu_freadall(in);
+  fclose(in);
+
+  return s;
+}
+
+char *flu_freadall(FILE *in)
+{
+  if (in == NULL) return NULL;
 
   flu_sbuffer *b = flu_sbuffer_malloc();
-  flu_sbvprintf(b, format, ap);
-  char *s = flu_sbuffer_to_string(b);
+  char rb[1024];
 
-  perror(s);
+  while (1)
+  {
+    size_t s = fread(rb, 1024, 1, in);
 
-  free(s);
+    if (s == 0)
+    {
+      if (feof(in) == 1) break;
 
+      // else error...
+      flu_sbuffer_free(b);
+      return NULL;
+    }
+
+    flu_sbputs(b, rb);
+  }
+
+  return flu_sbuffer_to_string(b);
+}
+
+
+//
+// flu_list
+
+static flu_node *flu_node_malloc(void *item)
+{
+  flu_node *n = calloc(1, sizeof(flu_node));
+  n->item = item;
+  n->next = NULL;
+  n->key = NULL;
+
+  return n;
+}
+
+void flu_node_free(flu_node *n)
+{
+  if (n->key != NULL) free(n->key);
+  free(n);
+}
+
+flu_list *flu_list_malloc()
+{
+  flu_list *l = calloc(1, sizeof(flu_list));
+
+  l->first = NULL;
+  l->last = NULL;
+  l->size = 0;
+
+  return l;
+}
+
+void flu_list_free(flu_list *l)
+{
+  for (flu_node *n = l->first; n != NULL; )
+  {
+    flu_node *next = n->next;
+    flu_node_free(n);
+    n = next;
+  }
+  free(l);
+}
+
+void flu_list_and_items_free(flu_list *l, void (*free_item)(void *))
+{
+  for (flu_node *n = l->first; n != NULL; n = n->next) free_item(n->item);
+  flu_list_free(l);
+}
+
+void flu_list_free_all(flu_list *l)
+{
+  flu_list_and_items_free(l, free);
+}
+
+void *flu_list_at(const flu_list *l, size_t n)
+{
+  size_t i = 0;
+  for (flu_node *no = l->first; no != NULL; no = no->next)
+  {
+    if (i == n) return no->item;
+    ++i;
+  }
+  return NULL;
+}
+
+void flu_list_add(flu_list *l, void *item)
+{
+  flu_node *n = flu_node_malloc(item);
+
+  if (l->first == NULL) l->first = n;
+  if (l->last != NULL) l->last->next = n;
+  l->last = n;
+  l->size++;
+}
+
+int flu_list_add_unique(flu_list *l, void *item)
+{
+  for (flu_node *n = l->first; n != NULL; n = n->next)
+  {
+    if (n->item == item) return 0; // not added
+  }
+
+  flu_list_add(l, item);
+  return 1; // added
+}
+
+void flu_list_unshift(flu_list *l, void *item)
+{
+  flu_node *n = flu_node_malloc(item);
+  n->next = l->first;
+  l->first = n;
+  if (l->last == NULL) l->last = n;
+  l->size++;
+}
+
+void *flu_list_shift(flu_list *l)
+{
+  if (l->size == 0) return NULL;
+
+  flu_node *n = l->first;
+  void *item = n->item;
+  l->first = n->next;
+  free(n);
+  if (l->first == NULL) l->last = NULL;
+  l->size--;
+
+  return item;
+}
+
+void **flu_list_to_array(const flu_list *l, int flags)
+{
+  size_t s = l->size + (flags & FLU_F_EXTRA_NULL ? 1 : 0);
+  void **a = calloc(s, sizeof(void *));
+  size_t i = flags & FLU_F_REVERSE ? l->size - 1 : 0;
+  for (flu_node *n = l->first; n != NULL; n = n->next)
+  {
+    a[i] = n->item;
+    i = i + (flags & FLU_F_REVERSE ? -1 : 1);
+  }
+  return a;
+}
+
+void flu_list_set(flu_list *l, const char *key, void *item)
+{
+  flu_list_unshift(l, item); l->first->key = strdup(key);
+}
+
+void flu_list_set_last(flu_list *l, const char *key, void *item)
+{
+  flu_list_add(l, item); l->last->key = strdup(key);
+}
+
+static flu_node *flu_list_getn(flu_list *l, const char *key)
+{
+  for (flu_node *n = l->first; n != NULL; n = n->next)
+  {
+    if (n->key != NULL && strcmp(n->key, key) == 0) return n;
+  }
+  return NULL;
+}
+
+void *flu_list_get(flu_list *l, const char *key)
+{
+  flu_node *n = flu_list_getn(l, key);
+
+  return n == NULL ? NULL : n->item;
+}
+
+flu_list *flu_list_dtrim(flu_list *l)
+{
+  flu_list *r = flu_list_malloc();
+
+  for (flu_node *n = l->first; n != NULL; n = n->next)
+  {
+    if (n->key == NULL) continue;
+    if (flu_list_getn(r, n->key) != NULL) continue;
+    flu_list_add(r, n->item); r->last->key = strdup(n->key);
+  }
+
+  return r;
+}
+
+flu_list *flu_vd(va_list ap)
+{
+  flu_list *d = flu_list_malloc();
+
+  while (1)
+  {
+    char *k = va_arg(ap, char *);
+    if (k == NULL) break;
+    void *v = va_arg(ap, void *);
+    flu_list_set(d, k, v);
+  }
+
+  return d;
+}
+
+flu_list *flu_d(char *k0, void *v0, ...)
+{
+  va_list ap; va_start(ap, v0);
+  flu_list *d = flu_vd(ap);
   va_end(ap);
 
-  exit(exit_value);
+  flu_list_set(d, k0, v0);
+
+  return d;
 }
 
 
 //
 // escape
 
-char *flu_escape(char *s)
+char *flu_escape(const char *s)
 {
   return flu_n_escape(s, strlen(s));
 }
 
-char *flu_n_escape(char *s, size_t n)
+char *flu_n_escape(const char *s, size_t n)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
@@ -223,14 +469,14 @@ char *flu_n_escape(char *s, size_t n)
   return flu_sbuffer_to_string(b);
 }
 
-char *flu_unescape(char *s)
+char *flu_unescape(const char *s)
 {
   return flu_n_unescape(s, strlen(s));
 }
 
 // based on cutef8 by Jeff Bezanson
 //
-char *flu_n_unescape(char *s, size_t n)
+char *flu_n_unescape(const char *s, size_t n)
 {
   char *d = calloc(n + 1, sizeof(char));
 
@@ -276,5 +522,50 @@ char *flu_n_unescape(char *s, size_t n)
   }
 
   return d;
+}
+
+
+//
+// misc
+
+void flu_die(int exit_value, const char *format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+
+  flu_sbuffer *b = flu_sbuffer_malloc();
+  flu_sbvprintf(b, format, ap);
+
+  va_end(ap);
+
+  char *s = flu_sbuffer_to_string(b);
+
+  perror(s);
+
+  free(s);
+
+  exit(exit_value);
+}
+
+char *flu_strdup(char *s)
+{
+  int l = strlen(s);
+  char *r = calloc(l + 1, sizeof(char));
+  strcpy(r, s);
+  return r;
+}
+
+long long flu_getms()
+{
+  struct timeval tv;
+  int r = gettimeofday(&tv, NULL);
+  return r == 0 ? tv.tv_sec * 1000 + tv.tv_usec / 1000 : 0;
+}
+
+long long flu_getMs()
+{
+  struct timeval tv;
+  int r = gettimeofday(&tv, NULL);
+  return r == 0 ? tv.tv_sec * 1000000 + tv.tv_usec : 0;
 }
 
