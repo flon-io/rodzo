@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <wordexp.h>
+#include <unistd.h>
 
 #include "flutil.h"
 
@@ -863,7 +864,7 @@ void print_footer(FILE *out, context_s *c)
 void add_spec_path(flu_list *l, char *path)
 {
   if (flu_strends(path, "_spec.c")) {
-    flu_list_add_unique(l, strdup(path));
+    if (access(path, F_OK) == 0) flu_list_add_unique(l, strdup(path));
     return;
   }
 
@@ -886,6 +887,7 @@ void add_spec_path(flu_list *l, char *path)
 flu_list *list_spec_files(int argc, char *argv[])
 {
   flu_list *l = flu_list_malloc();
+  size_t args_seen = 0;
 
   for (int i = 1; i < argc; i++)
   {
@@ -893,18 +895,17 @@ flu_list *list_spec_files(int argc, char *argv[])
 
     if (arg[0] == '-') continue;
 
+    ++args_seen;
+
     wordexp_t we;
     wordexp(arg, &we, 0);
 
-    for (int j = 0; j < we.we_wordc; j++)
-    {
-      add_spec_path(l, we.we_wordv[j]);
-    }
+    for (size_t j = 0; j < we.we_wordc; j++) add_spec_path(l, we.we_wordv[j]);
 
     wordfree(&we);
   }
 
-  if (l->size < 1) add_spec_path(l, ".");
+  if (args_seen < 1) add_spec_path(l, ".");
 
   //qsort(r, c, sizeof(char *), _strcmp);
     // no sorting for now
