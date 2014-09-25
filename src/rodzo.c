@@ -863,6 +863,8 @@ int _strcmp(const void *s0, const void *s1)
 
 void add_spec_path(flu_list *l, char *path)
 {
+  if (flu_strends(path, ".")) return;
+
   if (flu_strends(path, "_spec.c")) {
     if (access(path, F_OK) == 0) flu_list_add_unique(l, strdup(path));
     return;
@@ -878,7 +880,7 @@ void add_spec_path(flu_list *l, char *path)
     char *fn = flu_sprintf(
       path[strlen(path) - 1] == '/' ? "%s%s" : "%s/%s", path, ep->d_name);
 
-    flu_list_add_unique(l, fn);
+    add_spec_path(l, fn);
   }
 
   closedir(dir);
