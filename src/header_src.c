@@ -175,6 +175,7 @@ void rdz_red() { if (isatty(1)) printf("[0;31m"); }
 void rdz_green() { if (isatty(1)) printf("[0;32m"); }
 void rdz_yellow() { if (isatty(1)) printf("[0;33m"); }
 void rdz_cyan() { if (isatty(1)) printf("[0;36m"); }
+void rdz_grey() { if (isatty(1)) printf("[1;30m"); }
 void rdz_clear() { if (isatty(1)) printf("[0;0m"); }
 
 void rdz_print_level(int nodenumber)//, int min)
@@ -208,10 +209,10 @@ void rdz_print_result(rdz_result *r)
   if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
 
-  rdz_clear();
+  rdz_grey();
+  printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
 
-  printf(" (%d)", r->ltnumber);
-  printf("\n");
+  rdz_clear();
 }
 
 char *rdz_string_expected(char *result, char *verb, char *expected)
@@ -631,7 +632,8 @@ void rdz_summary(int itcount)
       rdz_red(); printf("%s", line); rdz_clear();
       printf("<\n");
       rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
-      printf(" (%d)\n", r->ltnumber);
+      rdz_grey(); printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
+      rdz_clear();
       free(line);
     }
   }
