@@ -188,8 +188,8 @@ void rdz_print_level(int nodenumber)//, int min)
   for (int i = 0; i < n->depth - 1; i++) printf("  "); // indent
 
   printf("%s", n->text);
-  printf(" (%d)", n->ltstart);
-  printf("\n");
+  rdz_grey(); printf(" L=%d I=%d\n", n->ltstart, n->nodenumber);
+  rdz_clear();
 }
 
 void rdz_print_result(rdz_result *r)
