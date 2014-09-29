@@ -607,7 +607,9 @@ void rdz_summary(int itcount)
 
       rdz_yellow(); printf("  %s\n", r->title); rdz_clear();
       rdz_cyan(); printf("   # %s\n", r->message); rdz_clear();
-      rdz_cyan(); printf("   # %s:%d\n", rit->fname, r->lnumber); rdz_clear();
+      rdz_cyan(); printf("   # %s:%d", rit->fname, r->lnumber);
+      rdz_grey(); printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
+      rdz_clear();
     }
 
     printf("\n");
