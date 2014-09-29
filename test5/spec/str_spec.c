@@ -66,6 +66,11 @@ context "pending everything"
 
   describe "x"
   {
+    it "is ok"
+    {
+      expect(1 == 1);
+    }
+
     it "is not included in the 'with before/after' context"
     //{
     //  ensure(1 == 1);

@@ -16,7 +16,7 @@ describe "mne_tos()" {
         // force text to appear in summary
     }
     it "does not care about \n" {
-      ensure(1 == 2);
+      expect(1 == 2);
         // force text to appear in summary
     }
 

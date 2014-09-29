@@ -598,7 +598,7 @@ void process_lines(context_s *c, char *path)
       if (flu_strends(l, "{")) c->node->hasbody = 1;
       free(l);
     }
-    else if (strcmp(head, "ensure") == 0)
+    else if (strcmp(head, "ensure") == 0 || strcmp(head, "expect") == 0)
     {
       lnumber = push_ensure(c, in, indent, lnumber, line);
     }

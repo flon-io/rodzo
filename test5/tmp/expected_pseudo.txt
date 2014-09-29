@@ -48,6 +48,9 @@
     }
     describe "x"
     {
+      it "is ok"
+      {
+      }
       it "is not included in the 'with before/after' context"
       {
         pending "not yet implemented"
