@@ -171,12 +171,12 @@ rdz_result **rdz_results = NULL;
 // Brown       0;33     Yellow        1;33
 // Light Gray  0;37     White         1;37
 
-void rdz_red() { if (isatty(1)) printf("[0;31m"); }
-void rdz_green() { if (isatty(1)) printf("[0;32m"); }
-void rdz_yellow() { if (isatty(1)) printf("[0;33m"); }
-void rdz_cyan() { if (isatty(1)) printf("[0;36m"); }
-void rdz_grey() { if (isatty(1)) printf("[1;30m"); }
-void rdz_clear() { if (isatty(1)) printf("[0;0m"); }
+char *rdz_rd() { return isatty(1) ? "[0;31m" : ""; }
+char *rdz_gn() { return isatty(1) ? "[0;32m" : ""; }
+char *rdz_yl() { return isatty(1) ? "[0;33m" : ""; }
+char *rdz_cy() { return isatty(1) ? "[0;36m" : ""; }
+char *rdz_gr() { return isatty(1) ? "[1;30m" : ""; }
+char *rdz_cl() { return isatty(1) ? "[0;0m" : ""; }
 
 void rdz_print_level(int nodenumber)//, int min)
 {
@@ -188,8 +188,7 @@ void rdz_print_level(int nodenumber)//, int min)
   for (int i = 0; i < n->depth - 1; i++) printf("  "); // indent
 
   printf("%s", n->text);
-  rdz_grey(); printf(" L=%d I=%d\n", n->ltstart, n->nodenumber);
-  rdz_clear();
+  printf(" %sL=%d I=%d%s\n", rdz_gr(), n->ltstart, n->nodenumber, rdz_cl());
 }
 
 void rdz_print_result(rdz_result *r)
@@ -200,19 +199,16 @@ void rdz_print_result(rdz_result *r)
 
   for (int i = 0; i < rit->depth - 1; i++) printf("  "); // indent
 
-  if (r->success == -1) rdz_yellow();
-  else if (r->success == 0) rdz_red();
-  else rdz_green();
+  char *co = rdz_gn();
+  if (r->success == -1) co = rdz_yl();
+  else if (r->success == 0) co = rdz_rd();
 
-  printf("%s", rit->text);
+  printf("%s%s", co, rit->text);
 
   if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
 
-  rdz_grey();
-  printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
-
-  rdz_clear();
+  printf(" %sL=%d I=%d%s\n", rdz_gr(), r->ltnumber, r->itnumber, rdz_cl());
 }
 
 char *rdz_string_expected(char *result, char *verb, char *expected)
@@ -605,11 +601,10 @@ void rdz_summary(int itcount)
 
       rdz_node *rit = rdz_nodes[r->itnumber];
 
-      rdz_yellow(); printf("  %s\n", r->title); rdz_clear();
-      rdz_cyan(); printf("   # %s\n", r->message); rdz_clear();
-      rdz_cyan(); printf("   # %s:%d", rit->fname, r->lnumber);
-      rdz_grey(); printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
-      rdz_clear();
+      printf("  %s%s%s\n", rdz_yl(), r->title, rdz_cl());
+      printf("   %s# %s%s\n", rdz_cy(), r->message, rdz_cl());
+      printf("   %s# %s:%d", rdz_cy(), rit->fname, r->lnumber);
+      printf(" %sL=%d I=%d%s\n", rdz_gr(), r->ltnumber, r->itnumber, rdz_cl());
     }
 
     printf("\n");
@@ -629,25 +624,23 @@ void rdz_summary(int itcount)
 
       char *line = rdz_read_line(rit->fname, r->lnumber);
       printf("  %zu) %s\n", ++j, r->title);
-      if (r->message) { rdz_red(); puts(r->message); rdz_clear(); }
+      if (r->message) { printf("%s%s%s", rdz_rd(), r->message, rdz_cl()); }
       printf("     >");
-      rdz_red(); printf("%s", line); rdz_clear();
+      printf("%s%s%s", rdz_rd(), line, rdz_cl());
       printf("<\n");
-      rdz_cyan(); printf("     # %s:%d", rit->fname, r->lnumber); rdz_clear();
-      rdz_grey(); printf(" L=%d I=%d\n", r->ltnumber, r->itnumber);
-      rdz_clear();
+      printf("     %s# %s:%d%s", rdz_cy(), rit->fname, r->lnumber, rdz_cl());
+      printf(" %sL=%d I=%d%s\n", rdz_gr(), r->ltnumber, r->itnumber, rdz_cl());
       free(line);
     }
   }
 
   printf("\n");
-  if (rdz_fail_count > 0) rdz_red(); else rdz_green();
-  printf("%d examples, ", itcount);
+  printf("%s%d examples, ", rdz_fail_count > 0 ? rdz_rd() : rdz_gn(), itcount);
   printf("%d tests seen, ", rdz_count - rdz_pending_count);
   printf("%d failures", rdz_fail_count);
   if (rdz_pending_count > 0) printf(", %d pending", rdz_pending_count);
+  printf("%s", rdz_cl());
   printf("\n");
-  rdz_clear();
   printf("\n");
 
   if (rdz_fail_count > 0)
@@ -660,9 +653,8 @@ void rdz_summary(int itcount)
 
       if (r->success != 0) continue;
 
-      rdz_red(); printf("make spec L=%d", r->ltnumber);
-      rdz_cyan(); printf(" # %s\n", r->title);
-      rdz_clear();
+      printf("%smake spec L=%d", rdz_rd(), r->ltnumber);
+      printf(" %s# %s%s\n", rdz_cy(), r->title, rdz_cl());
     }
 
     printf("\n");
