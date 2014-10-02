@@ -624,7 +624,7 @@ void rdz_summary(int itcount)
 
       char *line = rdz_read_line(rit->fname, r->lnumber);
       printf("  %zu) %s\n", ++j, r->title);
-      if (r->message) { printf("%s%s%s", rdz_rd(), r->message, rdz_cl()); }
+      if (r->message) { printf("%s%s%s\n", rdz_rd(), r->message, rdz_cl()); }
       printf("     >");
       printf("%s%s%s", rdz_rd(), line, rdz_cl());
       printf("<\n");
