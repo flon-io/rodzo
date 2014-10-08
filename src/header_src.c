@@ -211,20 +211,38 @@ void rdz_print_result(rdz_result *r)
   printf(" %sL=%d I=%d%s\n", rdz_gr(), r->ltnumber, r->itnumber, rdz_cl());
 }
 
+char *rdz_truncate(char *s, size_t l, int soe)
+{
+  if (s == NULL) return NULL;
+
+  size_t ls = strlen(s);
+
+  char *r = calloc(l + 6 + 1, sizeof(char));
+
+  if (ls <= l) snprintf(r, l + 6, "\"%s\"", s);
+  else if (soe <= 0) snprintf(r, l + 6, "\"%.*s...\"", l, s);
+  else snprintf(r, l + 6, "\"...%.*s\"", l, s + l + 1);
+
+  return r;
+}
+
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
-  int l = strlen(verb); if (l < 8) l = 8;
+  size_t l = strlen(verb); if (l < 8) l = 8;
+
+  int soe = 0; if (verb[3] == 's') soe = -1; else if (verb[3] == 'e') soe = 1;
+
+  char *res = rdz_truncate(result, 49, soe);
 
   char *s = calloc(2048, sizeof(char));
 
-  char *format =
-    result ?
-    "     %*s \"%s\"\n"
-    "     %*s \"%s\"" :
+  snprintf(
+    s, 2048,
     "     %*s %s\n"
-    "     %*s \"%s\"";
+    "     %*s \"%s\"",
+    l, "expected", res, l, verb, expected);
 
-  snprintf(s, 2048, format, l, "expected", result, l, verb, expected);
+  if (res) free(res);
 
   return s;
 }
@@ -238,7 +256,7 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
 
   if (strcmp(result, expected) == 0) return NULL;
 
-  return rdz_string_expected(expected, "got", result);
+  return rdz_string_expected(result, "to equal", expected);
 }
 
 char *rdz_string_neq(char *operator, char *result, char *not_expected)
@@ -274,11 +292,7 @@ char *rdz_string_start(char *operator, char *result, char *expected)
     strncmp(result, expected, strlen(expected)) == 0
   ) return NULL;
 
-  char *start = result ? rdz_strndup(result, 49) : NULL;
-  char *s = rdz_string_expected(start, "to start with", expected);
-  if (start) free(start);
-
-  return s;
+  return rdz_string_expected(result, "to start with", expected);
 }
 
 char *rdz_string_end(char *operator, char *result, char *expected)
