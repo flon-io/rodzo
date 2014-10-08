@@ -216,12 +216,13 @@ char *rdz_truncate(char *s, size_t l, int soe)
   if (s == NULL) return NULL;
 
   size_t ls = strlen(s);
+  int ll = l; // "%.*s" wants an int and not a size_t...
 
   char *r = calloc(l + 6 + 1, sizeof(char));
 
   if (ls <= l) snprintf(r, l + 6, "\"%s\"", s);
-  else if (soe <= 0) snprintf(r, l + 6, "\"%.*s...\"", l, s);
-  else snprintf(r, l + 6, "\"...%.*s\"", l, s + l + 1);
+  else if (soe <= 0) snprintf(r, l + 6, "\"%.*s...\"", ll, s);
+  else snprintf(r, l + 6, "\"...%.*s\"", ll, s + l + 1);
 
   return r;
 }
@@ -229,6 +230,7 @@ char *rdz_truncate(char *s, size_t l, int soe)
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
   size_t l = strlen(verb); if (l < 8) l = 8;
+  int ll = l; // "%.*s" wants an int and not a size_t...
 
   int soe = 0; if (verb[3] == 's') soe = -1; else if (verb[3] == 'e') soe = 1;
 
@@ -240,7 +242,7 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
     s, 2048,
     "     %*s %s\n"
     "     %*s \"%s\"",
-    l, "expected", res, l, verb, expected);
+    ll, "expected", res, ll, verb, expected);
 
   if (res) free(res);
 
