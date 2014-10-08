@@ -112,6 +112,10 @@ describe "mne_tos()"
     {
       ensure("this is true" ^== "that ");
     }
+    it "starts and ends quickly if the result is NULL"
+    {
+      ensure(NULL ^== "that ");
+    }
 
     it "ends with (success)"
     {
@@ -120,6 +124,10 @@ describe "mne_tos()"
     it "ends with (failure)"
     {
       ensure("this is true" $== " false");
+    }
+    it "ends quickly if the result is NULL"
+    {
+      ensure(NULL $== " false");
     }
   }
 }

@@ -217,10 +217,14 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
 
   char *s = calloc(2048, sizeof(char));
 
-  snprintf(s, 2048, ""
+  char *format =
+    result ?
     "     %*s \"%s\"\n"
-    "     %*s \"%s\"",
-    l, "expected", result, l, verb, expected);
+    "     %*s \"%s\"" :
+    "     %*s %s\n"
+    "     %*s \"%s\"";
+
+  snprintf(s, 2048, format, l, "expected", result, l, verb, expected);
 
   return s;
 }
@@ -265,20 +269,24 @@ char *rdz_string_match(char *operator, char *result, char *expected)
 
 char *rdz_string_start(char *operator, char *result, char *expected)
 {
-  if (strncmp(result, expected, strlen(expected)) == 0)
-    return NULL;
+  if (
+    result &&
+    strncmp(result, expected, strlen(expected)) == 0
+  ) return NULL;
 
-  char *start = rdz_strndup(result, 49);
+  char *start = result ? rdz_strndup(result, 49) : NULL;
   char *s = rdz_string_expected(start, "to start with", expected);
-  free(start);
+  if (start) free(start);
 
   return s;
 }
 
 char *rdz_string_end(char *operator, char *result, char *expected)
 {
-  if (strcmp(result + strlen(result) - strlen(expected), expected) == 0)
-    return NULL;
+  if (
+    result &&
+    strcmp(result + strlen(result) - strlen(expected), expected) == 0
+  ) return NULL;
 
   return rdz_string_expected(result, "to end with", expected);
 }
