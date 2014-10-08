@@ -60,3 +60,14 @@ char *flu_strrtrim(char *s)
   return r;
 }
 
+char *flu_sprintf(const char *format, ...)
+{
+  char *s = calloc(1024, sizeof(char));
+
+  va_list ap; va_start(ap, format);
+  vsprintf(s, format, ap);
+  va_end(ap);
+
+  return s;
+}
+

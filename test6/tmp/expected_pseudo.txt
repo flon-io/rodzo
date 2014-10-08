@@ -13,5 +13,8 @@
     it "does it again"
     {
     }
+    it "doesn't stumble on formats within the expect"
+    {
+    }
   }
 

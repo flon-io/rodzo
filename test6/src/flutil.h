@@ -36,15 +36,15 @@
 //
 // str functions
 
-/*
- * Returns 1 if the string s ends with the end string. Returns 0 else.
+/* Returns 1 if the string s ends with the end string. Returns 0 else.
  */
 int flu_strends(char *s, char *end);
 
-/*
- * Returns a copy of the string, trimmed on the right.
+/* Returns a copy of the string, trimmed on the right.
  */
 char *flu_strrtrim(char *s);
+
+char *flu_sprintf(const char *format, ...);
 
 #endif // FLON_FLUTIL_H
 

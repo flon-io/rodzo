@@ -17,22 +17,29 @@ context "functions defined within the specs"
 
   it "calls get_name()"
   {
-    ensure(get_name(1) === "Kurt");
+    expect(get_name(1) === "Kurt");
   }
 
   // fighting gh-10
   //
   it "is ok with comments after an ensure"
   {
-    ensure("1" === "1"); // easy
+    expect("1" === "1"); // easy
   }
   it "does that thing"
   {
-    ensure(2 == 2); // peasy
+    expect(2 == 2); // peasy
   }
   it "does it again"
   {
-    ensure(1 == 1);
+    expect(1 == 1);
+  }
+
+  // fighting gh-25
+  //
+  it "doesn't stumble on formats within the expect"
+  {
+    expect(flu_sprintf("type %s", "t") ===f "type t");
   }
 }
 

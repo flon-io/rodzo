@@ -386,7 +386,7 @@ char *extract_condition(FILE *in, char *line)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  flu_sbprintf(b, line);
+  flu_sbputs(b, line);
 
   if (ends_in_semicolon(line)) return flu_sbuffer_to_string(b);
 
@@ -396,7 +396,7 @@ char *extract_condition(FILE *in, char *line)
   while (1)
   {
     if (getline(&lin, &len, in) == -1) break;
-    flu_sbprintf(b, lin);
+    flu_sbputs(b, lin);
     if (ends_in_semicolon(lin)) break;
   }
 
@@ -431,6 +431,7 @@ char *chop_right(char *s)
 
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
+  //printf("l >%s<\n", l);
   l = strpbrk(l, "e");
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
