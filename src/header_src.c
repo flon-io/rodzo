@@ -220,7 +220,7 @@ char *rdz_truncate(char *s, size_t l, int soe)
 
   char *r = calloc(l + 6 + 1, sizeof(char));
 
-  if (ls <= l) snprintf(r, l + 6, "\"%s\"", s);
+  if (ls <= l || soe == 1) snprintf(r, l + 6, "\"%s\"", s);
   else if (soe <= 0) snprintf(r, l + 6, "\"%.*s...\"", ll, s);
   else snprintf(r, l + 6, "\"...%.*s\"", ll, s + l + 1);
 
