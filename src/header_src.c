@@ -216,11 +216,19 @@ char *rdz_truncate(char *s, size_t l, int soe)
   if (s == NULL) return NULL;
 
   size_t ls = strlen(s);
+
+  if (soe == 1)
+  {
+    char *r = calloc(ls + 3, sizeof(char));
+    snprintf(r, ls + 3, "\"%s\"", s);
+    return r;
+  }
+
   int ll = l; // "%.*s" wants an int and not a size_t...
 
   char *r = calloc(l + 6 + 1, sizeof(char));
 
-  if (ls <= l || soe == 1) snprintf(r, l + 6, "\"%s\"", s);
+  if (ls <= l) snprintf(r, l + 6, "\"%s\"", s);
   else if (soe <= 0) snprintf(r, l + 6, "\"%.*s...\"", ll, s);
   else snprintf(r, l + 6, "\"...%.*s\"", ll, s + l + 1);
 
