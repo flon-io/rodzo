@@ -156,6 +156,14 @@ describe "mne_tos()"
       {
         expect(1 i== 2);
       }
+      it "fails 'f'"
+      {
+        expect(1.0 f== 2.0);
+      }
+      it "fails 'zd'"
+      {
+        expect(-1 zd== 0);
+      }
     }
 
     it "accepts empty specs"

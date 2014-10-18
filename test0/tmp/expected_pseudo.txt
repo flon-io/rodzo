@@ -83,6 +83,12 @@
         it "fails"
         {
         }
+        it "fails 'f'"
+        {
+        }
+        it "fails 'zd'"
+        {
+        }
       }
       it "accepts empty specs"
       {

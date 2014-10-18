@@ -465,10 +465,20 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
     *(strrchr(right, ')')) = '\0';
 
     char *type = "int";
+    //if (strcmp(format, "d") == 0) type = "int";
     if (strcmp(format, "s") == 0) type = "short";
-    else if (strcmp(format, "l") == 0) type = "long";
-    else if (strcmp(format, "ll") == 0) type = "long long";
+    else if (strcmp(format, "c") == 0) type = "char";
+    else if (strcmp(format, "d") == 0) type = "double";
+    else if (strcmp(format, "f") == 0) type = "double";
+    else if (strcmp(format, "e") == 0) type = "double";
+    else if (strcmp(format, "o") == 0) type = "unsigned int";
+    else if (strcmp(format, "u") == 0) type = "unsigned int";
+    else if (strcmp(format, "li") == 0) type = "long";
+    else if (strcmp(format, "lli") == 0) type = "long long";
+    else if (strcmp(format, "lu") == 0) type = "long unsigned";
+    else if (strcmp(format, "llu") == 0) type = "long long unsigned";
     else if (strcmp(format, "zu") == 0) type = "size_t";
+    else if (strcmp(format, "zd") == 0) type = "ssize_t";
 
     push_linef(c, "%s%s left%d = %s;\n", ind, type, lnumber, left);
     push_linef(c, "%s%s right%d = %s;\n", ind, type, lnumber, right);
@@ -965,7 +975,7 @@ int main(int argc, char *argv[])
   regcomp(
     &ensure_operator_rex,
     " ("
-      "((c|i|zu)(!?={1,3}))" "|"
+      "((c|d|e|f|o|i|li|lli|u|zu|zd|lu|llu)(!?={1,3}))" "|"
       "([=!~\\^\\$]={2,3}i?[fF]?)"
     ") ",
     REG_EXTENDED);
