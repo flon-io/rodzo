@@ -62,6 +62,9 @@
         it "ends quickly if the result is NULL"
         {
         }
+        it "accepts ===i for case insensitive comparison"
+        {
+        }
       }
       context "typed equals"
       {

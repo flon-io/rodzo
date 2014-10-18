@@ -264,7 +264,9 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
   if (expected == NULL) return rdz_strdup("     expected NULL");
   if (result == NULL) return rdz_strdup("     result is NULL");
 
-  if (strcmp(result, expected) == 0) return NULL;
+  int r = strchr(operator, 'i') ?
+    strcasecmp(result, expected) : strcmp(result, expected);
+  if (r == 0) return NULL;
 
   return rdz_string_expected(result, "to equal", expected);
 }

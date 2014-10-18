@@ -962,7 +962,6 @@ int print_usage()
 
 int main(int argc, char *argv[])
 {
-  //regcomp(&ensure_operator_rex, " ([!=~\\^\\$]==[fF]?) ", REG_EXTENDED);
   regcomp(
     &ensure_operator_rex,
     " ("

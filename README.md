@@ -309,6 +309,11 @@ Ensure understands "!==" as well:
     ensure(s !== "parrot");
 ```
 
+### ===i
+
+Same as `===` but the case is ignored. `===if` and `===iF` are OK.
+
+
 ### ~==
 
 Match with a regular expression:

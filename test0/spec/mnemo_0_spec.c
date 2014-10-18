@@ -127,6 +127,11 @@ describe "mne_tos()"
       {
         ensure(NULL $== " false");
       }
+
+      it "accepts ===i for case insensitive comparison"
+      {
+        ensure("tRuE" ===i "true");
+      }
     }
 
     context "typed equals"
