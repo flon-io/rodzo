@@ -22,7 +22,9 @@ build-spec: spec.c
 
 spec: build build-spec
 	LD_LIBRARY_PATH=. time ./a.out
+	LD_LIBRARY_PATH=. ./a.out > spec_out.txt
 	@echo "[31m"
+	-diff -u expected_out.txt spec_out.txt
 	-diff -u expected_pseudo.txt spec_pseudo.txt
 	@echo "[0m"
 
