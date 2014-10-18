@@ -381,6 +381,26 @@ When testing functions that return newly allocated strings, it's advantageous to
 
 ```~==f```, ```^==f``` and ```$==f``` work as expected.
 
+### ensure (expect) and {printf-format}===
+
+Usually, one writes an expectation like:
+
+```
+  expect(add_one(2) == 3);
+```
+
+It works fine if the expectation is fulfilled, but in case of failure, it just says "failed".
+
+If one needs to see the expected value and the resulting value, one can "help" rodzo and pass it a printf format before the `===` (or `!==`).
+
+```
+  expect(add_one(2) i== 3);
+```
+
+Accepted "formats" are `c`, `d`, `e`, `f`, `o`, `i`, `li`, `lli`, `u`, `zu`, `zd`, `lu` and `llu`.
+
+Beware `d` isn't "double" but "decimal".
+
 ### before and after
 
 Those two block markers let one run code before or after examples (```it``` blocks). It is very important to understand the difference between the "all" and the "each" (and "each offline") flavours.
