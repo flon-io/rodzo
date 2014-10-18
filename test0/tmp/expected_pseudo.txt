@@ -12,56 +12,56 @@
       it "flips \"burgers\""
       {
       }
-      it "compares strings 1"
+      context "string equals"
       {
-      }
-      it "compares strings 2"
-      {
-      }
-      it "compares strings 2"
-      {
-      }
-      it "expects strings to differ 1"
-      {
-      }
-      it "expects strings to differ 2"
-      {
-      }
-      it "frees strings 1"
-      {
-      }
-      it "doesn't crash when strings are NULL"
-      {
-      }
-      it "compares empty strings"
-      {
-      }
-      it "accepts empty specs"
-      {
-      }
-      it "matches strings 1"
-      {
-      }
-      it "matches strings 2 (fail)"
-      {
-      }
-      it "starts with (success)"
-      {
-      }
-      it "starts with (failure)"
-      {
-      }
-      it "starts and ends quickly if the result is NULL"
-      {
-      }
-      it "ends with (success)"
-      {
-      }
-      it "ends with (failure)"
-      {
-      }
-      it "ends quickly if the result is NULL"
-      {
+        it "compares strings 1"
+        {
+        }
+        it "compares strings 2"
+        {
+        }
+        it "compares strings 2"
+        {
+        }
+        it "expects strings to differ 1"
+        {
+        }
+        it "expects strings to differ 2"
+        {
+        }
+        it "frees strings 1"
+        {
+        }
+        it "doesn't crash when strings are NULL"
+        {
+        }
+        it "compares empty strings"
+        {
+        }
+        it "matches strings 1"
+        {
+        }
+        it "matches strings 2 (fail)"
+        {
+        }
+        it "starts with (success)"
+        {
+        }
+        it "starts with (failure)"
+        {
+        }
+        it "starts and ends quickly if the result is NULL"
+        {
+        }
+        it "ends with (success)"
+        {
+        }
+        it "ends with (failure)"
+        {
+        }
+        it "ends quickly if the result is NULL"
+        {
+        }
       }
       context "typed equals"
       {
@@ -71,6 +71,9 @@
         it "fails"
         {
         }
+      }
+      it "accepts empty specs"
+      {
       }
     }
   }

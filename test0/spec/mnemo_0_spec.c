@@ -45,89 +45,88 @@ describe "mne_tos()"
     {
       ensure(strcmp(mne_tos(0), "a") == 0);
     }
-    it "compares strings 1"
-    {
-      ensure(mne_tos(1) === "i");
-    }
-    it "compares strings 2"
-    {
-      ensure(mne_tos(7) === "FAIL");
-    }
-    it "compares strings 2"
-    {
-      ensure(
-        mne_tos(47) === "ia"
-      );
-    }
-    it "expects strings to differ 1"
-    {
-      ensure(mne_tos(47) !== "nada");
-    }
-    it "expects strings to differ 2"
-    {
-      ensure(mne_tos(47) !== "ia");
-    }
-    it "frees strings 1"
-    {
-      ensure(mne_tos(47) ===f "ia");
-    }
-    it "doesn't crash when strings are NULL"
-    {
-      ensure(NULL === "ia");
-    }
 
-    it "compares empty strings"
+    context "string equals"
     {
-      ensure("" === "");
-    }
-    //it "compares empty strings (2)"
-    //{
-    //  ensure(NULL === "");
-    //}
-    //it "compares empty strings (3)"
-    //{
-    //  void *a = NULL;
-    //  ensure(a === "");
-    //}
+      it "compares strings 1"
+      {
+        ensure(mne_tos(1) === "i");
+      }
+      it "compares strings 2"
+      {
+        ensure(mne_tos(7) === "FAIL");
+      }
+      it "compares strings 2"
+      {
+        ensure(
+          mne_tos(47) === "ia"
+        );
+      }
+      it "expects strings to differ 1"
+      {
+        ensure(mne_tos(47) !== "nada");
+      }
+      it "expects strings to differ 2"
+      {
+        ensure(mne_tos(47) !== "ia");
+      }
+      it "frees strings 1"
+      {
+        ensure(mne_tos(47) ===f "ia");
+      }
+      it "doesn't crash when strings are NULL"
+      {
+        ensure(NULL === "ia");
+      }
 
-    it "accepts empty specs"
-    {
-      // has to be green
-    }
+      it "compares empty strings"
+      {
+        ensure("" === "");
+      }
+      //it "compares empty strings (2)"
+      //{
+      //  ensure(NULL === "");
+      //}
+      //it "compares empty strings (3)"
+      //{
+      //  void *a = NULL;
+      //  ensure(a === "");
+      //}
 
-    it "matches strings 1"
-    {
-      ensure(mne_tos(47) ~== "[iI]a");
-    }
-    it "matches strings 2 (fail)"
-    {
-      ensure(mne_tos(47) ~== "[xy]a");
-    }
+      it "matches strings 1"
+      {
+        ensure(mne_tos(47) ~== "[iI]a");
+      }
+      it "matches strings 2 (fail)"
+      {
+        ensure(mne_tos(47) ~== "[xy]a");
+      }
 
-    it "starts with (success)"
-    {
-      ensure("this is true" ^== "this ");
-    }
-    it "starts with (failure)"
-    {
-      ensure("this is true" ^== "that ");
-    }
-    it "starts and ends quickly if the result is NULL"
-    {
-      ensure(NULL ^== "that ");
-    }
+      it "starts with (success)"
+      {
+        ensure("this is true" ^== "this ");
+      }
+      it "starts with (failure)"
+      {
+        ensure("this is true" ^== "that ");
+      }
+      it "starts and ends quickly if the result is NULL"
+      {
+        ensure(NULL ^== "that ");
+      }
 
-    it "ends with (success)"
-    {
-      ensure("this is true" $== " true");
-    }
-    it "ends with (failure)"
-    {
-      ensure("this is true" $== " false");
-    }
-    it "ends quickly if the result is NULL"
-    {
-      ensure(NULL $== " false");
+      it "ends with (success)"
+      {
+        ensure("this is true" $== " true");
+      }
+      it "ends with (failure)"
+      {
+        ensure("this is true" $== " false");
+      }
+      it "ends quickly if the result is NULL"
+      {
+        ensure(NULL $== " false");
+      }
     }
 
     context "typed equals"
@@ -140,6 +139,11 @@ describe "mne_tos()"
       {
         expect(1 i== 2);
       }
+    }
+
+    it "accepts empty specs"
+    {
+      // has to be green
     }
   }
 }
