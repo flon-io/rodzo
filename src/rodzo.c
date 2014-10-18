@@ -429,6 +429,11 @@ char *chop_right(char *s)
   return s;
 }
 
+char *extract_match(char *s, regmatch_t m)
+{
+  return strndup(s + m.rm_so, m.rm_eo - m.rm_so);
+}
+
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
   //printf("l >%s<\n", l);
@@ -443,17 +448,50 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 
   push_linef(c, "%schar *msg%d = NULL;\n", ind, lnumber);
 
-  regmatch_t ms[2];
+  regmatch_t ms[6];
 
-  if (regexec(&ensure_operator_rex, con, 2, ms, 0)) // no match
+  if (regexec(&ensure_operator_rex, con, 6, ms, 0)) // no match
   {
     push_linef(c, "%sint r%d = %s", ind, lnumber, con);
   }
-  else // match
+  else if (ms[3].rm_eo > ms[3].rm_so) // type
   {
-    //if (right[0] == '"') {} // for now it only works with strings
+    char *format = extract_match(con, ms[3]);
+    char *eq = extract_match(con, ms[4]);
 
-    char *operator = strndup(con + ms[1].rm_so, ms[1].rm_eo - ms[1].rm_so);
+    char *left = strndup(con + 1, ms[1].rm_so - 2);
+    //
+    char *right = strndup(con + ms[1].rm_eo + 1, strlen(con) - ms[1].rm_eo - 1);
+    *(strrchr(right, ')')) = '\0';
+
+    char *type = "int";
+    if (strcmp(format, "s") == 0) type = "short";
+    else if (strcmp(format, "l") == 0) type = "long";
+    else if (strcmp(format, "ll") == 0) type = "long long";
+    else if (strcmp(format, "zu") == 0) type = "size_t";
+
+    push_linef(c, "%s%s left%d = %s;\n", ind, type, lnumber, left);
+    push_linef(c, "%s%s right%d = %s;\n", ind, type, lnumber, right);
+
+    push_linef(
+      c,
+      "%sint r%d = (left%d %s right%d);\n",
+      ind, lnumber, lnumber, eq, lnumber);
+
+    push_linef(c, "%sif ( ! r%d)\n", ind, lnumber);
+    push_linef(c, "%s{\n", ind);
+    push_linef(c, "%s  msg%d = calloc(2048, sizeof(char));\n", ind, lnumber);
+    push_linef(c, "%s  snprintf(\n", ind);
+    push_linef(c, "%s    msg%d, 2048,\n", ind, lnumber);
+    push_linef(c, "%s      \"     expected %s%s\\n\"\n", ind, "%", format);
+    push_linef(c, "%s      \"     %s8s %s%s\",\n", ind, "%", "%", format);
+    push_linef(c, "%s      left%d, \"to %s\", right%d\n", ind, lnumber, eq, lnumber);
+    push_linef(c, "%s    );\n", ind);
+    push_linef(c, "%s}\n", ind);
+  }
+  else // string
+  {
+    char *operator = extract_match(con, ms[5]);
 
     con[ms[1].rm_so] = '\0';
     char *left = flu_strtrim(con);
@@ -924,7 +962,14 @@ int print_usage()
 
 int main(int argc, char *argv[])
 {
-  regcomp(&ensure_operator_rex, " ([!=~\\^\\$]==[fF]?) ", REG_EXTENDED);
+  //regcomp(&ensure_operator_rex, " ([!=~\\^\\$]==[fF]?) ", REG_EXTENDED);
+  regcomp(
+    &ensure_operator_rex,
+    " ("
+      "((c|i|zu)(!?={1,3}))" "|"
+      "([=!~\\^\\$]={2,3}i?[fF]?)"
+    ") ",
+    REG_EXTENDED);
 
   // deal with arguments
 

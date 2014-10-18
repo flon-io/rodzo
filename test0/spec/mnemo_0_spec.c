@@ -129,6 +129,18 @@ describe "mne_tos()"
     {
       ensure(NULL $== " false");
     }
+
+    context "typed equals"
+    {
+      it "succeeds"
+      {
+        expect(1 i== 1);
+      }
+      it "fails"
+      {
+        expect(1 i== 2);
+      }
+    }
   }
 }
 

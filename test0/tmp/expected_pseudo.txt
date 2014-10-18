@@ -63,6 +63,15 @@
       it "ends quickly if the result is NULL"
       {
       }
+      context "typed equals"
+      {
+        it "succeeds"
+        {
+        }
+        it "fails"
+        {
+        }
+      }
     }
   }
   describe "mne_tos()"
