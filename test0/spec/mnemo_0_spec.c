@@ -101,6 +101,10 @@ describe "mne_tos()"
       {
         ensure(mne_tos(47) ~== "[xy]a");
       }
+      it "matches strings (insensitive)"
+      {
+        ensure("IA" ~==i "[ijk]a");
+      }
 
       it "starts with (success)"
       {
@@ -114,6 +118,10 @@ describe "mne_tos()"
       {
         ensure(NULL ^== "that ");
       }
+      it "starts with (insensitive)"
+      {
+        ensure("THIS is true" ^==i "this ");
+      }
 
       it "ends with (success)"
       {
@@ -126,6 +134,10 @@ describe "mne_tos()"
       it "ends quickly if the result is NULL"
       {
         ensure(NULL $== " false");
+      }
+      it "ends with (insensitive)"
+      {
+        ensure("this is True" $==i "true");
       }
 
       it "accepts ===i for case insensitive comparison"

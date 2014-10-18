@@ -320,6 +320,7 @@ Match with a regular expression:
 
 ```c
     ensure(s ~== "^[Pp]arrots?$");
+    ensure(s ~==i "^parrots?$"); // case insensitive
 ```
 
 ### ^== and $==
@@ -330,6 +331,8 @@ Match with a regular expression:
     ensure(s ^== "this is "); // s should start with "this is"
     ensure(s $== ". That's it."); // s should end with ". That's it"
 ```
+
+```^==i``` and ```$==i``` work as expected, case insensitively.
 
 ### ===f and ===F
 
@@ -376,7 +379,7 @@ When testing functions that return newly allocated strings, it's advantageous to
 
 ```===F``` like ```===f``` frees the left char array, but also frees the right one.
 
-```~==f``` should work as expected.
+```~==f```, ```^==f``` and ```$==f``` work as expected.
 
 ### before and after
 

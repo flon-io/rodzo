@@ -44,6 +44,9 @@
         it "matches strings 2 (fail)"
         {
         }
+        it "matches strings (insensitive)"
+        {
+        }
         it "starts with (success)"
         {
         }
@@ -53,6 +56,9 @@
         it "starts and ends quickly if the result is NULL"
         {
         }
+        it "starts with (insensitive)"
+        {
+        }
         it "ends with (success)"
         {
         }
@@ -60,6 +66,9 @@
         {
         }
         it "ends quickly if the result is NULL"
+        {
+        }
+        it "ends with (insensitive)"
         {
         }
         it "accepts ===i for case insensitive comparison"

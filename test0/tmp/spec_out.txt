@@ -15,25 +15,28 @@ mne_tos() L=21 I=2
       compares empty strings L=84 I=15
       matches strings 1 L=98 I=16
       matches strings 2 (fail) (FAILED) L=102 I=17
-      starts with (success) L=107 I=18
-      starts with (failure) (FAILED) L=111 I=19
-      starts and ends quickly if the result is NULL (FAILED) L=115 I=20
-      ends with (success) L=120 I=21
-      ends with (failure) (FAILED) L=124 I=22
-      ends quickly if the result is NULL (FAILED) L=128 I=23
-      accepts ===i for case insensitive comparison L=133 I=24
-    typed equals L=137 I=25
-      succeeds L=141 I=26
-      fails (FAILED) L=145 I=27
-    accepts empty specs L=149 I=28
-mne_tos() L=161 I=31
-  birds are flying L=162 I=32
-    finds the コンビニ convenient L=166 I=33
-    is OK with "double quotes" and 	abs (FAILED) L=170 I=34
+      matches strings (insensitive) L=106 I=18
+      starts with (success) L=111 I=19
+      starts with (failure) (FAILED) L=115 I=20
+      starts and ends quickly if the result is NULL (FAILED) L=119 I=21
+      starts with (insensitive) L=123 I=22
+      ends with (success) L=128 I=23
+      ends with (failure) (FAILED) L=132 I=24
+      ends quickly if the result is NULL (FAILED) L=136 I=25
+      ends with (insensitive) L=140 I=26
+      accepts ===i for case insensitive comparison L=145 I=27
+    typed equals L=149 I=28
+      succeeds L=153 I=29
+      fails (FAILED) L=157 I=30
+    accepts empty specs L=161 I=31
+mne_tos() L=173 I=34
+  birds are flying L=174 I=35
+    finds the コンビニ convenient L=178 I=36
+    is OK with "double quotes" and 	abs (FAILED) L=182 I=37
     does not care about 
- (FAILED) L=174 I=35
-mne_toi() L=184 I=37
-  flips burgers L=188 I=38
+ (FAILED) L=186 I=38
+mne_toi() L=196 I=40
+  flips burgers L=200 I=41
 
 Failures:
 
@@ -62,36 +65,36 @@ Failures:
           expected "this is true"
      to start with "that "
      >        ensure("this is true" ^== "that ");<
-     # ../spec/mnemo_0_spec.c:111 L=111 I=19
+     # ../spec/mnemo_0_spec.c:115 L=115 I=20
   7) mne_tos() cows are flying string equals starts and ends quickly if the result is NULL 
           expected (null)
      to start with "that "
      >        ensure(NULL ^== "that ");<
-     # ../spec/mnemo_0_spec.c:115 L=115 I=20
+     # ../spec/mnemo_0_spec.c:119 L=119 I=21
   8) mne_tos() cows are flying string equals ends with (failure) 
         expected "this is true"
      to end with " false"
      >        ensure("this is true" $== " false");<
-     # ../spec/mnemo_0_spec.c:124 L=124 I=22
+     # ../spec/mnemo_0_spec.c:132 L=132 I=24
   9) mne_tos() cows are flying string equals ends quickly if the result is NULL 
         expected (null)
      to end with " false"
      >        ensure(NULL $== " false");<
-     # ../spec/mnemo_0_spec.c:128 L=128 I=23
+     # ../spec/mnemo_0_spec.c:136 L=136 I=25
   10) mne_tos() cows are flying typed equals fails 
      expected 1
         to == 2
      >        expect(1 i== 2);<
-     # ../spec/mnemo_0_spec.c:145 L=145 I=27
+     # ../spec/mnemo_0_spec.c:157 L=157 I=30
   11) mne_tos() birds are flying is OK with "double quotes" and 	abs 
      >      ensure(1 == 2);<
-     # ../spec/mnemo_1_spec.c:15 L=170 I=34
+     # ../spec/mnemo_1_spec.c:15 L=182 I=37
   12) mne_tos() birds are flying does not care about 
  
      >      expect(1 == 2);<
-     # ../spec/mnemo_1_spec.c:19 L=174 I=35
+     # ../spec/mnemo_1_spec.c:19 L=186 I=38
 
-27 examples, 28 tests seen, 12 failures
+30 examples, 31 tests seen, 12 failures
 
 Failed examples:
 
@@ -100,12 +103,12 @@ make spec L=57 # mne_tos() cows are flying string equals compares strings 2
 make spec L=71 # mne_tos() cows are flying string equals expects strings to differ 2 
 make spec L=79 # mne_tos() cows are flying string equals doesn't crash when strings are NULL 
 make spec L=102 # mne_tos() cows are flying string equals matches strings 2 (fail) 
-make spec L=111 # mne_tos() cows are flying string equals starts with (failure) 
-make spec L=115 # mne_tos() cows are flying string equals starts and ends quickly if the result is NULL 
-make spec L=124 # mne_tos() cows are flying string equals ends with (failure) 
-make spec L=128 # mne_tos() cows are flying string equals ends quickly if the result is NULL 
-make spec L=145 # mne_tos() cows are flying typed equals fails 
-make spec L=170 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
-make spec L=174 # mne_tos() birds are flying does not care about 
+make spec L=115 # mne_tos() cows are flying string equals starts with (failure) 
+make spec L=119 # mne_tos() cows are flying string equals starts and ends quickly if the result is NULL 
+make spec L=132 # mne_tos() cows are flying string equals ends with (failure) 
+make spec L=136 # mne_tos() cows are flying string equals ends quickly if the result is NULL 
+make spec L=157 # mne_tos() cows are flying typed equals fails 
+make spec L=182 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
+make spec L=186 # mne_tos() birds are flying does not care about 
  
 

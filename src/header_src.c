@@ -28,8 +28,9 @@
    */
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 #include <unistd.h> // for isatty()
 #include <regex.h>
 #include <wordexp.h>
@@ -257,6 +258,14 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
   return s;
 }
 
+int rdz_strcmp(char *op, char *a, char *b, ssize_t n)
+{
+  short i = (strchr(op, 'i') != NULL);
+
+  if (n > -1) return i ? strncasecmp(a, b, n) : strncmp(a, b, n);
+  return i ? strcasecmp(a, b) : strcmp(a, b);
+}
+
 char *rdz_string_eq(char *operator, char *result, char *expected)
 {
   if (expected == NULL && result == NULL) return NULL;
@@ -264,16 +273,14 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
   if (expected == NULL) return rdz_strdup("     expected NULL");
   if (result == NULL) return rdz_strdup("     result is NULL");
 
-  int r = strchr(operator, 'i') ?
-    strcasecmp(result, expected) : strcmp(result, expected);
-  if (r == 0) return NULL;
+  if (rdz_strcmp(operator, result, expected, -1) == 0) return NULL;
 
   return rdz_string_expected(result, "to equal", expected);
 }
 
 char *rdz_string_neq(char *operator, char *result, char *not_expected)
 {
-  if (strcmp(result, not_expected) != 0) return NULL;
+  if (rdz_strcmp(operator, result, not_expected, -1) != 0) return NULL;
 
   size_t l = strlen(not_expected) + 22;
 
@@ -286,14 +293,20 @@ char *rdz_string_neq(char *operator, char *result, char *not_expected)
 char *rdz_string_match(char *operator, char *result, char *expected)
 {
   char *s = NULL;
+
+  int flags = REG_EXTENDED;
+  if (strchr(operator, 'i')) flags = flags | REG_ICASE;
+
   regex_t *r = calloc(1, sizeof(regex_t));
-  regcomp(r, expected, REG_EXTENDED);
+  regcomp(r, expected, flags);
   regmatch_t ms[0];
+
   if (regexec(r, result, 0, ms, 0)) // no match
   {
     s = rdz_string_expected(result, "to match", expected);
   }
   regfree(r); free(r);
+
   return s;
 }
 
@@ -301,7 +314,8 @@ char *rdz_string_start(char *operator, char *result, char *expected)
 {
   if (
     result &&
-    strncmp(result, expected, strlen(expected)) == 0
+    rdz_strcmp(
+      operator, result, expected, strlen(expected)) == 0
   ) return NULL;
 
   return rdz_string_expected(result, "to start with", expected);
@@ -311,7 +325,8 @@ char *rdz_string_end(char *operator, char *result, char *expected)
 {
   if (
     result &&
-    strcmp(result + strlen(result) - strlen(expected), expected) == 0
+    rdz_strcmp(
+      operator, result + strlen(result) - strlen(expected), expected, -1) == 0
   ) return NULL;
 
   return rdz_string_expected(result, "to end with", expected);
