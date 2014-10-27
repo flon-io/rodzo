@@ -78,6 +78,10 @@ describe "mne_tos()"
       {
         ensure(NULL === "ia");
       }
+      it "compares to NULL"
+      {
+        ensure("ia" === NULL);
+      }
 
       it "compares empty strings"
       {

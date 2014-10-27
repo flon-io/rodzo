@@ -238,6 +238,8 @@ char *rdz_truncate(char *s, size_t l, int soe)
 
 char *rdz_string_expected(char *result, char *verb, char *expected)
 {
+  if (expected == NULL) verb = "to be";
+
   size_t l = strlen(verb); if (l < 8) l = 8;
   int ll = l; // "%.*s" wants an int and not a size_t...
 
@@ -245,13 +247,20 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
 
   char *res = rdz_truncate(result, 49, soe);
 
-  char *s = calloc(2048, sizeof(char));
+  char *s = calloc(4096, sizeof(char));
 
-  snprintf(
-    s, 2048,
-    "     %*s %s\n"
-    "     %*s \"%s\"",
-    ll, "expected", res, ll, verb, expected);
+  if (expected)
+    snprintf(
+      s, 4096,
+      "     %*s %s\n"
+      "     %*s \"%s\"",
+      ll, "expected", res, ll, verb, expected);
+  else
+    snprintf(
+      s, 4096,
+      "     %*s %s\n"
+      "     %*s NULL",
+      ll, "expected", res, ll, verb);
 
   if (res) free(res);
 
@@ -270,10 +279,10 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
 {
   if (expected == NULL && result == NULL) return NULL;
 
-  if (expected == NULL) return rdz_strdup("     expected NULL");
+  //if (expected == NULL) return rdz_strdup("     expected NULL");
   if (result == NULL) return rdz_strdup("     result is NULL");
 
-  if (rdz_strcmp(operator, result, expected, -1) == 0) return NULL;
+  if (expected && rdz_strcmp(operator, result, expected, -1) == 0) return NULL;
 
   return rdz_string_expected(result, "to equal", expected);
 }

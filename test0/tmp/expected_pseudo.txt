@@ -35,6 +35,9 @@
         it "doesn't crash when strings are NULL"
         {
         }
+        it "compares to NULL"
+        {
+        }
         it "compares empty strings"
         {
         }
