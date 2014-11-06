@@ -24,7 +24,7 @@ clean:
 # copy up-to-date versions of dep libs into src/
 #
 upgrade:
-	cp -v ../flutil/src/flutil.* src/
+	cp -v ../flutil/src/flutil.[ch] src/
 
 .PHONY: clean test vtest upgrade
 
