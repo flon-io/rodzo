@@ -334,6 +334,15 @@ Match with a regular expression:
 
 ```^==i``` and ```$==i``` work as expected, case insensitively.
 
+### >==
+
+Means "contains". The text will be succesful if the string on the left contains the one on the right.
+
+```c
+    expect(s >== "Parrot");
+    expect(s >==i "parrot"); // case insensitive
+```
+
 ### ===f and ===F
 
 When testing functions that return newly allocated strings, it's advantageous to immediately free the returned value.
