@@ -74,6 +74,15 @@
         it "ends with (insensitive)"
         {
         }
+        it "accepts >== for 'contains' (hit)"
+        {
+        }
+        it "accepts >== for 'contains' (miss)"
+        {
+        }
+        it "accepts >==i for 'contains, whatever the case'"
+        {
+        }
         it "accepts ===i for case insensitive comparison"
         {
         }

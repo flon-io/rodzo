@@ -512,6 +512,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
     else if (operator[0] == '~') fun = "rdz_string_match";
     else if (operator[0] == '^') fun = "rdz_string_start";
     else if (operator[0] == '$') fun = "rdz_string_end";
+    else if (operator[0] == '>') fun = "rdz_string_contains";
 
     push_linef(
       c, "%schar *result%d = %s);\n",
@@ -976,7 +977,7 @@ int main(int argc, char *argv[])
     &ensure_operator_rex,
     " ("
       "((c|d|e|f|o|i|li|lli|u|zu|zd|lu|llu)(!?={1,3}))" "|"
-      "([=!~\\^\\$]={2,3}i?[fF]?)"
+      "([=!~\\^\\$>]={2,3}i?[fF]?)"
     ") ",
     REG_EXTENDED);
 

@@ -144,6 +144,19 @@ describe "mne_tos()"
         ensure("this is True" $==i "true");
       }
 
+      it "accepts >== for 'contains' (hit)"
+      {
+        expect("this is True" >== "is Tru");
+      }
+      it "accepts >== for 'contains' (miss)"
+      {
+        expect("this is True" >== "is Fal");
+      }
+      it "accepts >==i for 'contains, whatever the case'"
+      {
+        expect("this is True" >==i "is tru");
+      }
+
       it "accepts ===i for case insensitive comparison"
       {
         ensure("tRuE" ===i "true");

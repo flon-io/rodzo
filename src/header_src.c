@@ -341,6 +341,33 @@ char *rdz_string_end(char *operator, char *result, char *expected)
   return rdz_string_expected(result, "to end with", expected);
 }
 
+static char *lower_case(char *s)
+{
+  char *r = calloc(strlen(s) + 1, sizeof(char));
+  for (size_t i = 0; s[i]; ++i) r[i] = tolower(s[i]);
+
+  return r;
+}
+
+char *rdz_string_contains(char *operator, char *result, char *expected)
+{
+  char *re = result;
+  char *ex = expected;
+
+  if (result && strchr(operator, 'i'))
+  {
+    re = lower_case(result);
+    ex = lower_case(expected);
+  }
+
+  char *r = re ? strstr(re, ex) : NULL;
+
+  if (re != result) free(re);
+  if (ex != expected) free(ex);
+
+  return r ? NULL : rdz_string_expected(result, "to contain", expected);
+}
+
 void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)
 {
   rdz_result *result =
