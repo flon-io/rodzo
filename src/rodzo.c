@@ -906,11 +906,6 @@ void print_footer(FILE *out, context_s *c)
   fputs("\n", out);
 }
 
-int _strcmp(const void *s0, const void *s1)
-{
-  return strcmp((char *)s0, (char *)s1);
-}
-
 void add_spec_path(flu_list *l, char *path)
 {
   if (flu_strends(path, ".")) return;
@@ -959,7 +954,7 @@ flu_list *list_spec_files(int argc, char *argv[])
 
   if (args_seen < 1) add_spec_path(l, ".");
 
-  flu_list_isort(l, _strcmp);
+  flu_list_isort(l, (int (*)(const void *, const void *))strcmp);
 
   return l;
 }
