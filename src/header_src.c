@@ -309,7 +309,7 @@ char *rdz_string_match(char *operator, char *result, char *expected)
 
   regex_t *r = calloc(1, sizeof(regex_t));
   regcomp(r, expected, flags);
-  regmatch_t ms[0];
+  regmatch_t ms[1];
 
   if (regexec(r, result, 0, ms, 0)) // no match
   {
@@ -602,7 +602,7 @@ void rdz_dorun(rdz_node *n)
 
   if (t == 'i')
   {
-    if (n->children[0] > -1) return rdz_dorun(rdz_nodes[n->children[0]]);
+    if (n->children[0] > -1) { rdz_dorun(rdz_nodes[n->children[0]]); return; }
 
     int rc = rdz_count;
 
