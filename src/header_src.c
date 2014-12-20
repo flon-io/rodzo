@@ -290,6 +290,9 @@ char *rdz_string_eq(char *operator, char *result, char *expected)
 
 char *rdz_string_neq(char *operator, char *result, char *not_expected)
 {
+  if (result == NULL) return rdz_strdup("     result is NULL");
+
+  if (not_expected == NULL) return NULL;
   if (rdz_strcmp(operator, result, not_expected, -1) != 0) return NULL;
 
   size_t l = strlen(not_expected) + 22;

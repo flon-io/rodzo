@@ -98,6 +98,34 @@ describe "mne_tos()"
       //}
     }
 
+    context "!=="
+    {
+      it "fails when the result (left) is NULL"
+      {
+        ensure(NULL !== "a");
+      }
+      it "succeeds when the two strings are different"
+      {
+        ensure("b" !== "a");
+      }
+      it "frees when 'f' (hit)"
+      {
+        ensure(rdz_strdup("b") !==f "a");
+      }
+      it "frees when 'f' (miss)"
+      {
+        ensure(rdz_strdup("a") !==f "a");
+      }
+      it "doesn't free when the result is NULL"
+      {
+        ensure(NULL !==f "a");
+      }
+      it "is OK with comparing to NULL (and freeing)"
+      {
+        ensure(rdz_strdup("b") !==f NULL);
+      }
+    }
+
     context "~=="
     {
       it "matches strings 1"
