@@ -120,6 +120,10 @@ describe "mne_tos()"
       {
         ensure(NULL !==f "a");
       }
+      it "is OK with comparing to NULL"
+      {
+        ensure("b" !== NULL);
+      }
       it "is OK with comparing to NULL (and freeing)"
       {
         ensure(rdz_strdup("b") !==f NULL);

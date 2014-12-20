@@ -59,6 +59,9 @@
         it "doesn't free when the result is NULL"
         {
         }
+        it "is OK with comparing to NULL"
+        {
+        }
         it "is OK with comparing to NULL (and freeing)"
         {
         }
