@@ -42,6 +42,27 @@
         {
         }
       }
+      context "!=="
+      {
+        it "fails when the result (left) is NULL"
+        {
+        }
+        it "succeeds when the two strings are different"
+        {
+        }
+        it "frees when 'f' (hit)"
+        {
+        }
+        it "frees when 'f' (miss)"
+        {
+        }
+        it "doesn't free when the result is NULL"
+        {
+        }
+        it "is OK with comparing to NULL (and freeing)"
+        {
+        }
+      }
       context "~=="
       {
         it "matches strings 1"
