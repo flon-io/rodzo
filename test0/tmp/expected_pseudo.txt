@@ -12,7 +12,7 @@
       it "flips \"burgers\""
       {
       }
-      context "string equals"
+      context "==="
       {
         it "compares strings 1"
         {
@@ -41,6 +41,9 @@
         it "compares empty strings"
         {
         }
+      }
+      context "~=="
+      {
         it "matches strings 1"
         {
         }
@@ -50,6 +53,9 @@
         it "matches strings (insensitive)"
         {
         }
+      }
+      context "^=="
+      {
         it "starts with (success)"
         {
         }
@@ -62,6 +68,9 @@
         it "starts with (insensitive)"
         {
         }
+      }
+      context "$=="
+      {
         it "ends with (success)"
         {
         }

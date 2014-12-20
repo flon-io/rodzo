@@ -46,7 +46,7 @@ describe "mne_tos()"
       ensure(strcmp(mne_tos(0), "a") == 0);
     }
 
-    context "string equals"
+    context "==="
     {
       it "compares strings 1"
       {
@@ -96,7 +96,10 @@ describe "mne_tos()"
       //  void *a = NULL;
       //  ensure(a === "");
       //}
+    }
 
+    context "~=="
+    {
       it "matches strings 1"
       {
         ensure(mne_tos(47) ~== "[iI]a");
@@ -109,7 +112,10 @@ describe "mne_tos()"
       {
         ensure("IA" ~==i "[ijk]a");
       }
+    }
 
+    context "^=="
+    {
       it "starts with (success)"
       {
         ensure("this is true" ^== "this ");
@@ -126,7 +132,10 @@ describe "mne_tos()"
       {
         ensure("THIS is true" ^==i "this ");
       }
+    }
 
+    context "$=="
+    {
       it "ends with (success)"
       {
         ensure("this is true" $== " true");
