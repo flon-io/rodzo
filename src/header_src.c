@@ -366,7 +366,10 @@ char *rdz_string_contains(char *operator, char *result, char *expected)
   if (re != result) free(re);
   if (ex != expected) free(ex);
 
-  return r ? NULL : rdz_string_expected(result, "to contain", expected);
+  if (operator[0] == '!')
+    return r ? rdz_string_expected(result, "not to contain", expected) : NULL;
+  else
+    return r ? NULL : rdz_string_expected(result, "to contain", expected);
 }
 
 void rdz_record(int success, char *msg, int itnumber, int lnumber, int ltnumber)

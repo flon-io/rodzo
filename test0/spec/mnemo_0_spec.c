@@ -143,7 +143,10 @@ describe "mne_tos()"
       {
         ensure("this is True" $==i "true");
       }
+    }
 
+    context ">=="
+    {
       it "accepts >== for 'contains' (hit)"
       {
         expect("this is True" >== "is Tru");
@@ -157,9 +160,29 @@ describe "mne_tos()"
         expect("this is True" >==i "is tru");
       }
 
+      it "accepts !>== for 'does not contain' (hit)"
+      {
+        expect("this is True" !>== "false");
+      }
+      it "accepts !>== for 'does not contain' (miss)"
+      {
+        expect("this is True" !>== "is is");
+      }
+      it "accepts !>==i for 'does not contain, whatever the case'"
+      {
+        expect("this is True" !>==i "is fal");
+      }
+    }
+
+    context "===i"
+    {
       it "accepts ===i for case insensitive comparison"
       {
         ensure("tRuE" ===i "true");
+      }
+      it "accepts !==i for case insensitive comparison"
+      {
+        ensure("tRuE" !==i "false");
       }
     }
 

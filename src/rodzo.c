@@ -501,18 +501,20 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   }
   else // string
   {
-    char *operator = extract_match(con, ms[5]);
+    char *oper = extract_match(con, ms[5]);
 
     con[ms[1].rm_so] = '\0';
     char *left = flu_strtrim(con);
     char *right = chop_right(flu_strtrim(con + ms[1].rm_eo));
 
+    char op = oper[0] == '!' && oper[1] != '=' ? oper[1] : oper[0];
+    //
     char *fun = "rdz_string_eq";
-    if (operator[0] == '!') fun = "rdz_string_neq";
-    else if (operator[0] == '~') fun = "rdz_string_match";
-    else if (operator[0] == '^') fun = "rdz_string_start";
-    else if (operator[0] == '$') fun = "rdz_string_end";
-    else if (operator[0] == '>') fun = "rdz_string_contains";
+    if (op == '!') fun = "rdz_string_neq";
+    else if (op == '~') fun = "rdz_string_match";
+    else if (op == '^') fun = "rdz_string_start";
+    else if (op == '$') fun = "rdz_string_end";
+    else if (op == '>') fun = "rdz_string_contains";
 
     push_linef(
       c, "%schar *result%d = %s);\n",
@@ -522,25 +524,25 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
       ind, lnumber, right);
     push_linef(
       c, "%smsg%d = %s(\"%s\", result%d, expected%d);\n",
-      ind, lnumber, fun, operator, lnumber, lnumber);
+      ind, lnumber, fun, oper, lnumber, lnumber);
     push_linef(
       c, "%sint r%d = (msg%d == NULL);\n",
       ind, lnumber, lnumber);
 
-    if (strchr(operator, 'f'))
+    if (strchr(oper, 'f'))
     {
       push_linef(
         c, "%sfree(result%d);\n",
         ind, lnumber);
     }
-    else if (strchr(operator, 'F'))
+    else if (strchr(oper, 'F'))
     {
       push_linef(
         c, "%sfree(result%d); free(expected%d);\n",
         ind, lnumber, lnumber);
     }
 
-    free(operator);
+    free(oper);
     free(left);
     free(right);
   }
@@ -972,7 +974,7 @@ int main(int argc, char *argv[])
     &ensure_operator_rex,
     " ("
       "((c|d|e|f|o|i|li|lli|u|zu|zd|lu|llu)(!?={1,3}))" "|"
-      "([=!~\\^\\$>]={2,3}i?[fF]?)"
+      "(!?[=!~\\^\\$>]={2,3}i?[fF]?)"
     ") ",
     REG_EXTENDED);
 

@@ -74,6 +74,9 @@
         it "ends with (insensitive)"
         {
         }
+      }
+      context ">=="
+      {
         it "accepts >== for 'contains' (hit)"
         {
         }
@@ -83,7 +86,22 @@
         it "accepts >==i for 'contains, whatever the case'"
         {
         }
+        it "accepts !>== for 'does not contain' (hit)"
+        {
+        }
+        it "accepts !>== for 'does not contain' (miss)"
+        {
+        }
+        it "accepts !>==i for 'does not contain, whatever the case'"
+        {
+        }
+      }
+      context "===i"
+      {
         it "accepts ===i for case insensitive comparison"
+        {
+        }
+        it "accepts !==i for case insensitive comparison"
         {
         }
       }
