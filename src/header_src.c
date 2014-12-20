@@ -337,13 +337,18 @@ char *rdz_string_start(char *operator, char *result, char *expected)
 
 char *rdz_string_end(char *operator, char *result, char *expected)
 {
-  if (
+  int success =
     result &&
     rdz_strcmp(
-      operator, result + strlen(result) - strlen(expected), expected, -1) == 0
-  ) return NULL;
+      operator, result + strlen(result) - strlen(expected), expected, -1) == 0;
 
-  return rdz_string_expected(result, "to end with", expected);
+  if (operator[0] == '!')
+  {
+    return success ?
+      rdz_string_expected(result, "not to end with", expected) : NULL;
+  }
+  return success ?
+    NULL : rdz_string_expected(result, "to end with", expected);
 }
 
 static char *lower_case(char *s)

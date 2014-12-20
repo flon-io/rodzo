@@ -89,6 +89,12 @@
         it "ends with (insensitive)"
         {
         }
+        it "understands !$== (hit)"
+        {
+        }
+        it "understands !$== (failure)"
+        {
+        }
       }
       context ">=="
       {

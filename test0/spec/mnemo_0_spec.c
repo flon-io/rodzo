@@ -160,6 +160,14 @@ describe "mne_tos()"
       {
         ensure("this is True" $==i "true");
       }
+      it "understands !$== (hit)"
+      {
+        ensure("this is true" !$== " false");
+      }
+      it "understands !$== (failure)"
+      {
+        ensure("this is true" !$== " true");
+      }
     }
 
     context ">=="
