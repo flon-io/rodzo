@@ -20,44 +20,48 @@ mne_tos() L=21 I=2
       matches strings (insensitive) L=113 I=20
       understands !~== (hit) L=117 I=21
       understands !~== (miss) (FAILED) L=121 I=22
-    ^== L=125 I=23
-      starts with (success) L=129 I=24
-      starts with (failure) (FAILED) L=133 I=25
-      starts and ends quickly if the result is NULL (FAILED) L=137 I=26
-      starts with (insensitive) L=141 I=27
-      understands !^== (hit) L=145 I=28
-      understands !^== (miss) (FAILED) L=149 I=29
-    $== L=153 I=30
-      ends with (success) L=157 I=31
-      ends with (failure) (FAILED) L=161 I=32
-      ends quickly if the result is NULL (FAILED) L=165 I=33
-      ends with (insensitive) L=169 I=34
-      understands !$== (hit) L=173 I=35
-      understands !$== (failure) (FAILED) L=177 I=36
-    >== L=181 I=37
-      accepts >== for 'contains' (hit) L=185 I=38
-      accepts >== for 'contains' (miss) (FAILED) L=189 I=39
-      accepts >==i for 'contains, whatever the case' L=193 I=40
-      accepts !>== for 'does not contain' (hit) L=198 I=41
-      accepts !>== for 'does not contain' (miss) (FAILED) L=202 I=42
-      accepts !>==i for 'does not contain, whatever the case' L=206 I=43
-    ===i L=210 I=44
-      accepts ===i for case insensitive comparison L=214 I=45
-      accepts !==i for case insensitive comparison L=218 I=46
-    typed equals L=222 I=47
-      succeeds L=226 I=48
-      fails (FAILED) L=230 I=49
-      fails 'f' (FAILED) L=234 I=50
-      fails 'zd' (FAILED) L=238 I=51
-    accepts empty specs L=242 I=52
-mne_tos() L=254 I=55
-  birds are flying L=255 I=56
-    finds the コンビニ convenient L=259 I=57
-    is OK with "double quotes" and 	abs (FAILED) L=263 I=58
+      doesn't mind NULL values (miss) (FAILED) L=126 I=23
+    ^== L=130 I=24
+      starts with (success) L=134 I=25
+      starts with (failure) (FAILED) L=138 I=26
+      starts and ends quickly if the result is NULL (FAILED) L=142 I=27
+      starts with (insensitive) L=146 I=28
+      understands !^== (hit) L=150 I=29
+      understands !^== (miss) (FAILED) L=154 I=30
+      doesn't mind NULL values (miss) (FAILED) L=159 I=31
+    $== L=163 I=32
+      ends with (success) L=167 I=33
+      ends with (failure) (FAILED) L=171 I=34
+      ends quickly if the result is NULL (FAILED) L=175 I=35
+      ends with (insensitive) L=179 I=36
+      understands !$== (hit) L=183 I=37
+      understands !$== (failure) (FAILED) L=187 I=38
+      doesn't mind NULL values (miss) (FAILED) L=192 I=39
+    >== L=196 I=40
+      accepts >== for 'contains' (hit) L=200 I=41
+      accepts >== for 'contains' (miss) (FAILED) L=204 I=42
+      accepts >==i for 'contains, whatever the case' L=208 I=43
+      accepts !>== for 'does not contain' (hit) L=212 I=44
+      accepts !>== for 'does not contain' (miss) (FAILED) L=216 I=45
+      accepts !>==i for 'does not contain, whatever the case' L=220 I=46
+      doesn't mind NULL values (miss) (FAILED) L=225 I=47
+    ===i L=229 I=48
+      accepts ===i for case insensitive comparison L=233 I=49
+      accepts !==i for case insensitive comparison L=237 I=50
+    typed equals L=241 I=51
+      succeeds L=245 I=52
+      fails (FAILED) L=249 I=53
+      fails 'f' (FAILED) L=253 I=54
+      fails 'zd' (FAILED) L=257 I=55
+    accepts empty specs L=261 I=56
+mne_tos() L=273 I=59
+  birds are flying L=274 I=60
+    finds the コンビニ convenient L=278 I=61
+    is OK with "double quotes" and 	abs (FAILED) L=282 I=62
     does not care about 
- (FAILED) L=267 I=59
-mne_toi() L=277 I=61
-  flips burgers L=281 I=62
+ (FAILED) L=286 I=63
+mne_toi() L=296 I=65
+  flips burgers L=300 I=66
 
 Failures:
 
@@ -92,70 +96,89 @@ Failures:
      not to match "bl[aeu]h"
      >        ensure("blah" !~== "bl[aeu]h");<
      # ../spec/mnemo_0_spec.c:121 L=121 I=22
-  8) mne_tos() cows are flying ^== starts with (failure) 
+  8) mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
+     result is NULL
+     >        ensure(v ~== "bl[aeu]h");<
+     # ../spec/mnemo_0_spec.c:126 L=126 I=23
+  9) mne_tos() cows are flying ^== starts with (failure) 
           expected "this is true"
      to start with "that "
      >        ensure("this is true" ^== "that ");<
-     # ../spec/mnemo_0_spec.c:133 L=133 I=25
-  9) mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
+     # ../spec/mnemo_0_spec.c:138 L=138 I=26
+  10) mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
           expected (null)
      to start with "that "
      >        ensure(NULL ^== "that ");<
-     # ../spec/mnemo_0_spec.c:137 L=137 I=26
-  10) mne_tos() cows are flying ^== understands !^== (miss) 
+     # ../spec/mnemo_0_spec.c:142 L=142 I=27
+  11) mne_tos() cows are flying ^== understands !^== (miss) 
               expected "this is true"
      not to start with "this "
      >        ensure("this is true" !^== "this ");<
-     # ../spec/mnemo_0_spec.c:149 L=149 I=29
-  11) mne_tos() cows are flying $== ends with (failure) 
+     # ../spec/mnemo_0_spec.c:154 L=154 I=30
+  12) mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
+          expected (null)
+     to start with "blah"
+     >        ensure(v ^== "blah");<
+     # ../spec/mnemo_0_spec.c:159 L=159 I=31
+  13) mne_tos() cows are flying $== ends with (failure) 
         expected "this is true"
      to end with " false"
      >        ensure("this is true" $== " false");<
-     # ../spec/mnemo_0_spec.c:161 L=161 I=32
-  12) mne_tos() cows are flying $== ends quickly if the result is NULL 
+     # ../spec/mnemo_0_spec.c:171 L=171 I=34
+  14) mne_tos() cows are flying $== ends quickly if the result is NULL 
         expected (null)
      to end with " false"
      >        ensure(NULL $== " false");<
-     # ../spec/mnemo_0_spec.c:165 L=165 I=33
-  13) mne_tos() cows are flying $== understands !$== (failure) 
+     # ../spec/mnemo_0_spec.c:175 L=175 I=35
+  15) mne_tos() cows are flying $== understands !$== (failure) 
             expected "this is true"
      not to end with " true"
      >        ensure("this is true" !$== " true");<
-     # ../spec/mnemo_0_spec.c:177 L=177 I=36
-  14) mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
+     # ../spec/mnemo_0_spec.c:187 L=187 I=38
+  16) mne_tos() cows are flying $== doesn't mind NULL values (miss) 
+        expected (null)
+     to end with "blah"
+     >        ensure(v $== "blah");<
+     # ../spec/mnemo_0_spec.c:192 L=192 I=39
+  17) mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
        expected "this is True"
      to contain "is Fal"
      >        expect("this is True" >== "is Fal");<
-     # ../spec/mnemo_0_spec.c:189 L=189 I=39
-  15) mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
+     # ../spec/mnemo_0_spec.c:204 L=204 I=42
+  18) mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
            expected "this is True"
      not to contain "is is"
      >        expect("this is True" !>== "is is");<
-     # ../spec/mnemo_0_spec.c:202 L=202 I=42
-  16) mne_tos() cows are flying typed equals fails 
+     # ../spec/mnemo_0_spec.c:216 L=216 I=45
+  19) mne_tos() cows are flying >== doesn't mind NULL values (miss) 
+       expected (null)
+     to contain "blah"
+     >        ensure(v >== "blah");<
+     # ../spec/mnemo_0_spec.c:225 L=225 I=47
+  20) mne_tos() cows are flying typed equals fails 
      expected 1
         to == 2
      >        expect(1 i== 2);<
-     # ../spec/mnemo_0_spec.c:230 L=230 I=49
-  17) mne_tos() cows are flying typed equals fails 'f' 
+     # ../spec/mnemo_0_spec.c:249 L=249 I=53
+  21) mne_tos() cows are flying typed equals fails 'f' 
      expected 1.000000
         to == 2.000000
      >        expect(1.0 f== 2.0);<
-     # ../spec/mnemo_0_spec.c:234 L=234 I=50
-  18) mne_tos() cows are flying typed equals fails 'zd' 
+     # ../spec/mnemo_0_spec.c:253 L=253 I=54
+  22) mne_tos() cows are flying typed equals fails 'zd' 
      expected -1
         to == 0
      >        expect(-1 zd== 0);<
-     # ../spec/mnemo_0_spec.c:238 L=238 I=51
-  19) mne_tos() birds are flying is OK with "double quotes" and 	abs 
+     # ../spec/mnemo_0_spec.c:257 L=257 I=55
+  23) mne_tos() birds are flying is OK with "double quotes" and 	abs 
      >      ensure(1 == 2);<
-     # ../spec/mnemo_1_spec.c:15 L=263 I=58
-  20) mne_tos() birds are flying does not care about 
+     # ../spec/mnemo_1_spec.c:15 L=282 I=62
+  24) mne_tos() birds are flying does not care about 
  
      >      expect(1 == 2);<
-     # ../spec/mnemo_1_spec.c:19 L=267 I=59
+     # ../spec/mnemo_1_spec.c:19 L=286 I=63
 
-46 examples, 47 tests seen, 20 failures
+50 examples, 51 tests seen, 24 failures
 
 Failed examples:
 
@@ -166,18 +189,22 @@ make spec L=79 # mne_tos() cows are flying === doesn't crash when strings are NU
 make spec L=83 # mne_tos() cows are flying === compares to NULL 
 make spec L=109 # mne_tos() cows are flying ~== matches strings 2 (failure) 
 make spec L=121 # mne_tos() cows are flying ~== understands !~== (miss) 
-make spec L=133 # mne_tos() cows are flying ^== starts with (failure) 
-make spec L=137 # mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
-make spec L=149 # mne_tos() cows are flying ^== understands !^== (miss) 
-make spec L=161 # mne_tos() cows are flying $== ends with (failure) 
-make spec L=165 # mne_tos() cows are flying $== ends quickly if the result is NULL 
-make spec L=177 # mne_tos() cows are flying $== understands !$== (failure) 
-make spec L=189 # mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
-make spec L=202 # mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
-make spec L=230 # mne_tos() cows are flying typed equals fails 
-make spec L=234 # mne_tos() cows are flying typed equals fails 'f' 
-make spec L=238 # mne_tos() cows are flying typed equals fails 'zd' 
-make spec L=263 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
-make spec L=267 # mne_tos() birds are flying does not care about 
+make spec L=126 # mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
+make spec L=138 # mne_tos() cows are flying ^== starts with (failure) 
+make spec L=142 # mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
+make spec L=154 # mne_tos() cows are flying ^== understands !^== (miss) 
+make spec L=159 # mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
+make spec L=171 # mne_tos() cows are flying $== ends with (failure) 
+make spec L=175 # mne_tos() cows are flying $== ends quickly if the result is NULL 
+make spec L=187 # mne_tos() cows are flying $== understands !$== (failure) 
+make spec L=192 # mne_tos() cows are flying $== doesn't mind NULL values (miss) 
+make spec L=204 # mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
+make spec L=216 # mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
+make spec L=225 # mne_tos() cows are flying >== doesn't mind NULL values (miss) 
+make spec L=249 # mne_tos() cows are flying typed equals fails 
+make spec L=253 # mne_tos() cows are flying typed equals fails 'f' 
+make spec L=257 # mne_tos() cows are flying typed equals fails 'zd' 
+make spec L=282 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
+make spec L=286 # mne_tos() birds are flying does not care about 
  
 

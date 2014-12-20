@@ -59,6 +59,9 @@
         it "understands !~== (miss)"
         {
         }
+        it "doesn't mind NULL values (miss)"
+        {
+        }
       }
       context "^=="
       {
@@ -78,6 +81,9 @@
         {
         }
         it "understands !^== (miss)"
+        {
+        }
+        it "doesn't mind NULL values (miss)"
         {
         }
       }
@@ -101,6 +107,9 @@
         it "understands !$== (failure)"
         {
         }
+        it "doesn't mind NULL values (miss)"
+        {
+        }
       }
       context ">=="
       {
@@ -120,6 +129,9 @@
         {
         }
         it "accepts !>==i for 'does not contain, whatever the case'"
+        {
+        }
+        it "doesn't mind NULL values (miss)"
         {
         }
       }

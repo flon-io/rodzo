@@ -1,5 +1,6 @@
 
-CFLAGS=-fPIC -O3 -g -Wall -Werror
+#CFLAGS=-fPIC -O3 -g -Wall -Werror
+CFLAGS=-fPIC -g -Wall -Werror
 LDLIBS=
 CC=c99
 NAME=mnemo

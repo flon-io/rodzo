@@ -120,6 +120,11 @@ describe "mne_tos()"
       {
         ensure("blah" !~== "bl[aeu]h");
       }
+      it "doesn't mind NULL values (miss)"
+      {
+        char *v = NULL;
+        ensure(v ~== "bl[aeu]h");
+      }
     }
 
     context "^=="
@@ -147,6 +152,11 @@ describe "mne_tos()"
       it "understands !^== (miss)"
       {
         ensure("this is true" !^== "this ");
+      }
+      it "doesn't mind NULL values (miss)"
+      {
+        char *v = NULL;
+        ensure(v ^== "blah");
       }
     }
 
@@ -176,6 +186,11 @@ describe "mne_tos()"
       {
         ensure("this is true" !$== " true");
       }
+      it "doesn't mind NULL values (miss)"
+      {
+        char *v = NULL;
+        ensure(v $== "blah");
+      }
     }
 
     context ">=="
@@ -192,7 +207,6 @@ describe "mne_tos()"
       {
         expect("this is True" >==i "is tru");
       }
-
       it "accepts !>== for 'does not contain' (hit)"
       {
         expect("this is True" !>== "false");
@@ -204,6 +218,11 @@ describe "mne_tos()"
       it "accepts !>==i for 'does not contain, whatever the case'"
       {
         expect("this is True" !>==i "is fal");
+      }
+      it "doesn't mind NULL values (miss)"
+      {
+        char *v = NULL;
+        ensure(v >== "blah");
       }
     }
 

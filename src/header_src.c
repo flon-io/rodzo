@@ -302,6 +302,8 @@ char *rdz_string_neq(char *operator, char *result, char *not_expected)
 
 char *rdz_string_match(char *operator, char *result, char *expected)
 {
+  if (result == NULL) return rdz_strdup("     result is NULL");
+
   char *s = NULL;
 
   int flags = REG_EXTENDED;
