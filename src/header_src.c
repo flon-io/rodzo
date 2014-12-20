@@ -322,13 +322,17 @@ char *rdz_string_match(char *operator, char *result, char *expected)
 
 char *rdz_string_start(char *operator, char *result, char *expected)
 {
-  if (
+  int success =
     result &&
-    rdz_strcmp(
-      operator, result, expected, strlen(expected)) == 0
-  ) return NULL;
+    rdz_strcmp(operator, result, expected, strlen(expected)) == 0;
 
-  return rdz_string_expected(result, "to start with", expected);
+  if (operator[0] == '!')
+  {
+    return success ?
+      rdz_string_expected(result, "not to start with", expected) : NULL;
+  }
+  return success ?
+    NULL : rdz_string_expected(result, "to start with", expected);
 }
 
 char *rdz_string_end(char *operator, char *result, char *expected)

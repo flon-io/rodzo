@@ -68,6 +68,12 @@
         it "starts with (insensitive)"
         {
         }
+        it "understands !^== (hit)"
+        {
+        }
+        it "understands !^== (failure)"
+        {
+        }
       }
       context "$=="
       {

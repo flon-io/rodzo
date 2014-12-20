@@ -132,6 +132,14 @@ describe "mne_tos()"
       {
         ensure("THIS is true" ^==i "this ");
       }
+      it "understands !^== (hit)"
+      {
+        ensure("this is true" !^== "that ");
+      }
+      it "understands !^== (failure)"
+      {
+        ensure("this is true" !^== "this ");
+      }
     }
 
     context "$=="
