@@ -313,7 +313,13 @@ char *rdz_string_match(char *operator, char *result, char *expected)
 
   if (regexec(r, result, 0, ms, 0)) // no match
   {
-    s = rdz_string_expected(result, "to match", expected);
+    if (operator[0] != '!')
+      s = rdz_string_expected(result, "to match", expected);
+  }
+  else // match
+  {
+    if (operator[0] == '!')
+      s = rdz_string_expected(result, "not to match", expected);
   }
   regfree(r); free(r);
 

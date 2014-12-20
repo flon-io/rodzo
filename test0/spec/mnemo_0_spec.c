@@ -104,13 +104,21 @@ describe "mne_tos()"
       {
         ensure(mne_tos(47) ~== "[iI]a");
       }
-      it "matches strings 2 (fail)"
+      it "matches strings 2 (failure)"
       {
         ensure(mne_tos(47) ~== "[xy]a");
       }
       it "matches strings (insensitive)"
       {
         ensure("IA" ~==i "[ijk]a");
+      }
+      it "understands !~== (hit)"
+      {
+        ensure("blah" !~== "bl[eu]h");
+      }
+      it "understands !~== (miss)"
+      {
+        ensure("blah" !~== "bl[aeu]h");
       }
     }
 
@@ -136,7 +144,7 @@ describe "mne_tos()"
       {
         ensure("this is true" !^== "that ");
       }
-      it "understands !^== (failure)"
+      it "understands !^== (miss)"
       {
         ensure("this is true" !^== "this ");
       }

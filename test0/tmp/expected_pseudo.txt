@@ -47,10 +47,16 @@
         it "matches strings 1"
         {
         }
-        it "matches strings 2 (fail)"
+        it "matches strings 2 (failure)"
         {
         }
         it "matches strings (insensitive)"
+        {
+        }
+        it "understands !~== (hit)"
+        {
+        }
+        it "understands !~== (miss)"
         {
         }
       }
@@ -71,7 +77,7 @@
         it "understands !^== (hit)"
         {
         }
-        it "understands !^== (failure)"
+        it "understands !^== (miss)"
         {
         }
       }
