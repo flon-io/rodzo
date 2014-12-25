@@ -8,10 +8,10 @@ T=0
 #
 # "make test T=1" can be used too
 #
-test:
-	$(MAKE) && $(MAKE) -C test$(T) spec
-vtest:
-	$(MAKE) && $(MAKE) -C test$(T) vspec
+test: build
+	$(MAKE) -C test$(T) spec
+vtest: build
+	$(MAKE) -C test$(T) vspec
 
 TS=$(shell ls -1 | grep test.)
 #
