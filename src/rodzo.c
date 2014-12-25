@@ -379,12 +379,17 @@ line_s *split(char *line)
       if (c == ' ' || c == '\t') { ++l->indent; continue; }
       l->head = calloc(len, sizeof(char)); l->head[0] = c; k = 1;
     }
-    else if (l->text == NULL) // listing head
+    else if (l->text == NULL) // gathering head
     {
-      if (c != '"' && c != '(') { l->head[k++] = c; }
-      else { l->text = calloc(len, sizeof(char)); k = 0; }
+      if (strchr("\"( \t", c)) { l->text = calloc(len, sizeof(char)); k = len; }
+      else { l->head[k++] = c; }
     }
-    else if (k > -1) // listing text
+    else if (k == len) // space before text
+    {
+      if (strchr("\"( \t", c)) continue;
+      k = 0; l->text[k++] = c;
+    }
+    else if (k > -1) // gathering text
     {
       if (escape == 0 && c == '"') k = -1;
       else l->text[k++] = c;
@@ -661,14 +666,13 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {
-      //char *tline = flu_strtrim(line);
-      char *tline = strdup(l->line);
+      char *tline = flu_sprintf("%s %s", l->head, l->text);
       char t = 'b'; // "before each"
-      if (strncmp(tline, "before all", 10) == 0) t = 'B';
-      else if (strncmp(tline, "before each off", 15) == 0) t = 'y';
-      else if (strncmp(tline, "after each off", 14) == 0) t = 'z';
-      else if (strncmp(tline, "after each", 10) == 0) t = 'a';
-      else if (strncmp(tline, "after all", 9) == 0) t = 'A';
+      if (strcmp(tline, "before all") == 0) t = 'B';
+      else if (strcmp(tline, "before each offline") == 0) t = 'y';
+      else if (strcmp(tline, "after each offline") == 0) t = 'z';
+      else if (strcmp(tline, "after each") == 0) t = 'a';
+      else if (strcmp(tline, "after all") == 0) t = 'A';
       push(c, l->indent, t, tline, path, lnumber);
       free(tline);
     }
