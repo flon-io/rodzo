@@ -305,54 +305,102 @@ void pull(context_s *c, int indent, int lnumber)
 //
 // processing work
 
-int extract_indent(char *line)
+typedef struct line_s {
+  int indent;
+  char *head;
+  char *text;
+  char *line;
+  int comment; // 0 no change, 1 comment started, -1 comment ended
+} line_s;
+
+void line_s_free(line_s *l)
 {
-  for (int i = 0; i < strlen(line); i++)
+  free(l->head);
+  free(l->text);
+  free(l->line);
+  free(l);
+}
+
+char *line_s_to_s(line_s *l, int colour)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  char *con = colour ? "[1;33m" : "";
+  char *coff = colour ? "[0;00m" : "";
+
+  flu_sbprintf(
+    b,
+    "(l i%i c%i h>%s%s%s< t>%s%s%s< l>%s%s%s<)",
+    l->indent, l->comment,
+    con, l->head, coff, con, l->text, coff, con, l->line, coff);
+
+  return flu_sbuffer_to_string(b);
+}
+
+void rtrim(char *s)
+{
+  if (s) for (size_t i = strlen(s); i > 0; --i)
   {
-    if (*(line + i) == ' ') continue;
-    if (*(line + i) == '\t') continue;
-    return i;
+    char c = s[i - 1];
+    if (strchr(" \t\r\n", c) == NULL) break;
+    s[i - 1] = 0;
   }
-  return -1;
 }
 
-char *extract_head(char *line)
+line_s *split(char *line)
 {
-  char *stop = strpbrk(line, "     (");
+  size_t len = strlen(line) + 1;
+  line_s *l = calloc(1, sizeof(line_s));
+  l->indent = 0;
+  l->head = NULL;
+  l->text = NULL;
+  l->line = calloc(len, sizeof(char));
+  l->comment = 0;
 
-  if (stop == NULL) return flu_strrtrim(line);
-  if (stop == line) return extract_head(line + 1);
-  return strndup(line, stop - line);
-}
+  int comment = 0;
+  int string = 0;
+  int escape = 0;
 
-char *extract_string(char *line)
-{
-  char *l = line;
-  char *r = (char *)calloc(strlen(line), sizeof(char));
-  char *rr = r;
-  char prev = 0;
-
-  while (1)
+  for (ssize_t i = 0, j = 0, k = 0; i < len; ++i)
   {
-    if (*l == '\0') break;
-    else if (*l == '"' && prev != '\\') break;
-    *(rr++) = *l;
-    prev = *l;
-    ++l;
+    char c = line[i]; char c1 = line[i + 1];
+
+    if (string == 0 && c == '*' && c1 == '/') { comment = 0; ++i; continue; }
+
+    if (comment) continue;
+
+    if (string == 0 && c == '/' && c1 == '/') break;
+    if (string == 0 && c == '/' && c1 == '*') { comment = 1; ++i; continue; }
+
+    l->line[j++] = c;
+
+    if (l->head == NULL) // measuring indent
+    {
+      if (c == ' ' || c == '\t') { ++l->indent; continue; }
+      l->head = calloc(len, sizeof(char)); l->head[0] = c; k = 1;
+    }
+    else if (l->text == NULL) // listing head
+    {
+      if (c != '"' && c != '(') { l->head[k++] = c; }
+      else { l->text = calloc(len, sizeof(char)); k = 0; }
+    }
+    else if (k > -1) // listing text
+    {
+      if (escape == 0 && c == '"') k = -1;
+      else l->text[k++] = c;
+    }
+
+    if (escape == 0 && c == '"') string = ! string;
+    escape = (c == '\\');
   }
 
-  if (*l == '"') return r;
+  rtrim(l->head);
+  rtrim(l->text);
+  rtrim(l->line);
 
-  free(r);
-  return NULL;
-}
+  l->comment = comment;
 
-char *extract_text(char *line)
-{
-  char *start = strpbrk(line, "\"");
-  if (start == NULL) return NULL;
-
-  return extract_string(start + 1);
+  return l;
 }
 
 size_t last_relevant_char(char *line)
@@ -379,6 +427,7 @@ size_t last_relevant_char(char *line)
 
 int ends_in_semicolon(char *line)
 {
+  //printf("eis() >%s<\n", line);
   return (line[last_relevant_char(line)] == ';');
 }
 
@@ -576,12 +625,6 @@ void push_pending(context_s *c, int ind, char *text, char *fn, int lstart)
   }
 }
 
-char *rtrim(char *s)
-{
-  // TODO: chop comments
-  return flu_strrtrim(s);
-}
-
 void process_lines(context_s *c, char *path)
 {
   push(c, 0, 'g', NULL, path, 0);
@@ -597,74 +640,65 @@ void process_lines(context_s *c, char *path)
   {
     lnumber++;
 
-    int indent = extract_indent(line);
-    char *head = extract_head(line);
-    char *text = extract_text(line);
+    line_s *l = split(line);
 
-    //printf("line: >%s<\n", line);
-    //printf("head: >%s<\n", head);
-    //printf("  text: >%s<\n", text);
+    //printf("** >[1;33m%s[0;00m<\n", line);
+    //char *ls = line_s_to_s(l, 1); printf("   %s\n", ls); free(ls);
 
-    //char ctype = 'X';
     int cindent = -1;
-    if (c->node != NULL)
-    {
-      //ctype = c->node->type;
-      cindent = c->node->indent;
-    }
+    if (c->node != NULL) cindent = c->node->indent;
 
-    if (strcmp(head, "{") == 0 && indent == cindent)
+    char *head = l->head ? l->head : "";
+
+    if (strcmp(head, "{") == 0 && l->indent == cindent)
     {
       c->node->hasbody = 1;
     }
-    //else if (strcmp(head, "}") == 0 && (indent <= cindent || ctype != 'i'))
-    else if (strcmp(head, "}") == 0 && indent <= cindent)
+    else if (strcmp(head, "}") == 0 && l->indent <= cindent)
     {
       //printf("i: %d, ci: %d, ct: %c\n", indent, cindent, ctype);
-      pull(c, indent, lnumber);
+      pull(c, l->indent, lnumber);
     }
     else if (strcmp(head, "before") == 0 || strcmp(head, "after") == 0)
     {
-      char *tline = flu_strtrim(line);
+      //char *tline = flu_strtrim(line);
+      char *tline = strdup(l->line);
       char t = 'b'; // "before each"
       if (strncmp(tline, "before all", 10) == 0) t = 'B';
       else if (strncmp(tline, "before each off", 15) == 0) t = 'y';
       else if (strncmp(tline, "after each off", 14) == 0) t = 'z';
       else if (strncmp(tline, "after each", 10) == 0) t = 'a';
       else if (strncmp(tline, "after all", 9) == 0) t = 'A';
-      push(c, indent, t, tline, path, lnumber);
+      push(c, l->indent, t, tline, path, lnumber);
       free(tline);
     }
     else if (strcmp(head, "describe") == 0)
     {
-      push(c, indent, 'd', text, path, lnumber);
+      push(c, l->indent, 'd', l->text, path, lnumber);
     }
     else if (strcmp(head, "context") == 0)
     {
-      push(c, indent, 'c', text, path, lnumber);
+      push(c, l->indent, 'c', l->text, path, lnumber);
     }
     else if (strcmp(head, "it") == 0 || strcmp(head, "they") == 0)
     {
-      push(c, indent, 'i', text, path, lnumber);
-      char *l = rtrim(line);
-      if (flu_strends(l, "{")) c->node->hasbody = 1;
-      free(l);
+      push(c, l->indent, 'i', l->text, path, lnumber);
+      if (flu_strends(l->line, "{")) c->node->hasbody = 1;
     }
     else if (strcmp(head, "ensure") == 0 || strcmp(head, "expect") == 0)
     {
-      lnumber = push_ensure(c, in, indent, lnumber, line);
+      lnumber = push_ensure(c, in, l->indent, lnumber, line);
     }
     else if (strcmp(head, "pending") == 0)
     {
-      push_pending(c, indent, text, path, lnumber);
+      push_pending(c, l->indent, l->text, path, lnumber);
     }
     else
     {
       push_line(c, line);
     }
 
-    free(head);
-    free(text);
+    line_s_free(l);
   }
 
   free(line);
@@ -961,6 +995,10 @@ flu_list *list_spec_files(int argc, char *argv[])
   return l;
 }
 
+
+//
+// main
+
 int print_usage()
 {
   printf("rodzo usage...");
@@ -1033,4 +1071,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-

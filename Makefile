@@ -13,6 +13,9 @@ test: build
 vtest: build
 	$(MAKE) -C test$(T) vspec
 
+rtest: build
+	bin/rodzo --test
+
 TS=$(shell ls -1 | grep test.)
 #
 clean:
