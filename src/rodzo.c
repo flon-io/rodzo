@@ -986,10 +986,16 @@ flu_list *list_spec_files(int argc, char *argv[])
 //
 // main
 
-int print_usage()
+int print_usage(char *arg0)
 {
-  printf("rodzo usage...");
-  // TODO: write usage
+  fprintf(stderr, "" "\n");
+  fprintf(stderr, "# rodzo" "\n");
+  fprintf(stderr, "" "\n");
+  fprintf(stderr, "%s [-o outfile] [-d] [dirs or spec files]" "\n", arg0);
+  fprintf(stderr, "" "\n");
+  fprintf(stderr, "  turns a spec fileset into a compilable spec.c file" "\n");
+  fprintf(stderr, "" "\n");
+
   return 1;
 }
 
@@ -1011,13 +1017,15 @@ int main(int argc, char *argv[])
   {
     char *a = argv[i];
     if (strcmp(a, "-o") == 0) {
-      if (i + 1 >= argc) return print_usage(); // TODO: print then die?
+      if (i + 1 >= argc) return print_usage(argv[0]);
       c->out_fname = strdup(argv[++i]);
     }
     else if (strcmp(a, "-d") == 0) {
       c->debug = 1;
     }
   }
+    //
+    // TODO: use getopt
 
   if (c->out_fname == NULL) c->out_fname = strdup("spec.c");
 
