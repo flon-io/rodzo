@@ -386,12 +386,13 @@ line_s *split(char *line)
     }
     else if (k == len) // space before text
     {
-      if (strchr("\"( \t", c)) continue;
-      k = 0; l->text[k++] = c;
+      if (strchr("\"() \t", c) == NULL) { k = 0; l->text[k++] = c; }
+      else if (c == ')') k = -1;
     }
     else if (k > -1) // gathering text
     {
-      if (escape == 0 && c == '"') k = -1;
+      if (string == 1 && escape == 0 && c == '"') k = -1;
+      else if (string == 0 && c == ')') k = -1;
       else l->text[k++] = c;
     }
 
@@ -616,17 +617,18 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   return lnumber;
 }
 
-void push_pending(context_s *c, int ind, char *text, char *fn, int lstart)
+void push_pending(context_s *c, line_s *l, char *fn, int lstart)
 {
   node_s *cn = c->node;
-  if (cn->type == 'i' && cn->indent < ind)
+
+  if (cn->type == 'i' && cn->indent < l->indent)
   {
-    push(c, ind, 'p', text, fn, lstart);
+    push(c, l->indent, 'p', strlen(l->text) > 0 ? l->text : NULL, fn, lstart);
   }
   else // lonely p
   {
-    push(c, ind, 'i', text, fn, lstart);
-    push(c, ind + 2, 'p', NULL, fn, lstart); // "no reason given"
+    push(c, l->indent, 'i', l->text, fn, lstart);
+    push(c, l->indent + 2, 'p', NULL, fn, lstart); // "no reason given"
   }
 }
 
@@ -647,8 +649,8 @@ void process_lines(context_s *c, char *path)
 
     line_s *l = split(line);
 
-    //printf("** >[1;33m%s[0;00m<\n", line);
-    //char *ls = line_s_to_s(l, 1); printf("   %s\n", ls); free(ls);
+    printf("** >[1;33m%s[0;00m<\n", line);
+    char *ls = line_s_to_s(l, 1); printf("   %s\n", ls); free(ls);
 
     int cindent = -1;
     if (c->node != NULL) cindent = c->node->indent;
@@ -695,7 +697,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "pending") == 0)
     {
-      push_pending(c, l->indent, l->text, path, lnumber);
+      push_pending(c, l, path, lnumber);
     }
     else
     {
