@@ -459,15 +459,9 @@ regex_t ensure_operator_rex;
 
 char *chop_right(char *s)
 {
-  // TODO: too naive, have to survive comments... // and /*
+  char *brackend = strrchr(s, ')');
+  if (brackend) *brackend = 0;
 
-  size_t l = strlen(s);
-  for (size_t i = l - 1; i > 0; i--)
-  {
-    char c = s[i];
-    s[i] = '\0';
-    if (c == ')') break;
-  }
   return s;
 }
 
