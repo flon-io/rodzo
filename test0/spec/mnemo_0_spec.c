@@ -290,6 +290,18 @@ describe "mne_tos()"
       }
     }
 
+    /*
+    it "DOES NOT RUN THIS SPEC"
+    {
+      ensure(0 i== 1);
+    }
+    */
+
+    /*it "DOES NOT RUN THIS SPEC EITHER"
+    {
+      ensure(0 i== 1);
+    }*/
+
     it "accepts empty specs"
     {
       // has to be green

@@ -61,15 +61,15 @@ mne_tos() L=21 I=2
       fails (FAILED) L=281 I=61
       fails 'f' (FAILED) L=285 I=62
       fails 'zd' (FAILED) L=289 I=63
-    accepts empty specs L=293 I=64
-mne_tos() L=305 I=67
-  birds are flying L=306 I=68
-    finds the コンビニ convenient L=310 I=69
-    is OK with "double quotes" and 	abs (FAILED) L=314 I=70
+    accepts empty specs L=305 I=64
+mne_tos() L=317 I=67
+  birds are flying L=318 I=68
+    finds the コンビニ convenient L=322 I=69
+    is OK with "double quotes" and 	abs (FAILED) L=326 I=70
     does not care about 
- (FAILED) L=318 I=71
-mne_toi() L=328 I=73
-  flips burgers L=332 I=74
+ (FAILED) L=330 I=71
+mne_toi() L=340 I=73
+  flips burgers L=344 I=74
 
 Failures:
 
@@ -192,11 +192,11 @@ Failures:
      # ../spec/mnemo_0_spec.c:289 L=289 I=63
   26) mne_tos() birds are flying is OK with "double quotes" and 	abs 
      >      ensure(1 == 2);<
-     # ../spec/mnemo_1_spec.c:15 L=314 I=70
+     # ../spec/mnemo_1_spec.c:15 L=326 I=70
   27) mne_tos() birds are flying does not care about 
  
      >      expect(1 == 2);<
-     # ../spec/mnemo_1_spec.c:19 L=318 I=71
+     # ../spec/mnemo_1_spec.c:19 L=330 I=71
 
 57 examples, 58 tests seen, 27 failures
 
@@ -227,7 +227,7 @@ make spec L=257 # mne_tos() cows are flying >== doesn't mind NULL values (miss)
 make spec L=281 # mne_tos() cows are flying typed equals fails 
 make spec L=285 # mne_tos() cows are flying typed equals fails 'f' 
 make spec L=289 # mne_tos() cows are flying typed equals fails 'zd' 
-make spec L=314 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
-make spec L=318 # mne_tos() birds are flying does not care about 
+make spec L=326 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
+make spec L=330 # mne_tos() birds are flying does not care about 
  
 

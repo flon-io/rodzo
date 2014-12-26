@@ -347,7 +347,7 @@ void rtrim(char *s)
   }
 }
 
-line_s *split(char *line)
+line_s *split(int comment, char *line)
 {
   size_t len = strlen(line) + 1;
   line_s *l = calloc(1, sizeof(line_s));
@@ -355,9 +355,8 @@ line_s *split(char *line)
   l->head = NULL;
   l->text = NULL;
   l->line = calloc(len, sizeof(char));
-  l->comment = 0;
+  l->comment = comment;
 
-  int comment = 0;
   int string = 0;
   int escape = 0;
 
@@ -365,12 +364,12 @@ line_s *split(char *line)
   {
     char c = line[i]; char c1 = line[i + 1];
 
-    if (string == 0 && c == '*' && c1 == '/') { comment = 0; ++i; continue; }
+    if ( ! string && c == '*' && c1 == '/') { l->comment = -1; ++i; continue; }
 
-    if (comment) continue;
+    if (l->comment == 1) continue;
 
-    if (string == 0 && c == '/' && c1 == '/') break;
-    if (string == 0 && c == '/' && c1 == '*') { comment = 1; ++i; continue; }
+    if ( ! string && c == '/' && c1 == '/') break;
+    if ( ! string && c == '/' && c1 == '*') { l->comment = 1; ++i; continue; }
 
     l->line[j++] = c;
 
@@ -403,8 +402,6 @@ line_s *split(char *line)
   rtrim(l->head);
   rtrim(l->text);
   rtrim(l->line);
-
-  l->comment = comment;
 
   return l;
 }
@@ -642,15 +639,18 @@ void process_lines(context_s *c, char *path)
   int lnumber = 0;
   char *line = NULL;
   size_t len = 0;
+  int comment = 0;
 
   while (getline(&line, &len, in) != -1)
   {
     lnumber++;
 
-    line_s *l = split(line);
+    line_s *l = split(comment, line);
 
-    printf("** >[1;33m%s[0;00m<\n", line);
-    char *ls = line_s_to_s(l, 1); printf("   %s\n", ls); free(ls);
+    //printf("** >[1;33m%s[0;00m<\n", line);
+    //char *ls = line_s_to_s(l, 1); printf("   %s\n", ls); free(ls);
+
+    comment = l->comment;
 
     int cindent = -1;
     if (c->node != NULL) cindent = c->node->indent;
