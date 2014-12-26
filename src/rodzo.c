@@ -412,8 +412,6 @@ line_s *split(int comment, char *line)
 
 int ends_in_semicolon(char *line)
 {
-  printf("eis() >%s<\n", line);
-
   if (*line != 0) for (size_t i = strlen(line) - 1; ; --i)
   {
     char c = line[i];
