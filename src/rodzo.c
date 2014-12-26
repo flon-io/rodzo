@@ -343,7 +343,7 @@ char *line_s_to_s(line_s *l, int colour)
 
 void rtrim(char *s)
 {
-  if (s) for (size_t i = strlen(s); i > 0; --i)
+  if (s && *s != 0) for (size_t i = strlen(s); i > 0; --i)
   {
     char c = s[i - 1];
     if (strchr(" \t\r\n", c) == NULL) break;
@@ -410,32 +410,18 @@ line_s *split(int comment, char *line)
   return l;
 }
 
-size_t last_relevant_char(char *line)
-{
-  size_t i = 0;
-  int instring = 0;
-
-  for (; i < strlen(line); i++)
-  {
-    char c = line[i];
-    if ( ! instring && c == '"') instring = 1;
-    else if (c == '\\') i++;
-    else if (instring && c == '"') instring = 0;
-    else if ( ! instring && c == '/' && line[i + 1] == '/') break;
-  }
-  for (--i; i >= 0; i--)
-  {
-    char c = line[i];
-    if (c != ' ' && c != '\t' && c != '\n') break;
-  }
-
-  return i;
-}
-
 int ends_in_semicolon(char *line)
 {
-  //printf("eis() >%s<\n", line);
-  return (line[last_relevant_char(line)] == ';');
+  printf("eis() >%s<\n", line);
+
+  if (*line != 0) for (size_t i = strlen(line) - 1; ; --i)
+  {
+    char c = line[i];
+    if (c == ';') return 1;
+    if (i > 0 && (c == '\r' || c == '\n')) continue;
+    return 0;
+  }
+  return 0;
 }
 
 char *extract_condition(FILE *in, char *line)
@@ -461,9 +447,9 @@ char *extract_condition(FILE *in, char *line)
   return flu_sbuffer_to_string(b);
 }
 
-int count_lines(char *s)
+size_t count_lines(char *s)
 {
-  int count = -1;
+  size_t count = 0;
   while (*(s++) != '\0') { if (*s == '\n') count++; }
 
   return count;
@@ -492,7 +478,6 @@ char *extract_match(char *s, regmatch_t m)
 
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
-  //printf("l >%s<\n", l);
   l = strpbrk(l, "e");
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
@@ -697,7 +682,7 @@ void process_lines(context_s *c, char *path)
     }
     else if (strcmp(head, "ensure") == 0 || strcmp(head, "expect") == 0)
     {
-      lnumber = push_ensure(c, in, l->indent, lnumber, line);
+      lnumber = push_ensure(c, in, l->indent, lnumber, l->line);
     }
     else if (strcmp(head, "pending") == 0)
     {
