@@ -36,7 +36,11 @@
 
 #include "flutil.h"
 
+
+#define RODZO_VERSION "1.2.0"
+
 #define NODE_MAX_CHILDREN 128
+
 
 
 //
@@ -1061,6 +1065,7 @@ int main(int argc, char *argv[])
     flu_die(1, "couldn't open %s file for writing", c->out_fname);
   }
 
+  fprintf(out, "\n/* rodzo %s */", RODZO_VERSION);
   print_header(out);
   print_body(out, c);
   print_footer(out, c);
