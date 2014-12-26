@@ -478,7 +478,7 @@ char *extract_match(char *s, regmatch_t m)
 
 int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 {
-  l = strpbrk(l, "e");
+  l = strchr(l, 'e');
   char *con = extract_condition(in, l + 6);
   lnumber += count_lines(con);
 
