@@ -61,7 +61,7 @@ typedef struct node_s {
   struct node_s **children;
 } node_s;
 
-typedef struct context_s {
+typedef struct {
   int loffset;
   int nodecount;
   int itcount; // it count
@@ -954,18 +954,13 @@ void add_spec_path(flu_list *l, char *path)
   closedir(dir);
 }
 
-flu_list *list_spec_files(int argc, char *argv[])
+flu_list *list_spec_files(int optind, int argc, char *argv[])
 {
   flu_list *l = flu_list_malloc();
-  size_t args_seen = 0;
 
-  for (int i = 1; i < argc; i++)
+  for (int i = optind; i < argc; i++)
   {
     char *arg = argv[i];
-
-    if (arg[0] == '-') continue;
-
-    ++args_seen;
 
     wordexp_t we;
     wordexp(arg, &we, 0);
@@ -975,7 +970,7 @@ flu_list *list_spec_files(int argc, char *argv[])
     wordfree(&we);
   }
 
-  if (args_seen < 1) add_spec_path(l, ".");
+  if (optind >= argc) add_spec_path(l, ".");
 
   flu_list_isort(l, (int (*)(const void *, const void *))strcmp);
 
@@ -985,6 +980,18 @@ flu_list *list_spec_files(int argc, char *argv[])
 
 //
 // main
+
+char *record_call(int argc, char **argv)
+{
+  flu_sbuffer *b = flu_sbuffer_malloc();
+
+  for (size_t i = 0; i < argc; ++i)
+  {
+    flu_sbputs(b, argv[i]); if (i < argc - 1) flu_sbputc(b, ' ');
+  }
+
+  return flu_sbuffer_to_string(b);
+}
 
 int print_usage(char *arg0)
 {
@@ -1013,25 +1020,22 @@ int main(int argc, char *argv[])
 
   context_s *c = malloc_context();
 
-  for (int i = 1; i < argc; i++)
+  char *call = record_call(argc, argv);
+
+  int badarg = 0;
+  int opt; while ((opt = getopt(argc, argv, "o:d")) != -1)
   {
-    char *a = argv[i];
-    if (strcmp(a, "-o") == 0) {
-      if (i + 1 >= argc) return print_usage(argv[0]);
-      c->out_fname = strdup(argv[++i]);
-    }
-    else if (strcmp(a, "-d") == 0) {
-      c->debug = 1;
-    }
+    if (opt == 'o') c->out_fname = optarg;
+    else if (opt == 'd') c->debug = 1;
+    else badarg = 1;
   }
-    //
-    // TODO: use getopt
+  if (badarg) return print_usage(argv[0]);
 
   if (c->out_fname == NULL) c->out_fname = strdup("spec.c");
 
   // reads specs, grow tree
 
-  flu_list *fnames = list_spec_files(argc, argv);
+  flu_list *fnames = list_spec_files(optind, argc, argv);
 
   for (flu_node *n = fnames->first; n != NULL; n = n->next)
   {
@@ -1051,6 +1055,8 @@ int main(int argc, char *argv[])
   }
 
   fprintf(out, "\n/* rodzo %s */", RODZO_VERSION);
+  fprintf(out, "\n// %s", call); free(call);
+
   print_header(out);
   print_body(out, c);
   print_footer(out, c);
@@ -1067,3 +1073,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+
