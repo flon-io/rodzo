@@ -993,6 +993,17 @@ char *record_call(int argc, char **argv)
   return flu_sbuffer_to_string(b);
 }
 
+char *grab_git_info(char *path)
+{
+  char *dir = flu_dirname(path);
+  char *r = flu_plines("cd %s && git show | head -5", dir);
+  free(dir);
+
+  if (strncmp(r, "fatal:", 6) == 0) { free(r); return NULL; }
+  if (strlen(r) < 1) { free(r); return NULL; }
+  return r;
+}
+
 int print_usage(char *arg0)
 {
   fprintf(stderr, "" "\n");
@@ -1020,6 +1031,7 @@ int main(int argc, char *argv[])
 
   context_s *c = malloc_context();
 
+  char *ginfo = grab_git_info(argv[0]);
   char *call = record_call(argc, argv);
 
   int badarg = 0;
@@ -1055,7 +1067,8 @@ int main(int argc, char *argv[])
   }
 
   fprintf(out, "\n/* rodzo %s */", RODZO_VERSION);
-  fprintf(out, "\n// %s", call); free(call);
+  if (ginfo) fprintf(out, "\n/*\n%s*/", ginfo); free(ginfo);
+  fprintf(out, "\n\n// %s", call); free(call);
 
   print_header(out);
   print_body(out, c);
