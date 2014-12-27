@@ -954,23 +954,27 @@ void add_spec_path(flu_list *l, char *path)
   closedir(dir);
 }
 
-flu_list *list_spec_files(int optind, int argc, char *argv[])
+flu_list *list_spec_files(int argc, char *argv[])
 {
   flu_list *l = flu_list_malloc();
 
-  for (int i = optind; i < argc; i++)
+  int no_args = 1;
+
+  for (int i = 1; i < argc; i++)
   {
-    char *arg = argv[i];
+    if (*argv[i] == '-') continue;
+
+    no_args = 0;
 
     wordexp_t we;
-    wordexp(arg, &we, 0);
+    wordexp(argv[i], &we, 0);
 
     for (size_t j = 0; j < we.we_wordc; j++) add_spec_path(l, we.we_wordv[j]);
 
     wordfree(&we);
   }
 
-  if (optind >= argc) add_spec_path(l, ".");
+  if (no_args) add_spec_path(l, ".");
 
   flu_list_isort(l, (int (*)(const void *, const void *))strcmp);
 
@@ -1035,10 +1039,11 @@ int main(int argc, char *argv[])
   char *call = record_call(argc, argv);
 
   int badarg = 0;
-  int opt; while ((opt = getopt(argc, argv, "o:d")) != -1)
+  for (size_t i = 1; i < argc; ++i)
   {
-    if (opt == 'o') c->out_fname = optarg;
-    else if (opt == 'd') c->debug = 1;
+    if (*argv[i] != '-') continue;
+    if (argv[i][1] == 'o') c->out_fname = strdup(argv[i + 1]);
+    else if (argv[i][1] == 'd') c->debug = 1;
     else badarg = 1;
   }
   if (badarg) return print_usage(argv[0]);
@@ -1047,7 +1052,7 @@ int main(int argc, char *argv[])
 
   // reads specs, grow tree
 
-  flu_list *fnames = list_spec_files(optind, argc, argv);
+  flu_list *fnames = list_spec_files(argc, argv);
 
   for (flu_node *n = fnames->first; n != NULL; n = n->next)
   {
