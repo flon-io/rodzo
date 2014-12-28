@@ -362,6 +362,11 @@ void *flu_list_getd(flu_list *l, const char *key, void *def);
  */
 flu_list *flu_list_dtrim(flu_list *l);
 
+/* Reads a text file of the form "key: value\n"* and returns the corresponding
+ * flu_dict object. Values are all strings.
+ */
+flu_dict *flu_readdict(const char *path, ...);
+
 /* Given a va_list builds a flu_list dict. Is used underneath by flu_d().
  */
 flu_list *flu_vd(va_list ap);
@@ -390,6 +395,10 @@ flu_list *flu_sd(char *k0, ...);
 /* Returns 1 if the string s ends with the end string. Returns 0 else.
  */
 int flu_strends(const char *s, const char *end);
+
+/* Right trims in place, returns s.
+ */
+char *flu_rtrim(char *s);
 
 /* Returns a copy of the string, trimmed on the right.
  */

@@ -57,17 +57,21 @@ int flu_strends(const char *s, const char *end)
   return (strncmp(s + ls - le, end, le) == 0);
 }
 
-char *flu_strrtrim(const char *s)
+char *flu_rtrim(char *s)
 {
-  char *r = strdup(s);
-  for (size_t l = strlen(r); l > 0; l--)
+  if (s) for (size_t l = strlen(s); l > 0; l--)
   {
-    char c = r[l - 1];
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') r[l - 1] = '\0';
+    char c = s[l - 1];
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') s[l - 1] = 0;
     else break;
   }
 
-  return r;
+  return s;
+}
+
+char *flu_strrtrim(const char *s)
+{
+  return flu_rtrim(strdup(s));
 }
 
 char *flu_strtrim(const char *s)
@@ -76,8 +80,7 @@ char *flu_strtrim(const char *s)
   char *s2 = s1;
   while (1)
   {
-    char c = *s2;
-    if (c == ' ' || c == '\t' || c == '\n' || c == '\r') ++s2;
+    if (*s2 == ' ' || *s2 == '\t' || *s2 == '\n' || *s2 == '\r') ++s2;
     else break;
   }
   char *r = strdup(s2);
@@ -91,7 +94,7 @@ ssize_t flu_index(const char *s, size_t off, char c)
   for (size_t i = off; ; ++i)
   {
     char cc = s[i];
-    if (cc == '\0') break;
+    if (cc == 0) break;
     if (cc == c) return i;
   }
   return -1;
@@ -581,10 +584,10 @@ int flu_prune_empty_dirs(const char *path, ...)
 
   int r = 1;
 
+  char *pa = NULL;
+
   DIR *dir = opendir(p);
   if (dir == NULL) goto _over;
-
-  char *pa = NULL;
 
   struct dirent *de;
   while ((de = readdir(dir)) != NULL)
@@ -872,6 +875,42 @@ flu_list *flu_list_dtrim(flu_list *l)
     if (flu_list_getn(r, n->key) != NULL) continue;
     flu_list_add(r, n->item); r->last->key = strdup(n->key);
   }
+
+  return r;
+}
+
+flu_dict *flu_readdict(const char *path, ...)
+{
+  va_list ap; va_start(ap, path);
+  char *s = flu_vreadall(path, ap);
+  va_end(ap);
+
+  if (s == NULL) return NULL;
+
+  char *os = s;
+  flu_dict *r = flu_list_malloc();
+
+  while (1)
+  {
+    while (*s == '\n' || *s == '\r' || *s == ' ' || *s == '\t') ++s;
+    if (s == 0) break;
+
+    char *col = strpbrk(s, ":="); if (col == NULL) break;
+    char *end = strpbrk(s, "\n\r\0");
+
+    char *co = col - 1; while (*co == ' ' || *co == '\t') --co;
+    char *key = strndup(s, co + 1 - s);
+
+    ++col; while (*col == ' ' || *col == '\t') ++col;
+    char *en = end - 1; while (*en == ' ' || *en == '\t') --en;
+    char *val = strndup(col, en + 1 - col);
+
+    flu_list_setk(r, key, val, 0);
+
+    s = end;
+  }
+
+  free(os);
 
   return r;
 }
