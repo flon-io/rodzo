@@ -341,16 +341,6 @@ char *line_s_to_s(line_s *l, int colour)
   return flu_sbuffer_to_string(b);
 }
 
-void rtrim(char *s)
-{
-  if (s && *s != 0) for (size_t i = strlen(s); i > 0; --i)
-  {
-    char c = s[i - 1];
-    if (strchr(" \t\r\n", c) == NULL) break;
-    s[i - 1] = 0;
-  }
-}
-
 line_s *split(int comment, char *line)
 {
   size_t len = strlen(line) + 1;
@@ -403,9 +393,9 @@ line_s *split(int comment, char *line)
     escape = (c == '\\');
   }
 
-  rtrim(l->head);
-  rtrim(l->text);
-  rtrim(l->line);
+  flu_rtrim(l->head);
+  flu_rtrim(l->text);
+  flu_rtrim(l->line);
 
   return l;
 }
