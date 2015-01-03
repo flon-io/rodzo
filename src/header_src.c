@@ -415,6 +415,8 @@ void rdz_extract_arguments()
 
   if (l != NULL)
   {
+    rdz_example = NULL;
+
     rdz_lines = calloc(RDZ_LINES_MAX + 1, sizeof(int));
 
     for (size_t i = 0; i < RDZ_LINES_MAX; i++)
@@ -436,6 +438,8 @@ void rdz_extract_arguments()
 
   if (i != NULL)
   {
+    rdz_example = NULL;
+
     rdz_it = atoi(i);
   }
 
