@@ -35,6 +35,7 @@
 #include <unistd.h> // for isatty()
 #include <regex.h>
 #include <wordexp.h>
+#include <sys/time.h>
 
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
@@ -51,7 +52,7 @@ char *rdz_strndup(char *s, size_t n)
   return r;
 }
 
-typedef int rdz_func();
+typedef double rdz_func();
 
 typedef struct rdz_node {
   int dorun;
@@ -92,6 +93,20 @@ typedef struct rdz_result {
   int lnumber;
   int ltnumber;
 } rdz_result;
+
+double rdz_now()
+{
+  struct timeval tv;
+
+  if (gettimeofday(&tv, NULL) != 0) return 0,0;
+
+  return 1000.0 * tv.tv_sec + tv.tv_usec / 1000.0; // turn to ms
+}
+
+double rdz_duration(double start)
+{
+  return rdz_now() - start; // still ms
+}
 
 char *rdz_determine_title(rdz_node *n)
 {
@@ -193,7 +208,20 @@ void rdz_print_level(int nodenumber)//, int min)
   printf(" %sL=%d I=%d%s\n", rdz_gr(), n->ltstart, n->nodenumber, rdz_cl());
 }
 
-void rdz_print_result(rdz_result *r)
+void rdz_duration_to_s(double duration, char *ca)
+{
+  *ca = 0;
+
+  char *e = getenv("RDZ_NO_DURATION"); if (e && strcmp(e, "1") == 0) return;
+
+  if (duration < 1000.0) { sprintf(ca, "%fms ", duration); return; }
+
+  double s = duration / 1000.0;
+  sprintf(ca, "%.6f ", s);
+  for (size_t i = 0; ; ++i) { if (ca[i] == '.') { ca[i] = 's'; break; } }
+}
+
+void rdz_print_result(rdz_result *r, double duration)
 {
   if (r == NULL) return;
 
@@ -210,7 +238,10 @@ void rdz_print_result(rdz_result *r)
   if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
 
-  printf(" %sL=%d I=%d%s\n", rdz_gr(), r->ltnumber, r->itnumber, rdz_cl());
+  char du[81]; rdz_duration_to_s(duration, du);
+
+  printf(
+    " %s%sL=%d I=%d%s\n", rdz_gr(), du, r->ltnumber, r->itnumber, rdz_cl());
 }
 
 char *rdz_truncate(char *s, size_t l, int soe)
@@ -633,20 +664,20 @@ void rdz_dorun(rdz_node *n)
 
     int rc = rdz_count;
 
-    n->func(); // run the "it"
+    double du = n->func(); // run the "it"
 
     if (rdz_count == rc) // no ensure in the example, record a success...
     {
       rdz_record(1, rdz_strdup(n->text), n->nodenumber, n->lstart, n->ltstart);
     }
 
-    rdz_print_result(rdz_results[rdz_count - 1]);
+    rdz_print_result(rdz_results[rdz_count - 1], du);
   }
   else if (t == 'p')
   {
     rdz_record(-1, rdz_strdup(n->text), n->parentnumber, n->lstart, n->ltstart);
 
-    rdz_print_result(rdz_results[rdz_count - 1]);
+    rdz_print_result(rdz_results[rdz_count - 1], 0.0);
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {

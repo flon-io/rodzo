@@ -475,7 +475,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
 
   if (regexec(&ensure_operator_rex, con, 6, ms, 0)) // no match
   {
-    push_linef(c, "%sint r%d = %s", ind, lnumber, con);
+    push_linef(c, "%sint r%d = %s\n", ind, lnumber, con);
   }
   else if (ms[3].rm_eo > ms[3].rm_so) // type
   {
@@ -750,8 +750,10 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    fprintf(out, "%sint it_%d()\n", ind, n->nodenumber);
+    fprintf(out, "%sdouble it_%d()\n", ind, n->nodenumber);
     fprintf(out, "%s{\n", ind);
+    fprintf(out, "%s  double __start = rdz_now();", ind);
+    fprintf(out, " double __duration = 0.0;\n");
 
     print_eaches(out, ind, 'b', n->parent);
   }
@@ -763,7 +765,7 @@ void print_node(FILE *out, node_s *n)
     else if (t == 'z') type = "after_each_offline";
 
     fprintf(out, "\n");
-    fprintf(out, "%sint %s_%d()", ind, type, n->nodenumber);
+    fprintf(out, "%sdouble %s_%d()", ind, type, n->nodenumber);
     fprintf(out, " // li%d\n", n->lstart);
     fprintf(out, "%s{\n", ind);
   }
@@ -783,15 +785,17 @@ void print_node(FILE *out, node_s *n)
       fprintf(out, "%s_over:\n", ind);
     }
 
+    fprintf(out, "\n%s  __duration = rdz_duration(__start);", ind);
+
     print_eaches(out, ind, 'a', n->parent);
 
     fprintf(out, "\n");
-    fprintf(out, "%s  return 1;\n", ind);
+    fprintf(out, "%s  return __duration;\n", ind);
     fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
   }
   else if (offline)
   {
-    fprintf(out, "%s  return 1;\n", ind);
+    fprintf(out, "%s  return 0.0;\n", ind);
     fprintf(out, "%s} // %s_%d()\n", ind, type, n->nodenumber);
   }
 
