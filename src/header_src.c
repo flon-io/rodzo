@@ -212,7 +212,10 @@ void rdz_duration_to_s(double duration, char *ca)
 {
   *ca = 0;
 
-  char *e = getenv("RDZ_NO_DURATION"); if (e && strcmp(e, "1") == 0) return;
+  if (duration < 0.0) return;
+
+  char *e = getenv("RDZ_NO_DURATION");
+  if (e && (strcmp(e, "1") == 0 || strcmp(e, "true"))) return;
 
   if (duration < 1000.0) { sprintf(ca, "%fms ", duration); return; }
 
@@ -238,7 +241,7 @@ void rdz_print_result(rdz_result *r, double duration)
   if (r->success == -1) printf(" (PENDING: %s)", r->message);
   if (r->success == 0) printf(" (FAILED)");
 
-  char du[81]; rdz_duration_to_s(duration, du);
+  char du[77]; rdz_duration_to_s(duration, du);
 
   printf(
     " %s%sL=%d I=%d%s\n", rdz_gr(), du, r->ltnumber, r->itnumber, rdz_cl());
@@ -677,7 +680,7 @@ void rdz_dorun(rdz_node *n)
   {
     rdz_record(-1, rdz_strdup(n->text), n->parentnumber, n->lstart, n->ltstart);
 
-    rdz_print_result(rdz_results[rdz_count - 1], 0.0);
+    rdz_print_result(rdz_results[rdz_count - 1], -1.0);
   }
   else if (t == 'G' || t == 'g' || t == 'd' || t == 'c')
   {
