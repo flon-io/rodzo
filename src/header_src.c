@@ -732,7 +732,7 @@ char *rdz_read_line(char *fname, int lnumber)
   return l;
 }
 
-void rdz_summary(int itcount)
+void rdz_summary(int itcount, double duration)
 {
   printf("\n");
 
@@ -781,13 +781,15 @@ void rdz_summary(int itcount)
     }
   }
 
+  char sdu[80]; rdz_duration_to_s(duration, sdu);
+
   printf("\n");
   printf("%s%d examples, ", rdz_fail_count > 0 ? rdz_rd() : rdz_gn(), itcount);
   printf("%d tests seen, ", rdz_count - rdz_pending_count);
   printf("%d failures", rdz_fail_count);
   if (rdz_pending_count > 0) printf(", %d pending", rdz_pending_count);
-  printf("%s", rdz_cl());
-  printf("\n");
+  if (*sdu != 0) printf("  %s%s", rdz_gr(), sdu);
+  printf("%s\n", rdz_cl());
   printf("\n");
 
   if (rdz_fail_count > 0)
@@ -806,5 +808,8 @@ void rdz_summary(int itcount)
 
     printf("\n");
   }
+
+  //printf("%s%s%s\n", rdz_gr(), sdu, rdz_cl());
+  //printf("\n");
 }
 

@@ -883,10 +883,10 @@ void print_nodes(FILE *out, size_t depth, node_s *n)
 
 void print_footer(FILE *out, context_s *c)
 {
-  fputs("\n", out);
-  fputs("  /*\n", out);
-  fputs("   * rodzo footer\n", out);
-  fputs("   */\n\n", out);
+  fprintf(out, "\n");
+  fprintf(out, "  /*\n");
+  fprintf(out, "   * rodzo footer\n");
+  fprintf(out, "   */\n\n");
 
   node_s *n = c->node; while (n->parent != NULL) n = n->parent;
 
@@ -907,20 +907,23 @@ void print_footer(FILE *out, context_s *c)
   fprintf(out, "\n");
 
   fprintf(out, "  rdz_determine_dorun();\n");
+  fprintf(out, "\n");
+  fprintf(out, "  double start = rdz_now();\n");
   fprintf(out, "  rdz_dorun(rdz_nodes[0]);\n");
+  fprintf(out, "  double duration = rdz_duration(start);\n");
 
-  fputs("\n", out);
-  fprintf(out, "  rdz_summary(%d);\n", c->itcount);
+  fprintf(out, "\n");
+  fprintf(out, "  rdz_summary(%d, duration);\n", c->itcount);
 
-  fputs("\n", out);
+  fprintf(out, "\n");
   fprintf(out, "  for (size_t i = 0; i < rdz_count; i++) rdz_result_free(rdz_results[i]);\n");
   fprintf(out, "  free(rdz_results);\n");
 
-  fputs("\n", out);
+  fprintf(out, "\n");
   fprintf(out, "  free(rdz_lines);\n");
 
-  fputs("}\n", out);
-  fputs("\n", out);
+  fprintf(out, "}\n");
+  fprintf(out, "\n");
 }
 
 void add_spec_path(flu_list *l, char *path)
