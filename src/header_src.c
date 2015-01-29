@@ -802,7 +802,7 @@ void rdz_summary(int itcount, double duration)
 
       if (r->success != 0) continue;
 
-      printf("%smake spec L=%d", rdz_rd(), r->ltnumber);
+      printf("%smake spec I=%d", rdz_rd(), r->itnumber);
       printf(" %s# %s%s\n", rdz_cy(), r->title, rdz_cl());
     }
 

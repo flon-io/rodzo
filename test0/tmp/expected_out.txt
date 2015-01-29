@@ -202,32 +202,32 @@ Failures:
 
 Failed examples:
 
-make spec L=37 # mne_tos() cows are flying turns longs to mnemonic (hopefully) strings 
-make spec L=57 # mne_tos() cows are flying === compares strings 2 
-make spec L=71 # mne_tos() cows are flying === expects strings to differ 2 
-make spec L=79 # mne_tos() cows are flying === doesn't crash when strings are NULL 
-make spec L=83 # mne_tos() cows are flying === compares to NULL 
-make spec L=105 # mne_tos() cows are flying !== fails when the result (left) is NULL 
-make spec L=117 # mne_tos() cows are flying !== frees when 'f' (miss) 
-make spec L=121 # mne_tos() cows are flying !== doesn't free when the result is NULL 
-make spec L=141 # mne_tos() cows are flying ~== matches strings 2 (failure) 
-make spec L=153 # mne_tos() cows are flying ~== understands !~== (miss) 
-make spec L=158 # mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
-make spec L=170 # mne_tos() cows are flying ^== starts with (failure) 
-make spec L=174 # mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
-make spec L=186 # mne_tos() cows are flying ^== understands !^== (miss) 
-make spec L=191 # mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
-make spec L=203 # mne_tos() cows are flying $== ends with (failure) 
-make spec L=207 # mne_tos() cows are flying $== ends quickly if the result is NULL 
-make spec L=219 # mne_tos() cows are flying $== understands !$== (failure) 
-make spec L=224 # mne_tos() cows are flying $== doesn't mind NULL values (miss) 
-make spec L=236 # mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
-make spec L=248 # mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
-make spec L=257 # mne_tos() cows are flying >== doesn't mind NULL values (miss) 
-make spec L=281 # mne_tos() cows are flying typed equals fails 
-make spec L=285 # mne_tos() cows are flying typed equals fails 'f' 
-make spec L=289 # mne_tos() cows are flying typed equals fails 'zd' 
-make spec L=326 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
-make spec L=330 # mne_tos() birds are flying does not care about 
+make spec I=5 # mne_tos() cows are flying turns longs to mnemonic (hopefully) strings 
+make spec I=9 # mne_tos() cows are flying === compares strings 2 
+make spec I=12 # mne_tos() cows are flying === expects strings to differ 2 
+make spec I=14 # mne_tos() cows are flying === doesn't crash when strings are NULL 
+make spec I=15 # mne_tos() cows are flying === compares to NULL 
+make spec I=18 # mne_tos() cows are flying !== fails when the result (left) is NULL 
+make spec I=21 # mne_tos() cows are flying !== frees when 'f' (miss) 
+make spec I=22 # mne_tos() cows are flying !== doesn't free when the result is NULL 
+make spec I=27 # mne_tos() cows are flying ~== matches strings 2 (failure) 
+make spec I=30 # mne_tos() cows are flying ~== understands !~== (miss) 
+make spec I=31 # mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
+make spec I=34 # mne_tos() cows are flying ^== starts with (failure) 
+make spec I=35 # mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
+make spec I=38 # mne_tos() cows are flying ^== understands !^== (miss) 
+make spec I=39 # mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
+make spec I=42 # mne_tos() cows are flying $== ends with (failure) 
+make spec I=43 # mne_tos() cows are flying $== ends quickly if the result is NULL 
+make spec I=46 # mne_tos() cows are flying $== understands !$== (failure) 
+make spec I=47 # mne_tos() cows are flying $== doesn't mind NULL values (miss) 
+make spec I=50 # mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
+make spec I=53 # mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
+make spec I=55 # mne_tos() cows are flying >== doesn't mind NULL values (miss) 
+make spec I=61 # mne_tos() cows are flying typed equals fails 
+make spec I=62 # mne_tos() cows are flying typed equals fails 'f' 
+make spec I=63 # mne_tos() cows are flying typed equals fails 'zd' 
+make spec I=70 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
+make spec I=71 # mne_tos() birds are flying does not care about 
  
 
