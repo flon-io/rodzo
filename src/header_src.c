@@ -35,6 +35,7 @@
 #include <unistd.h> // for isatty()
 #include <regex.h>
 #include <wordexp.h>
+#include <errno.h>
 #include <sys/time.h>
 
   // avoiding strdup and the posix_source requirement...
@@ -188,13 +189,22 @@ rdz_result **rdz_results = NULL;
 // Brown       0;33     Yellow        1;33
 // Light Gray  0;37     White         1;37
 
-char *rdz_rd() { return isatty(1) ? "[0;31m" : ""; }
-char *rdz_gn() { return isatty(1) ? "[0;32m" : ""; }
-char *rdz_yl() { return isatty(1) ? "[0;33m" : ""; }
-char *rdz_cy() { return isatty(1) ? "[0;36m" : ""; }
-char *rdz_gr() { return isatty(1) ? "[1;30m" : ""; }
-char *rdz_bl() { return isatty(1) ? "[1;34m" : ""; }
-char *rdz_cl() { return isatty(1) ? "[0;0m" : ""; }
+static int istty()
+{
+  int rno = errno;
+  int r = isatty(1);
+  errno = rno;
+
+  return r;
+}
+
+char *rdz_rd() { return istty() ? "[0;31m" : ""; }
+char *rdz_gn() { return istty() ? "[0;32m" : ""; }
+char *rdz_yl() { return istty() ? "[0;33m" : ""; }
+char *rdz_cy() { return istty() ? "[0;36m" : ""; }
+char *rdz_gr() { return istty() ? "[1;30m" : ""; }
+char *rdz_bl() { return istty() ? "[1;34m" : ""; }
+char *rdz_cl() { return istty() ? "[0;0m" : ""; }
 
 void rdz_print_level(int nodenumber)//, int min)
 {

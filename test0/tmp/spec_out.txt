@@ -5,37 +5,37 @@ mne_tos() L=21 I=2
     turns longs to mnemonic (hopefully) strings (FAILED) L=37 I=5
     flips "burgers" L=46 I=6
     === L=49 I=7
-0xdd0790   69 00                                             |i               |
-0x4094c8   69 00                                             |i               |
+0x14b7790  69 00                                             |i               |
+0x409574   69 00                                             |i               |
       compares strings 1 L=53 I=8
-0xdd08d0   6b 75 00                                          |ku              |
-0x4094c3   46 41 49 4c 00                                    |FAIL            |
+0x14b78d0  6b 75 00                                          |ku              |
+0x40956f   46 41 49 4c 00                                    |FAIL            |
       compares strings 2 (FAILED) L=57 I=9
-0xdd09e0   69 61 00                                          |ia              |
-0x4094ca   69 61 00                                          |ia              |
+0x14b79e0  69 61 00                                          |ia              |
+0x409576   69 61 00                                          |ia              |
       compares strings 2 L=63 I=10
-0xdd0af0   69 61 00                                          |ia              |
-0x4094df   6e 61 64 61 00                                    |nada            |
+0x14b7af0  69 61 00                                          |ia              |
+0x40958b   6e 61 64 61 00                                    |nada            |
       expects strings to differ 1 L=67 I=11
-0xdd0c10   69 61 00                                          |ia              |
-0x4094ca   69 61 00                                          |ia              |
+0x14b7c10  69 61 00                                          |ia              |
+0x409576   69 61 00                                          |ia              |
       expects strings to differ 2 (FAILED) L=71 I=12
-0xdd1d30   69 61 00                                          |ia              |
-0x4094ca   69 61 00                                          |ia              |
+0x14b8d30  69 61 00                                          |ia              |
+0x409576   69 61 00                                          |ia              |
       frees strings 1 L=75 I=13
       doesn't crash when strings are NULL (FAILED) L=79 I=14
       compares to NULL (FAILED) L=83 I=15
       compares empty strings L=88 I=16
     !== L=101 I=17
       fails when the result (left) is NULL (FAILED) L=105 I=18
-0x4094ed   62 00                                             |b               |
-0x4094c1   61 00                                             |a               |
+0x409599   62 00                                             |b               |
+0x40956d   61 00                                             |a               |
       succeeds when the two strings are different L=109 I=19
-0xdd2050   62 00                                             |b               |
-0x4094c1   61 00                                             |a               |
+0x14b9050  62 00                                             |b               |
+0x40956d   61 00                                             |a               |
       frees when 'f' (hit) L=113 I=20
-0xdd2050   61 00                                             |a               |
-0x4094c1   61 00                                             |a               |
+0x14b9050  61 00                                             |a               |
+0x40956d   61 00                                             |a               |
       frees when 'f' (miss) (FAILED) L=117 I=21
       doesn't free when the result is NULL (FAILED) L=121 I=22
       is OK with comparing to NULL L=125 I=23
@@ -48,39 +48,39 @@ mne_tos() L=21 I=2
       understands !~== (miss) (FAILED) L=153 I=30
       doesn't mind NULL values (miss) (FAILED) L=158 I=31
     ^== L=162 I=32
-0x40952e   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
-0x40953b   74 68 69 73 20 00                                 |this            |
+0x4095da   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
+0x4095e7   74 68 69 73 20 00                                 |this            |
       starts with (success) L=166 I=33
-0x40952e   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
-0x409545   74 68 61 74 20 00                                 |that            |
+0x4095da   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
+0x4095f1   74 68 61 74 20 00                                 |that            |
       starts with (failure) (FAILED) L=170 I=34
       starts and ends quickly if the result is NULL (FAILED) L=174 I=35
-0x40954b   54 48 49 53 20 69 73 20 74 72 75 65 00            |THIS is true    |
-0x40953b   74 68 69 73 20 00                                 |this            |
+0x4095f7   54 48 49 53 20 69 73 20 74 72 75 65 00            |THIS is true    |
+0x4095e7   74 68 69 73 20 00                                 |this            |
       starts with (insensitive) L=178 I=36
-0x40952e   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
-0x409545   74 68 61 74 20 00                                 |that            |
+0x4095da   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
+0x4095f1   74 68 61 74 20 00                                 |that            |
       understands !^== (hit) L=182 I=37
-0x40952e   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
-0x40953b   74 68 69 73 20 00                                 |this            |
+0x4095da   74 68 69 73 20 69 73 20 74 72 75 65 00            |this is true    |
+0x4095e7   74 68 69 73 20 00                                 |this            |
       understands !^== (miss) (FAILED) L=186 I=38
       doesn't mind NULL values (miss) (FAILED) L=191 I=39
     $== L=195 I=40
-0x409535   20 74 72 75 65 00                                 | true           |
-0x409562   20 74 72 75 65 00                                 | true           |
+0x4095e1   20 74 72 75 65 00                                 | true           |
+0x40960e   20 74 72 75 65 00                                 | true           |
       ends with (success) L=199 I=41
-0x409534   73 20 74 72 75 65 00                              |s true          |
-0x40956c   20 66 61 6c 73 65 00                              | false          |
+0x4095e0   73 20 74 72 75 65 00                              |s true          |
+0x409618   20 66 61 6c 73 65 00                              | false          |
       ends with (failure) (FAILED) L=203 I=42
       ends quickly if the result is NULL (FAILED) L=207 I=43
-0x40957b   54 72 75 65 00                                    |True            |
-0x409250   74 72 75 65 00                                    |true            |
+0x409627   54 72 75 65 00                                    |True            |
+0x4092f0   74 72 75 65 00                                    |true            |
       ends with (insensitive) L=211 I=44
-0x409534   73 20 74 72 75 65 00                              |s true          |
-0x40956c   20 66 61 6c 73 65 00                              | false          |
+0x4095e0   73 20 74 72 75 65 00                              |s true          |
+0x409618   20 66 61 6c 73 65 00                              | false          |
       understands !$== (hit) L=215 I=45
-0x409535   20 74 72 75 65 00                                 | true           |
-0x409562   20 74 72 75 65 00                                 | true           |
+0x4095e1   20 74 72 75 65 00                                 | true           |
+0x40960e   20 74 72 75 65 00                                 | true           |
       understands !$== (failure) (FAILED) L=219 I=46
       doesn't mind NULL values (miss) (FAILED) L=224 I=47
     >== L=228 I=48
@@ -92,11 +92,11 @@ mne_tos() L=21 I=2
       accepts !>==i for 'does not contain, whatever the case' L=252 I=54
       doesn't mind NULL values (miss) (FAILED) L=257 I=55
     ===i L=261 I=56
-0x4095c6   74 52 75 45 00                                    |tRuE            |
-0x409250   74 72 75 65 00                                    |true            |
+0x409672   74 52 75 45 00                                    |tRuE            |
+0x4092f0   74 72 75 65 00                                    |true            |
       accepts ===i for case insensitive comparison L=265 I=57
-0x4095c6   74 52 75 45 00                                    |tRuE            |
-0x4095a8   66 61 6c 73 65 00                                 |false           |
+0x409672   74 52 75 45 00                                    |tRuE            |
+0x409654   66 61 6c 73 65 00                                 |false           |
       accepts !==i for case insensitive comparison L=269 I=58
     typed equals L=273 I=59
       succeeds L=277 I=60
