@@ -193,6 +193,7 @@ char *rdz_gn() { return isatty(1) ? "[0;32m" : ""; }
 char *rdz_yl() { return isatty(1) ? "[0;33m" : ""; }
 char *rdz_cy() { return isatty(1) ? "[0;36m" : ""; }
 char *rdz_gr() { return isatty(1) ? "[1;30m" : ""; }
+char *rdz_bl() { return isatty(1) ? "[1;34m" : ""; }
 char *rdz_cl() { return isatty(1) ? "[0;0m" : ""; }
 
 void rdz_print_level(int nodenumber)//, int min)
@@ -302,9 +303,45 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
   return s;
 }
 
+static void rdz_hexdump(const char *s)
+{
+  size_t line = 16;
+  size_t len = strlen(s);
+  size_t j = 0;
+
+  while (j < len)
+  {
+    if (j == 0) printf("%-10p ", s);
+    else printf("           ");
+
+    for (size_t i = j, over = 0; i < j + line; ++i)
+    {
+      if (over) printf("   ");
+      else if (s[i] >= 32 && s[i] <= 126) printf("%02x ", s[i]);
+      else printf("%s%02x%s ", rdz_bl(), s[i], rdz_cl());
+      if (s[i] == 0) over = 1;
+    }
+
+    printf("  %s|%s", rdz_bl(), rdz_cl());
+    for (size_t i = j, over = 0; i < j + line; ++i)
+    {
+      if (s[i] == 0) over = 1;
+      if (over) printf(" ");
+      else if (s[i] >= 32 && s[i] <= 126) printf("%c", s[i]);
+      else printf("%s.%s", rdz_bl(), rdz_cl());
+    }
+    printf("%s|%s\n", rdz_bl(), rdz_cl());
+
+    j += line;
+  }
+}
+
 int rdz_strcmp(char *op, char *a, char *b, ssize_t n)
 {
   short i = (strchr(op, 'i') != NULL);
+
+  rdz_hexdump(a);
+  rdz_hexdump(b);
 
   if (n > -1) return i ? strncasecmp(a, b, n) : strncmp(a, b, n);
   return i ? strcasecmp(a, b) : strcmp(a, b);
