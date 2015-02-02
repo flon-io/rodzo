@@ -582,9 +582,10 @@ void rdz_extract_arguments()
   rdz_hexdump_on =
     rh &&
     (
+      strcmp(rh, "1") == 0 ||
+      strcasecmp(rh, "on") == 0 ||
       strcasecmp(rh, "yes") == 0 ||
-      strcasecmp(rh, "true") == 0 ||
-      strcmp(rh, "1") == 0
+      strcasecmp(rh, "true") == 0
     );
 }
 

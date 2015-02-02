@@ -123,7 +123,7 @@ context "str functions"
 
 Running ```make spec``` from test4/ should yield something like:
 
-<img src="doc/output0.png" />
+<src="doc/output0.png" />
 
 ### specifying lines with L=
 
@@ -409,6 +409,18 @@ If one needs to see the expected value and the resulting value, one can "help" r
 Accepted "formats" are `c`, `d`, `e`, `f`, `o`, `i`, `li`, `lli`, `u`, `zu`, `zd`, `lu` and `llu`.
 
 Beware `d` isn't "double" but "decimal".
+
+### string comparisons / checks and RDZ_HEXDUMP
+
+Sometimes, string comparisons seem to go wrong. It's OK to turn RDZ_HEXDUMP on to go a char by char comparison of the two strings.
+
+```
+RDZ_HEXDUMP=1 make spec
+```
+
+would yield something ressembling:
+
+<img src="doc/hexdump.png" />
 
 ### before and after
 
