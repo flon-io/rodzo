@@ -96,6 +96,26 @@ describe "mne_tos()"
       //  void *a = NULL;
       //  ensure(a === "");
       //}
+
+      it "compares long strings"
+      {
+        expect(""
+          "Aeneadum genetrix, hominum divomque voluptas,"
+          "alma Venus, caeli subter labentia signa"
+          "quae mare navigerum, quae terras frugiferentis"
+          "concelebras, per te quoniam genus omne animantum"
+          "concipitur visitque exortum lumina solis:"
+          "te, dea, te fugiunt venti, te nubila caeli"
+          "adventumque tuum, tibi suavis daedala tellus"
+          "summittit flores, tibi rident aequora ponti"
+          "placatumque nitet diffuso lumine caelum."
+            "" === ""
+          "Aeneadum genetrix, hominum divomque voluptas,"
+          "alma Venus, caeli subter labentia signa"
+          "quae mare navigerum, quae terras frugiferentis"
+          "nada plus ultra."
+        );
+      }
     }
 
     context "!=="

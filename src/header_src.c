@@ -38,6 +38,9 @@
 #include <errno.h>
 #include <sys/time.h>
 
+
+int rdz_hexdump_on = 0;
+
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
 {
@@ -204,6 +207,7 @@ char *rdz_yl() { return istty() ? "[0;33m" : ""; }
 char *rdz_cy() { return istty() ? "[0;36m" : ""; }
 char *rdz_gr() { return istty() ? "[1;30m" : ""; }
 char *rdz_bl() { return istty() ? "[1;34m" : ""; }
+//char *rdz_by() { return istty() ? "[1;33m" : ""; }
 char *rdz_cl() { return istty() ? "[0;0m" : ""; }
 
 void rdz_print_level(int nodenumber)//, int min)
@@ -313,45 +317,56 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
   return s;
 }
 
-static void rdz_hexdump(const char *s)
+static int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
 {
-  size_t line = 16;
-  size_t len = strlen(s);
-  size_t j = 0;
+  char *s = (char *)d;
+  ssize_t l = len;
+  if (len < 0) len = strlen(s);
 
-  while (j < len)
+  size_t line_length = 15;
+  size_t j = line * line_length;
+
+  printf("%s%-10p%s ", j == 0 ? rdz_cl() : rdz_gr(), s, rdz_cl());
+
+  size_t over = (j >= len);
+
+  for (size_t i = j; i < j + line_length; ++i)
   {
-    if (j == 0) printf("%-10p ", s);
-    else printf("           ");
-
-    for (size_t i = j, over = 0; i < j + line; ++i)
-    {
-      if (over) printf("   ");
-      else if (s[i] >= 32 && s[i] <= 126) printf("%02x ", s[i]);
-      else printf("%s%02x%s ", rdz_bl(), s[i], rdz_cl());
-      if (s[i] == 0) over = 1;
-    }
-
-    printf("  %s|%s", rdz_bl(), rdz_cl());
-    for (size_t i = j, over = 0; i < j + line; ++i)
-    {
-      if (s[i] == 0) over = 1;
-      if (over) printf(" ");
-      else if (s[i] >= 32 && s[i] <= 126) printf("%c", s[i]);
-      else printf("%s.%s", rdz_bl(), rdz_cl());
-    }
-    printf("%s|%s\n", rdz_bl(), rdz_cl());
-
-    j += line;
+    if (over) printf("   ");
+    else if (s[i] >= 32 && s[i] <= 126) printf("%02x ", s[i]);
+    else printf("%s%02x%s ", rdz_bl(), s[i], rdz_cl());
+    if (l < 0) { if (s[i] == 0) over = 1; } else { if (i >= l) over = 1; }
+    int m = i - j + 1; if (m == 5 || m == 10) printf(" ");
   }
+
+  over = (j >= len);
+  printf(" %s|%s", second ? rdz_cl() : rdz_bl(), rdz_cl());
+  for (size_t i = j; i < j + line_length; ++i)
+  {
+    if (l < 0) { if (s[i] == 0) over = 1; } else { if (i >= l) over = 1; }
+    if (over) printf(" ");
+    else if (s[i] >= 32 && s[i] <= 126) printf("%c", s[i]);
+    else printf("%s.%s", rdz_bl(), rdz_cl());
+    int m = i - j + 1;
+    if (m == 5 || m == 10) printf("%s-%s", rdz_gr(), rdz_cl());
+  }
+  printf("%s|%s\n", second ? rdz_cl() : rdz_bl(), rdz_cl());
+
+  if (over) return 1; // over
+
+  return 0;
 }
 
 int rdz_strcmp(char *op, char *a, char *b, ssize_t n)
 {
   short i = (strchr(op, 'i') != NULL);
 
-  rdz_hexdump(a);
-  rdz_hexdump(b);
+  if (rdz_hexdump_on) for (size_t line = 0; ; ++line)
+  {
+    int oa = rdz_hexdump(a, -1, line, 0);
+    int ob = rdz_hexdump(b, -1, line, 1);
+    if (oa && ob) break;
+  }
 
   if (n > -1) return i ? strncasecmp(a, b, n) : strncmp(a, b, n);
   return i ? strcasecmp(a, b) : strcmp(a, b);
@@ -559,6 +574,18 @@ void rdz_extract_arguments()
       while (1) if (f[0] != ' ' && f[0] != '\t') break; else ++f;
     }
   }
+
+  // RDZ_HEXDUMP
+
+  char *rh = getenv("RDZ_HEXDUMP");
+
+  rdz_hexdump_on =
+    rh &&
+    (
+      strcasecmp(rh, "yes") == 0 ||
+      strcasecmp(rh, "true") == 0 ||
+      strcmp(rh, "1") == 0
+    );
 }
 
 void rdz_run_all_children(rdz_node *n)

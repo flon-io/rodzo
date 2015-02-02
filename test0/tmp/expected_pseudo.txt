@@ -41,6 +41,9 @@
         it "compares empty strings"
         {
         }
+        it "compares long strings"
+        {
+        }
       }
       context "!=="
       {
