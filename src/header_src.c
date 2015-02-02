@@ -317,7 +317,7 @@ char *rdz_string_expected(char *result, char *verb, char *expected)
   return s;
 }
 
-static int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
+int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
 {
   char *s = (char *)d;
   ssize_t l = len;
@@ -357,16 +357,21 @@ static int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
   return 0;
 }
 
+void rdz_hexshow(const char *a, const char *b, ssize_t n)
+{
+  for (size_t line = 0; ; ++line)
+  {
+    int oa = rdz_hexdump(a, n, line, 0);
+    int ob = rdz_hexdump(b, n, line, 1);
+    if (oa && ob) break;
+  }
+}
+
 int rdz_strcmp(char *op, char *a, char *b, ssize_t n)
 {
   short i = (strchr(op, 'i') != NULL);
 
-  if (rdz_hexdump_on) for (size_t line = 0; ; ++line)
-  {
-    int oa = rdz_hexdump(a, -1, line, 0);
-    int ob = rdz_hexdump(b, -1, line, 1);
-    if (oa && ob) break;
-  }
+  if (rdz_hexdump_on) rdz_hexshow(a, b, n);
 
   if (n > -1) return i ? strncasecmp(a, b, n) : strncmp(a, b, n);
   return i ? strcasecmp(a, b) : strcmp(a, b);
@@ -478,6 +483,8 @@ char *rdz_string_contains(char *operator, char *result, char *expected)
   }
 
   char *r = re ? strstr(re, ex) : NULL;
+
+  if (re && rdz_hexdump_on) rdz_hexshow(re, ex, -1);
 
   if (re != result) free(re);
   if (ex != expected) free(ex);

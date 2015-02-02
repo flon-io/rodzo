@@ -1,72 +1,240 @@
 
 mne_tos() L=21 I=2
   cows are flying L=23 I=3
+    used to crash when the 1st it had no ensure L=25 I=4
+    turns longs to mnemonic (hopefully) strings (FAILED) L=37 I=5
+    flips "burgers" L=46 I=6
     === L=49 I=7
-0x4098c8   41 65 6e 65 61  64 75 6d 20 67  65 6e 65 74 72  |Aenea-dum g-enetr|
-0x409a50   41 65 6e 65 61  64 75 6d 20 67  65 6e 65 74 72  |Aenea-dum g-enetr|
-0x4098c8   69 78 2c 20 68  6f 6d 69 6e 75  6d 20 64 69 76  |ix, h-ominu-m div|
-0x409a50   69 78 2c 20 68  6f 6d 69 6e 75  6d 20 64 69 76  |ix, h-ominu-m div|
-0x4098c8   6f 6d 71 75 65  20 76 6f 6c 75  70 74 61 73 2c  |omque- volu-ptas,|
-0x409a50   6f 6d 71 75 65  20 76 6f 6c 75  70 74 61 73 2c  |omque- volu-ptas,|
-0x4098c8   61 6c 6d 61 20  56 65 6e 75 73  2c 20 63 61 65  |alma -Venus-, cae|
-0x409a50   61 6c 6d 61 20  56 65 6e 75 73  2c 20 63 61 65  |alma -Venus-, cae|
-0x4098c8   6c 69 20 73 75  62 74 65 72 20  6c 61 62 65 6e  |li su-bter -laben|
-0x409a50   6c 69 20 73 75  62 74 65 72 20  6c 61 62 65 6e  |li su-bter -laben|
-0x4098c8   74 69 61 20 73  69 67 6e 61 71  75 61 65 20 6d  |tia s-ignaq-uae m|
-0x409a50   74 69 61 20 73  69 67 6e 61 71  75 61 65 20 6d  |tia s-ignaq-uae m|
-0x4098c8   61 72 65 20 6e  61 76 69 67 65  72 75 6d 2c 20  |are n-avige-rum, |
-0x409a50   61 72 65 20 6e  61 76 69 67 65  72 75 6d 2c 20  |are n-avige-rum, |
-0x4098c8   71 75 61 65 20  74 65 72 72 61  73 20 66 72 75  |quae -terra-s fru|
-0x409a50   71 75 61 65 20  74 65 72 72 61  73 20 66 72 75  |quae -terra-s fru|
-0x4098c8   67 69 66 65 72  65 6e 74 69 73  63 6f 6e 63 65  |gifer-entis-conce|
-0x409a50   67 69 66 65 72  65 6e 74 69 73  6e 61 64 61 20  |gifer-entis-nada |
-0x4098c8   6c 65 62 72 61  73 2c 20 70 65  72 20 74 65 20  |lebra-s, pe-r te |
-0x409a50   70 6c 75 73 20  75 6c 74 72 61  2e 00           |plus -ultra-.    |
-0x4098c8   71 75 6f 6e 69  61 6d 20 67 65  6e 75 73 20 6f  |quoni-am ge-nus o|
-0x409a50                                                   |     -     -     |
-0x4098c8   6d 6e 65 20 61  6e 69 6d 61 6e  74 75 6d 63 6f  |mne a-niman-tumco|
-0x409a50                                                   |     -     -     |
-0x4098c8   6e 63 69 70 69  74 75 72 20 76  69 73 69 74 71  |ncipi-tur v-isitq|
-0x409a50                                                   |     -     -     |
-0x4098c8   75 65 20 65 78  6f 72 74 75 6d  20 6c 75 6d 69  |ue ex-ortum- lumi|
-0x409a50                                                   |     -     -     |
-0x4098c8   6e 61 20 73 6f  6c 69 73 3a 74  65 2c 20 64 65  |na so-lis:t-e, de|
-0x409a50                                                   |     -     -     |
-0x4098c8   61 2c 20 74 65  20 66 75 67 69  75 6e 74 20 76  |a, te- fugi-unt v|
-0x409a50                                                   |     -     -     |
-0x4098c8   65 6e 74 69 2c  20 74 65 20 6e  75 62 69 6c 61  |enti,- te n-ubila|
-0x409a50                                                   |     -     -     |
-0x4098c8   20 63 61 65 6c  69 61 64 76 65  6e 74 75 6d 71  | cael-iadve-ntumq|
-0x409a50                                                   |     -     -     |
-0x4098c8   75 65 20 74 75  75 6d 2c 20 74  69 62 69 20 73  |ue tu-um, t-ibi s|
-0x409a50                                                   |     -     -     |
-0x4098c8   75 61 76 69 73  20 64 61 65 64  61 6c 61 20 74  |uavis- daed-ala t|
-0x409a50                                                   |     -     -     |
-0x4098c8   65 6c 6c 75 73  73 75 6d 6d 69  74 74 69 74 20  |ellus-summi-ttit |
-0x409a50                                                   |     -     -     |
-0x4098c8   66 6c 6f 72 65  73 2c 20 74 69  62 69 20 72 69  |flore-s, ti-bi ri|
-0x409a50                                                   |     -     -     |
-0x4098c8   64 65 6e 74 20  61 65 71 75 6f  72 61 20 70 6f  |dent -aequo-ra po|
-0x409a50                                                   |     -     -     |
-0x4098c8   6e 74 69 70 6c  61 63 61 74 75  6d 71 75 65 20  |ntipl-acatu-mque |
-0x409a50                                                   |     -     -     |
-0x4098c8   6e 69 74 65 74  20 64 69 66 66  75 73 6f 20 6c  |nitet- diff-uso l|
-0x409a50                                                   |     -     -     |
-0x4098c8   75 6d 69 6e 65  20 63 61 65 6c  75 6d 2e 00     |umine- cael-um.  |
-0x409a50                                                   |     -     -     |
+      compares strings 1 L=53 I=8
+      compares strings 2 (FAILED) L=57 I=9
+      compares strings 2 L=63 I=10
+      expects strings to differ 1 L=67 I=11
+      expects strings to differ 2 (FAILED) L=71 I=12
+      frees strings 1 L=75 I=13
+      doesn't crash when strings are NULL (FAILED) L=79 I=14
+      compares to NULL (FAILED) L=83 I=15
+      compares empty strings L=88 I=16
       compares long strings (FAILED) L=117 I=17
+    !== L=121 I=18
+      fails when the result (left) is NULL (FAILED) L=125 I=19
+      succeeds when the two strings are different L=129 I=20
+      frees when 'f' (hit) L=133 I=21
+      frees when 'f' (miss) (FAILED) L=137 I=22
+      doesn't free when the result is NULL (FAILED) L=141 I=23
+      is OK with comparing to NULL L=145 I=24
+      is OK with comparing to NULL (and freeing) L=149 I=25
+    ~== L=153 I=26
+      matches strings 1 L=157 I=27
+      matches strings 2 (failure) (FAILED) L=161 I=28
+      matches strings (insensitive) L=165 I=29
+      understands !~== (hit) L=169 I=30
+      understands !~== (miss) (FAILED) L=173 I=31
+      doesn't mind NULL values (miss) (FAILED) L=178 I=32
+    ^== L=182 I=33
+      starts with (success) L=186 I=34
+      starts with (failure) (FAILED) L=190 I=35
+      starts and ends quickly if the result is NULL (FAILED) L=194 I=36
+      starts with (insensitive) L=198 I=37
+      understands !^== (hit) L=202 I=38
+      understands !^== (miss) (FAILED) L=206 I=39
+      doesn't mind NULL values (miss) (FAILED) L=211 I=40
+    $== L=215 I=41
+      ends with (success) L=219 I=42
+      ends with (failure) (FAILED) L=223 I=43
+      ends quickly if the result is NULL (FAILED) L=227 I=44
+      ends with (insensitive) L=231 I=45
+      understands !$== (hit) L=235 I=46
+      understands !$== (failure) (FAILED) L=239 I=47
+      doesn't mind NULL values (miss) (FAILED) L=244 I=48
+    >== L=248 I=49
+      accepts >== for 'contains' (hit) L=252 I=50
+      accepts >== for 'contains' (miss) (FAILED) L=256 I=51
+      accepts >==i for 'contains, whatever the case' L=260 I=52
+      accepts !>== for 'does not contain' (hit) L=264 I=53
+      accepts !>== for 'does not contain' (miss) (FAILED) L=268 I=54
+      accepts !>==i for 'does not contain, whatever the case' L=272 I=55
+      doesn't mind NULL values (miss) (FAILED) L=277 I=56
+    ===i L=281 I=57
+      accepts ===i for case insensitive comparison L=285 I=58
+      accepts !==i for case insensitive comparison L=289 I=59
+    typed equals L=293 I=60
+      succeeds L=297 I=61
+      fails (FAILED) L=301 I=62
+      fails 'f' (FAILED) L=305 I=63
+      fails 'zd' (FAILED) L=309 I=64
+    accepts empty specs L=325 I=65
+mne_tos() L=337 I=68
+  birds are flying L=338 I=69
+    finds the コンビニ convenient L=342 I=70
+    is OK with "double quotes" and 	abs (FAILED) L=346 I=71
+    does not care about 
+ (FAILED) L=350 I=72
+mne_toi() L=360 I=74
+  flips burgers L=364 I=75
 
 Failures:
 
-  1) mne_tos() cows are flying === compares long strings 
+  1) mne_tos() cows are flying turns longs to mnemonic (hopefully) strings 
+     >      ensure(strcmp(mne_tos(7), "FAIL") == 0);<
+     # ../spec/mnemo_0_spec.c:37 L=37 I=5
+  2) mne_tos() cows are flying === compares strings 2 
+     expected "ku"
+     to equal "FAIL"
+     >        ensure(mne_tos(7) === "FAIL");<
+     # ../spec/mnemo_0_spec.c:57 L=57 I=9
+  3) mne_tos() cows are flying === expects strings to differ 2 
+     didn't expect "ia"
+     >        ensure(mne_tos(47) !== "ia");<
+     # ../spec/mnemo_0_spec.c:71 L=71 I=12
+  4) mne_tos() cows are flying === doesn't crash when strings are NULL 
+     result is NULL
+     >        ensure(NULL === "ia");<
+     # ../spec/mnemo_0_spec.c:79 L=79 I=14
+  5) mne_tos() cows are flying === compares to NULL 
+     expected "ia"
+        to be NULL
+     >        ensure("ia" === NULL);<
+     # ../spec/mnemo_0_spec.c:83 L=83 I=15
+  6) mne_tos() cows are flying === compares long strings 
      expected "Aeneadum genetrix, hominum divomque voluptas,alma Venus, caeli subter labentia signaquae mare navigerum, quae terras frugiferentisconcelebras, per te quoniam genus omne animantumconcipitur visitque exortum lumina solis:te, dea, te fugiunt venti, te nubila caeliadventumque tuum, tibi suavis daedala tellussummittit flores, tibi rident aequora pontiplacatumque nitet diffuso lumine caelum."
      to equal "Aeneadum genetrix, hominum divomque voluptas,alma Venus, caeli subter labentia signaquae mare navigerum, quae terras frugiferentisnada plus ultra."
      >        );<
      # ../spec/mnemo_0_spec.c:117 L=117 I=17
+  7) mne_tos() cows are flying !== fails when the result (left) is NULL 
+     result is NULL
+     >        ensure(NULL !== "a");<
+     # ../spec/mnemo_0_spec.c:125 L=125 I=19
+  8) mne_tos() cows are flying !== frees when 'f' (miss) 
+     didn't expect "a"
+     >        ensure(rdz_strdup("a") !==f "a");<
+     # ../spec/mnemo_0_spec.c:137 L=137 I=22
+  9) mne_tos() cows are flying !== doesn't free when the result is NULL 
+     result is NULL
+     >        ensure(NULL !==f "a");<
+     # ../spec/mnemo_0_spec.c:141 L=141 I=23
+  10) mne_tos() cows are flying ~== matches strings 2 (failure) 
+     expected "ia"
+     to match "[xy]a"
+     >        ensure(mne_tos(47) ~== "[xy]a");<
+     # ../spec/mnemo_0_spec.c:161 L=161 I=28
+  11) mne_tos() cows are flying ~== understands !~== (miss) 
+         expected "blah"
+     not to match "bl[aeu]h"
+     >        ensure("blah" !~== "bl[aeu]h");<
+     # ../spec/mnemo_0_spec.c:173 L=173 I=31
+  12) mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
+     result is NULL
+     >        ensure(v ~== "bl[aeu]h");<
+     # ../spec/mnemo_0_spec.c:178 L=178 I=32
+  13) mne_tos() cows are flying ^== starts with (failure) 
+          expected "this is true"
+     to start with "that "
+     >        ensure("this is true" ^== "that ");<
+     # ../spec/mnemo_0_spec.c:190 L=190 I=35
+  14) mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
+          expected (null)
+     to start with "that "
+     >        ensure(NULL ^== "that ");<
+     # ../spec/mnemo_0_spec.c:194 L=194 I=36
+  15) mne_tos() cows are flying ^== understands !^== (miss) 
+              expected "this is true"
+     not to start with "this "
+     >        ensure("this is true" !^== "this ");<
+     # ../spec/mnemo_0_spec.c:206 L=206 I=39
+  16) mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
+          expected (null)
+     to start with "blah"
+     >        ensure(v ^== "blah");<
+     # ../spec/mnemo_0_spec.c:211 L=211 I=40
+  17) mne_tos() cows are flying $== ends with (failure) 
+        expected "this is true"
+     to end with " false"
+     >        ensure("this is true" $== " false");<
+     # ../spec/mnemo_0_spec.c:223 L=223 I=43
+  18) mne_tos() cows are flying $== ends quickly if the result is NULL 
+        expected (null)
+     to end with " false"
+     >        ensure(NULL $== " false");<
+     # ../spec/mnemo_0_spec.c:227 L=227 I=44
+  19) mne_tos() cows are flying $== understands !$== (failure) 
+            expected "this is true"
+     not to end with " true"
+     >        ensure("this is true" !$== " true");<
+     # ../spec/mnemo_0_spec.c:239 L=239 I=47
+  20) mne_tos() cows are flying $== doesn't mind NULL values (miss) 
+        expected (null)
+     to end with "blah"
+     >        ensure(v $== "blah");<
+     # ../spec/mnemo_0_spec.c:244 L=244 I=48
+  21) mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
+       expected "this is True"
+     to contain "is Fal"
+     >        expect("this is True" >== "is Fal");<
+     # ../spec/mnemo_0_spec.c:256 L=256 I=51
+  22) mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
+           expected "this is True"
+     not to contain "is is"
+     >        expect("this is True" !>== "is is");<
+     # ../spec/mnemo_0_spec.c:268 L=268 I=54
+  23) mne_tos() cows are flying >== doesn't mind NULL values (miss) 
+       expected (null)
+     to contain "blah"
+     >        ensure(v >== "blah");<
+     # ../spec/mnemo_0_spec.c:277 L=277 I=56
+  24) mne_tos() cows are flying typed equals fails 
+     expected 1
+        to == 2
+     >        expect(1 i== 2);<
+     # ../spec/mnemo_0_spec.c:301 L=301 I=62
+  25) mne_tos() cows are flying typed equals fails 'f' 
+     expected 1.000000
+        to == 2.000000
+     >        expect(1.0 f== 2.0);<
+     # ../spec/mnemo_0_spec.c:305 L=305 I=63
+  26) mne_tos() cows are flying typed equals fails 'zd' 
+     expected -1
+        to == 0
+     >        expect(-1 zd== 0);<
+     # ../spec/mnemo_0_spec.c:309 L=309 I=64
+  27) mne_tos() birds are flying is OK with "double quotes" and 	abs 
+     >      ensure(1 == 2);<
+     # ../spec/mnemo_1_spec.c:15 L=346 I=71
+  28) mne_tos() birds are flying does not care about 
+ 
+     >      expect(1 == 2);<
+     # ../spec/mnemo_1_spec.c:19 L=350 I=72
 
-58 examples, 1 tests seen, 1 failures
+58 examples, 59 tests seen, 28 failures
 
 Failed examples:
 
+make spec I=5 # mne_tos() cows are flying turns longs to mnemonic (hopefully) strings 
+make spec I=9 # mne_tos() cows are flying === compares strings 2 
+make spec I=12 # mne_tos() cows are flying === expects strings to differ 2 
+make spec I=14 # mne_tos() cows are flying === doesn't crash when strings are NULL 
+make spec I=15 # mne_tos() cows are flying === compares to NULL 
 make spec I=17 # mne_tos() cows are flying === compares long strings 
+make spec I=19 # mne_tos() cows are flying !== fails when the result (left) is NULL 
+make spec I=22 # mne_tos() cows are flying !== frees when 'f' (miss) 
+make spec I=23 # mne_tos() cows are flying !== doesn't free when the result is NULL 
+make spec I=28 # mne_tos() cows are flying ~== matches strings 2 (failure) 
+make spec I=31 # mne_tos() cows are flying ~== understands !~== (miss) 
+make spec I=32 # mne_tos() cows are flying ~== doesn't mind NULL values (miss) 
+make spec I=35 # mne_tos() cows are flying ^== starts with (failure) 
+make spec I=36 # mne_tos() cows are flying ^== starts and ends quickly if the result is NULL 
+make spec I=39 # mne_tos() cows are flying ^== understands !^== (miss) 
+make spec I=40 # mne_tos() cows are flying ^== doesn't mind NULL values (miss) 
+make spec I=43 # mne_tos() cows are flying $== ends with (failure) 
+make spec I=44 # mne_tos() cows are flying $== ends quickly if the result is NULL 
+make spec I=47 # mne_tos() cows are flying $== understands !$== (failure) 
+make spec I=48 # mne_tos() cows are flying $== doesn't mind NULL values (miss) 
+make spec I=51 # mne_tos() cows are flying >== accepts >== for 'contains' (miss) 
+make spec I=54 # mne_tos() cows are flying >== accepts !>== for 'does not contain' (miss) 
+make spec I=56 # mne_tos() cows are flying >== doesn't mind NULL values (miss) 
+make spec I=62 # mne_tos() cows are flying typed equals fails 
+make spec I=63 # mne_tos() cows are flying typed equals fails 'f' 
+make spec I=64 # mne_tos() cows are flying typed equals fails 'zd' 
+make spec I=71 # mne_tos() birds are flying is OK with "double quotes" and 	abs 
+make spec I=72 # mne_tos() birds are flying does not care about 
+ 
 
