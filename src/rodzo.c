@@ -491,7 +491,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
     //if (strcmp(format, "d") == 0) type = "int";
     if (strcmp(format, "s") == 0) type = "short";
     else if (strcmp(format, "c") == 0) type = "char";
-    else if (strcmp(format, "d") == 0) type = "double";
+    //else if (strcmp(format, "d") == 0) type = "int";
     else if (strcmp(format, "f") == 0) type = "double";
     else if (strcmp(format, "e") == 0) type = "double";
     else if (strcmp(format, "o") == 0) type = "unsigned int";
