@@ -1,8 +1,9 @@
 
-default: build
+default: tests
 
 .DEFAULT:
 	$(MAKE) -C tmp/ $@
+
 
 T=0
 #
@@ -13,11 +14,16 @@ test: build
 vtest: build
 	$(MAKE) -C test$(T) vspec
 
+TS=$(shell ls -1 | grep test.)
+
+tests: build
+	$(foreach t, $(TS), $(MAKE) -C $(t) spec;)
+vtests: build
+	$(foreach t, $(TS), $(MAKE) -C $(t) vspec;)
+
 rtest: build
 	bin/rodzo --test
 
-TS=$(shell ls -1 | grep test.)
-#
 clean:
 	rm -f src/header.c
 	rm -f tmp/*.o tmp/rodzo tmp/pfize
