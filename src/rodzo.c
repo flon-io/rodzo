@@ -710,6 +710,23 @@ void print_eaches(FILE *out, char *indent, char t, node_s *n)
   if (t == 'a') print_eaches(out, indent, t, n->parent);
 }
 
+static char *neutralize(char *fname)
+{
+  char *r = strdup(fname);
+  size_t l = strlen(fname);
+
+  for (size_t i = 0; i < l; i++)
+  {
+    char c = r[i];
+    if (c >= 48 && c <= 57) continue; // 0-9
+    if (c >= 65 && c <= 90) continue; // A-Z
+    if (c >= 97 && c <= 122) continue; // a-z
+    r[i] = '_';
+  }
+
+  return r;
+}
+
 void print_node(FILE *out, node_s *n)
 {
   char t = n->type;
@@ -726,6 +743,14 @@ void print_node(FILE *out, node_s *n)
   else
   {
     ind = strdup("");
+  }
+
+  char *i_func = NULL;
+  if (t == 'i')
+  {
+    char *nfname = neutralize(n->fname);
+    i_func = flu_sprintf("it_%d__%s__l%d", n->nodenumber, nfname, n->lstart);
+    free(nfname);
   }
 
   if (t == 'g' && n->lstart == 0)
@@ -750,7 +775,7 @@ void print_node(FILE *out, node_s *n)
 
   if (t == 'i')
   {
-    fprintf(out, "%sdouble it_%d()\n", ind, n->nodenumber);
+    fprintf(out, "%sdouble %s()\n", ind, i_func);
     fprintf(out, "%s{\n", ind);
     fprintf(out, "%s  double __start = rdz_now();", ind);
     fprintf(out, " double __duration = 0.0;\n");
@@ -791,7 +816,7 @@ void print_node(FILE *out, node_s *n)
 
     fprintf(out, "\n");
     fprintf(out, "%s  return __duration;\n", ind);
-    fprintf(out, "%s} // it_%d()\n", ind, n->nodenumber);
+    fprintf(out, "%s} // %s()\n", ind, i_func);
   }
   else if (offline)
   {
@@ -799,6 +824,7 @@ void print_node(FILE *out, node_s *n)
     fprintf(out, "%s} // %s_%d()\n", ind, type, n->nodenumber);
   }
 
+  free(i_func);
   free(ind);
 
   for (size_t i = 0; ; i++)
@@ -849,13 +875,36 @@ void print_nodes(FILE *out, size_t depth, node_s *n)
   char *children = flu_sbuffer_to_string(b);
 
   char *func;
-  if (t == 'i' && n->children[0] != NULL) func = strdup("NULL");
-  else if (t == 'i') func = flu_sprintf("it_%d", n->nodenumber);
-  else if (t == 'B') func = flu_sprintf("before_all_%d", n->nodenumber);
-  else if (t == 'A') func = flu_sprintf("after_all_%d", n->nodenumber);
-  else if (t == 'y') func = flu_sprintf("before_each_offline_%d", n->nodenumber);
-  else if (t == 'z') func = flu_sprintf("after_each_offline_%d", n->nodenumber);
-  else func = strdup("NULL");
+  if (t == 'i' && n->children[0] != NULL)
+  {
+    func = strdup("NULL");
+  }
+  else if (t == 'i')
+  {
+    char *nfname = neutralize(n->fname);
+    func = flu_sprintf("it_%d__%s__l%d", n->nodenumber, nfname, n->lstart);
+    free(nfname);
+  }
+  else if (t == 'B')
+  {
+    func = flu_sprintf("before_all_%d", n->nodenumber);
+  }
+  else if (t == 'A')
+  {
+    func = flu_sprintf("after_all_%d", n->nodenumber);
+  }
+  else if (t == 'y')
+  {
+    func = flu_sprintf("before_each_offline_%d", n->nodenumber);
+  }
+  else if (t == 'z')
+  {
+    func = flu_sprintf("after_each_offline_%d", n->nodenumber);
+  }
+  else
+  {
+    func = strdup("NULL");
+  }
 
   char *tx = "NULL";
   if (t == 'i' || t == 'd' || t == 'c' || t == 'p') tx = n->text;
