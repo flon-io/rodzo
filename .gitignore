@@ -1,3 +1,13 @@
+
 src/header.c
 tmp/*
 bin/*
+
+.vimgrep
+
+.deep.md
+.chat.md
+.claude.*
+.openai.*
+.deepseek.*
+
