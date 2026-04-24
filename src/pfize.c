@@ -59,6 +59,8 @@ int usage(char *pname)
 //
 int main(int argc, char *argv[])
 {
+  (void) argc;
+
   char *func_name = argv[1];
   FILE *in = fopen(argv[2], "r");
 
@@ -66,6 +68,8 @@ int main(int argc, char *argv[])
 
   char *line = NULL;
   size_t len = 0;
+
+  //printf("#include <stdio.h>\n\n");
 
   printf("void %s(FILE *out)\n", func_name);
   printf("{\n");

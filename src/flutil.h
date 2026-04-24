@@ -1,6 +1,6 @@
 
 //
-// Copyright (c) 2013-2014, John Mettraux, jmettraux+flon@gmail.com
+// Copyright (c) 2013-2026, John Mettraux, jmettraux+flon@gmail.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,10 @@ int flu_sbputs(flu_sbuffer *b, const char *s);
  */
 int flu_sbputs_n(flu_sbuffer *b, const char *s, size_t n);
 
+/* Puts a string to the buffer then frees the string.
+ */
+int flu_sbputs_f(flu_sbuffer *b, char *s);
+
 /* Merely encapsulates a fwrite().
  */
 size_t flu_sbwrite(flu_sbuffer *b, const char *s, size_t n);
@@ -102,6 +106,8 @@ char *flu_sbuffer_to_string(flu_sbuffer *b);
  * Returns NULL in case of issue.
  */
 char *flu_svprintf(const char *format, va_list ap);
+
+#define flu_sv(format, ap) flu_svprintf(format, ap)
 
 /* Wraps the sbuffer operations in a single call, yielding the result string.
  *
@@ -234,6 +240,10 @@ flu_list *flu_list_malloc();
  */
 flu_list *flu_l(void *elt0, ...);
 
+/* Returns the length of the given flu_list.
+ */
+size_t flu_list_length(flu_list *l);
+
 /* Frees a flu_list and all its nodes. But doesn't attempt freeing the
  * items in the nodes.
  */
@@ -336,8 +346,11 @@ char *flu_list_to_sp(flu_list *l);
 
 /* Sets an item under a given key.
  * Unshifts the new binding (O(1)).
+ *
+ * Composes the key with the ... and expects the last arguments to be
+ * the item.
  */
-void flu_list_set(flu_list *l, const char *key, void *item);
+void flu_list_set(flu_list *l, const char *key, ...);
 
 /* Like flu_list_set() but doesn't duplicate the string key, uses it as is.
  */
@@ -345,17 +358,34 @@ void flu_list_setk(flu_list *l, char *key, void *item, int set_as_last);
 
 /* Sets an item under a given key, but at then end of the list.
  * Useful for "defaults".
+ *
+ * Composes the key with the ... and expects the last arguments to be
+ * the item.
  */
-void flu_list_set_last(flu_list *l, const char *key, void *item);
+void flu_list_set_last(flu_list *l, const char *key, ...);
 
-/* Like flu_list_get() but a default is specified.
+/* Composes key and *string* value then sets in dictionary.
  */
-void *flu_list_getd(flu_list *l, const char *key, void *def);
+void flu_list_sets(flu_list *l, const char *key, ...);
+
+/* Like flu_list_get() but returns the flu_node...
+ */
+flu_node *flu_list_getn(flu_list *l, const char *key);
+
+/* Fetches the item (void *) corresponding to the given key.
+ * Expects a last arg that is the default value, returned in case of miss.
+ */
+void *flu_list_getd(flu_list *l, const char *key, ...);
+
+/* Like flu_list_getd() but tolerates a NULL l, in which case it returns
+ * the default.
+ */
+void *flu_list_getod(flu_list *l, const char *key, ...);
 
 /* Given a key, returns the item bound for it, NULL instead.
  * (O(n)).
  */
-#define flu_list_get(l, key) flu_list_getd(l, key, NULL)
+void *flu_list_get(flu_list *l, const char *key, ...);
 
 /* Returns a trimmed (a unique value per key) version of the given flu_list
  * dictionary. Meant for iterating over key/values.
@@ -477,6 +507,11 @@ long long flu_stoll(char *s, size_t l, int base);
 /* Calls puts() with its argument, then frees it. Returns puts() result.
  */
 int flu_putf(char *s);
+
+/* Overwrites a string with zeros and then frees it.
+ * If n == -1, will call strlen() to determine how many zeros to write.
+ */
+void flu_zero_and_free(char *s, ssize_t n);
 
 #endif // FLON_FLUTIL_H
 

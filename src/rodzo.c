@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libgen.h>
-#include <wordexp.h>
+#include <glob.h>
 #include <unistd.h>
 
 #include "flutil.h"
@@ -284,6 +284,8 @@ void free_context(context_s *c)
 
 void pull(context_s *c, int indent, int lnumber)
 {
+  (void)indent;
+
   node_s *n = c->node;
 
   //printf("0 pull() from %d to %d\n", n->indent, n->parent->indent);
@@ -354,7 +356,7 @@ line_s *split(int comment, char *line)
   int string = 0;
   int escape = 0;
 
-  for (ssize_t i = 0, j = 0, k = 0; i < len; ++i)
+  for (size_t i = 0, j = 0, k = 0; i < len; ++i)
   {
     char c = line[i]; char c1 = line[i + 1];
 
@@ -467,7 +469,7 @@ int push_ensure(context_s *c, FILE *in, int indent, int lnumber, char *l)
   //printf("con >%s<\n", con);
 
   char *ind = calloc(indent + 1, sizeof(char));
-  for (size_t i = 0; i < indent; i++) ind[i] = ' ';
+  for (int i = 0; i < indent; i++) ind[i] = ' ';
 
   push_linef(c, "%schar *msg%d = NULL;\n", ind, lnumber);
 
@@ -684,7 +686,7 @@ void process_lines(context_s *c, char *path)
   c->loffset += lnumber;
 }
 
-#include "header.c"
+//#include "header.c"
 
 void print_eaches(FILE *out, char *indent, char t, node_s *n)
 {
@@ -738,7 +740,7 @@ void print_node(FILE *out, node_s *n)
   if (n->indent > 0)
   {
     ind = calloc(n->indent + 1, sizeof(char));
-    for (size_t i = 0; i < n->indent; i++) ind[i] = ' ';
+    for (int i = 0; i < n->indent; i++) ind[i] = ' ';
   }
   else
   {
@@ -1012,12 +1014,12 @@ flu_list *list_spec_files(int argc, char *argv[])
 
     no_args = 0;
 
-    wordexp_t we;
-    wordexp(argv[i], &we, 0);
+    glob_t gl;
+    glob(argv[i], GLOB_NOSORT, NULL, &gl);
 
-    for (size_t j = 0; j < we.we_wordc; j++) add_spec_path(l, we.we_wordv[j]);
+    for (size_t j = 0; j < gl.gl_pathc; j++) add_spec_path(l, gl.gl_pathv[j]);
 
-    wordfree(&we);
+    globfree(&gl);
   }
 
   if (no_args) add_spec_path(l, ".");
@@ -1035,7 +1037,7 @@ char *record_call(int argc, char **argv)
 {
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  for (size_t i = 0; i < argc; ++i)
+  for (int i = 0; i < argc; ++i)
   {
     flu_sbputs(b, argv[i]); if (i < argc - 1) flu_sbputc(b, ' ');
   }
@@ -1067,6 +1069,9 @@ int print_usage(char *arg0)
   return 1;
 }
 
+void print_header(FILE *out);
+  // forward declaration ;-)
+
 int main(int argc, char *argv[])
 {
   regcomp(
@@ -1085,7 +1090,7 @@ int main(int argc, char *argv[])
   char *call = record_call(argc, argv);
 
   int badarg = 0;
-  for (size_t i = 1; i < argc; ++i)
+  for (int i = 1; i < argc; ++i)
   {
     if (*argv[i] != '-') continue;
     if (argv[i][1] == 'o') c->out_fname = strdup(argv[i + 1]);

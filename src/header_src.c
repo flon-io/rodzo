@@ -34,7 +34,7 @@
 #include <strings.h>
 #include <unistd.h> // for isatty()
 #include <regex.h>
-#include <wordexp.h>
+#include <glob.h>
 #include <errno.h>
 #include <sys/time.h>
 
@@ -217,7 +217,7 @@ void rdz_print_level(int nodenumber)//, int min)
   rdz_node *n = rdz_nodes[nodenumber];
   if (n->depth == 0) return;
 
-  for (int i = 0; i < n->depth - 1; i++) printf("  "); // indent
+  for (size_t i = 0; i < n->depth - 1; i++) printf("  "); // indent
 
   printf("%s", n->text);
   printf(" %sL=%d I=%d%s\n", rdz_gr(), n->ltstart, n->nodenumber, rdz_cl());
@@ -245,7 +245,7 @@ void rdz_print_result(rdz_result *r, double duration)
 
   rdz_node *rit = rdz_nodes[r->itnumber];
 
-  for (int i = 0; i < rit->depth - 1; i++) printf("  "); // indent
+  for (size_t i = 0; i < rit->depth - 1; i++) printf("  "); // indent
 
   char *co = rdz_gn();
   if (r->success == -1) co = rdz_yl();
@@ -323,14 +323,14 @@ int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
   ssize_t l = len;
   if (len < 0) len = strlen(s);
 
-  size_t line_length = 15;
-  size_t j = line * line_length;
+  ssize_t line_length = 15;
+  ssize_t j = line * line_length;
 
   printf("%s%-10p%s ", j == 0 ? rdz_cl() : rdz_gr(), s, rdz_cl());
 
-  size_t over = (j >= len);
+  short over = (j >= len);
 
-  for (size_t i = j; i < j + line_length; ++i)
+  for (ssize_t i = j; i < j + line_length; ++i)
   {
     if (over) printf("   ");
     else if (s[i] >= 32 && s[i] <= 126) printf("%02x ", s[i]);
@@ -341,7 +341,7 @@ int rdz_hexdump(const void *d, ssize_t len, size_t line, int second)
 
   over = (j >= len);
   printf(" %s|%s", second ? rdz_cl() : rdz_bl(), rdz_cl());
-  for (size_t i = j; i < j + line_length; ++i)
+  for (ssize_t i = j; i < j + line_length; ++i)
   {
     if (l < 0) { if (s[i] == 0) over = 1; } else { if (i >= l) over = 1; }
     if (over) printf(" ");
@@ -569,12 +569,12 @@ void rdz_extract_arguments()
         strcpy(fn, "../spec/"); strncpy(fn + 8, f, l);
       }
 
-      wordexp_t we;
-      wordexp(fn, &we, 0);
+      glob_t gl;
+      glob(fn, GLOB_NOSORT, NULL, &gl);
 
-      rdz_files[i] = rdz_strdup(we.we_wordv[0]);
+      rdz_files[i] = rdz_strdup(gl.gl_pathv[0]);
 
-      wordfree(&we);
+      globfree(&gl);
       free(fn);
 
       f = ff; if (f == NULL) break;
@@ -822,7 +822,7 @@ void rdz_summary(int itcount, double duration)
   {
     printf("Pending:\n");
 
-    for (size_t i = 0; i < rdz_count; i++)
+    for (int i = 0; i < rdz_count; i++)
     {
       rdz_result *r = rdz_results[i];
 
@@ -843,7 +843,7 @@ void rdz_summary(int itcount, double duration)
   {
     printf("Failures:\n\n");
 
-    for (size_t i = 0, j = 0; i < rdz_count; i++)
+    for (int i = 0, j = 0; i < rdz_count; i++)
     {
       rdz_result *r = rdz_results[i];
 
@@ -852,7 +852,7 @@ void rdz_summary(int itcount, double duration)
       rdz_node *rit = rdz_nodes[r->itnumber];
 
       char *line = rdz_read_line(rit->fname, r->lnumber);
-      printf("  %zu) %s\n", ++j, r->title);
+      printf("  %d) %s\n", ++j, r->title);
       if (r->message) { printf("%s%s%s\n", rdz_rd(), r->message, rdz_cl()); }
       printf("     >");
       printf("%s%s%s", rdz_rd(), line, rdz_cl());
@@ -878,7 +878,7 @@ void rdz_summary(int itcount, double duration)
   {
     printf("Failed examples:\n\n");
 
-    for (size_t i = 0; i < rdz_count; i++)
+    for (int i = 0; i < rdz_count; i++)
     {
       rdz_result *r = rdz_results[i];
 

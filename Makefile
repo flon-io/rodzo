@@ -1,39 +1,38 @@
 
-default: tests
+CC = clang
 
-.DEFAULT:
-	$(MAKE) -C tmp/ $@
+SRCS = src/flutil.c
+OBJS := $(SRCS:.c=.o)
 
+#.DEFAULT = bin/rodzo
 
-T=0
-#
-# "make test T=1" can be used too
-#
-test: build
-	$(MAKE) -C test$(T) spec
-vtest: build
-	$(MAKE) -C test$(T) vspec
+$(OBJS):
+	$(CC) $(CFLAGS) -c $< -o $@
 
-TS=$(shell ls -1 | grep test.)
+all: bin/rodzo
 
-tests: build
-	$(foreach t, $(TS), $(MAKE) -C $(t) spec;)
-vtests: build
-	$(foreach t, $(TS), $(MAKE) -C $(t) vspec;)
+tmp/pfize: src/pfize.c
+	$(CC) -std=c11 -Wall -Wextra -O3 src/pfize.c -o tmp/pfize
 
-rtest: build
-	bin/rodzo --test
+tmp/header.c: tmp/pfize src/header_src.c
+	./tmp/pfize print_header src/header_src.c > tmp/header.c
+
+tmp/rodzo.c: src/rodzo.c tmp/header.c
+	cat src/rodzo.c tmp/header.c > tmp/rodzo.c
+
+bin/rodzo: tmp/rodzo.c $(OBJS)
+	$(CC) \
+      -std=c11 -Wall -Wextra -O0 -g -fno-omit-frame-pointer \
+      -Isrc \
+      $(OBJS) tmp/rodzo.c \
+        -o bin/rodzo
 
 clean:
-	rm -f src/header.c
-	rm -f tmp/*.o tmp/rodzo tmp/pfize
+	rm -f src/*.o
+	rm -f tmp/pfize
+	rm -f tmp/header.c
 	rm -f bin/rodzo
-	$(foreach t, $(TS), $(MAKE) -C $(t) clean;)
 
-# copy up-to-date versions of dep libs into src/
-#
-upgrade:
-	cp -v ../flutil/src/flutil.[ch] src/
 
-.PHONY: clean test vtest upgrade
+.PHONY: clean
 

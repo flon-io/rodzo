@@ -1,7 +1,8 @@
 
-src/header.c
-tmp/*
 bin/*
+src/*.o
+tmp/*.c
+tmp/pfize
 
 .vimgrep
 

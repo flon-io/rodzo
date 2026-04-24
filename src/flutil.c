@@ -1,6 +1,6 @@
 
 //
-// Copyright (c) 2013-2014, John Mettraux, jmettraux+flon@gmail.com
+// Copyright (c) 2013-2026, John Mettraux, jmettraux+flon@gmail.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 #include <libgen.h>
 #include <errno.h>
 #include <dirent.h>
-#include <wordexp.h>
+#include <glob.h>
 
 #include "flutil.h"
 
@@ -183,6 +183,14 @@ int flu_sbputs_n(flu_sbuffer *b, const char *s, size_t n)
     r = putc(s[i], b->stream);
     if (r == EOF) return EOF;
   }
+
+  return r;
+}
+
+int flu_sbputs_f(flu_sbuffer *b, char *s)
+{
+  int r = flu_sbputs(b, s);
+  free(s);
 
   return r;
 }
@@ -441,7 +449,9 @@ char *flu_basename(const char *path, ...)
   char *dbn = strdup(bn);
   free(s);
 
-  if (new_suffix) strcpy(strrchr(dbn, '.'), new_suffix);
+  //if (new_suffix) strcpy(strrchr(dbn, '.'), new_suffix);
+  //if (new_suffix) strlcpy(strrchr(dbn, '.'), new_suffix, strlen(new_suffix));
+  if (new_suffix) memcpy(strrchr(dbn, '.'), new_suffix, strlen(new_suffix));
 
   return dbn;
 }
@@ -523,18 +533,18 @@ ssize_t flu_rm_files(const char *path, ...)
 
   ssize_t r = 0;
 
-  wordexp_t we;
-  wordexp(p, &we, WRDE_NOCMD);
+  glob_t gl;
+  glob(p, GLOB_NOSORT, NULL, &gl);
 
-  for (size_t i = 0; i < we.we_wordc; ++i)
+  for (size_t i = 0; i < gl.gl_pathc; ++i)
   {
-    if (unlink(we.we_wordv[i]) != 0) { r = -1; goto _over; }
+    if (unlink(gl.gl_pathv[i]) != 0) { r = -1; goto _over; }
     ++r;
   }
 
 _over:
 
-  wordfree(&we);
+  globfree(&gl);
   free(p);
 
   return r;
@@ -653,6 +663,14 @@ flu_list *flu_l(void *elt0, ...)
   for (void *e = elt0; e; e = va_arg(ap, void *)) flu_list_add(r, e);
 
   va_end(ap);
+
+  return r;
+}
+
+size_t flu_list_length(flu_list *l)
+{
+  size_t r = 0;
+  for (flu_node *n = l->first; n != NULL; n = n->next) { r++; }
 
   return r;
 }
@@ -815,7 +833,7 @@ static char *list_to_s(flu_list *l, char mode)
     if (multi) flu_sbputs(b, "\n  ");
     if (isdict) flu_sbprintf(b, "%s:", n->key);
     if (multi) flu_sbputc(b, ' ');
-    if (mode == 's') flu_sbputs(b, (char *)n->item);
+    if (mode == 's') flu_sbputs(b, n->item ? (char *)n->item : "NULL");
     else flu_sbprintf(b, "%p", n->item);
   }
   if (multi && l->first) flu_sbputc(b, '\n');
@@ -826,11 +844,6 @@ static char *list_to_s(flu_list *l, char mode)
 char *flu_list_to_s(flu_list *l) { return list_to_s(l, 's'); }
 char *flu_list_to_sm(flu_list *l) { return list_to_s(l, 'S'); }
 char *flu_list_to_sp(flu_list *l) { return list_to_s(l, 'p'); }
-
-void flu_list_set(flu_list *l, const char *key, void *item)
-{
-  flu_list_setk(l, strdup(key), item, 0);
-}
 
 void flu_list_setk(flu_list *l, char *key, void *item, int set_as_last)
 {
@@ -844,12 +857,38 @@ void flu_list_setk(flu_list *l, char *key, void *item, int set_as_last)
   }
 }
 
-void flu_list_set_last(flu_list *l, const char *key, void *item)
+void flu_list_set(flu_list *l, const char *key, ...)
 {
-  flu_list_add(l, item); l->last->key = strdup(key);
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  void *item = va_arg(ap, void *);
+  va_end(ap);
+
+  flu_list_setk(l, k, item, 0);
 }
 
-static flu_node *flu_list_getn(flu_list *l, const char *key)
+void flu_list_set_last(flu_list *l, const char *key, ...)
+{
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  void *item = va_arg(ap, void *);
+  va_end(ap);
+
+  flu_list_add(l, item); l->last->key = k;
+}
+
+void flu_list_sets(flu_list *l, const char *key, ...)
+{
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  char *value = va_arg(ap, char *);
+  char *v = flu_svprintf(value, ap);
+  va_end(ap);
+
+  flu_list_setk(l, k, v, 0);
+}
+
+flu_node *flu_list_getn(flu_list *l, const char *key)
 {
   for (flu_node *n = l->first; n != NULL; n = n->next)
   {
@@ -858,11 +897,45 @@ static flu_node *flu_list_getn(flu_list *l, const char *key)
   return NULL;
 }
 
-void *flu_list_getd(flu_list *l, const char *key, void *def)
+void *flu_list_getd(flu_list *l, const char *key, ...)
 {
-  flu_node *n = flu_list_getn(l, key);
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  void *def = va_arg(ap, void *);
+  va_end(ap);
+
+  flu_node *n = flu_list_getn(l, k);
+
+  free(k);
 
   return n ? n->item : def;
+}
+
+void *flu_list_getod(flu_list *l, const char *key, ...)
+{
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  void *def = va_arg(ap, void *);
+  va_end(ap);
+
+  flu_node *n = l ? flu_list_getn(l, k) : NULL;
+
+  free(k);
+
+  return n ? n->item : def;
+}
+
+void *flu_list_get(flu_list *l, const char *key, ...)
+{
+  va_list ap; va_start(ap, key);
+  char *k = flu_svprintf(key, ap);
+  va_end(ap);
+
+  flu_node *n = flu_list_getn(l, k);
+
+  free(k);
+
+  return n ? n->item : NULL;
 }
 
 flu_list *flu_list_dtrim(flu_list *l)
@@ -910,6 +983,7 @@ flu_dict *flu_readdict(const char *path, ...)
     s = end;
   }
 
+  memset(os, 0, strlen(os));
   free(os);
 
   return r;
@@ -1069,7 +1143,7 @@ char *flu_urlencode(const char *s, ssize_t n)
 
   flu_sbuffer *b = flu_sbuffer_malloc();
 
-  for (size_t i = 0; i < n; ++i)
+  for (ssize_t i = 0; i < n; ++i)
   {
     char c = s[i];
 
@@ -1093,7 +1167,7 @@ char *flu_urldecode(const char *s, ssize_t n)
 
   char *r = calloc(n + 1, sizeof(char));
 
-  for (size_t i = 0, j = 0; i < n; ++j)
+  for (ssize_t i = 0, j = 0; i < n; ++j)
   {
     if (s[i] != '%') { r[j] = s[i++]; continue; }
 
@@ -1134,7 +1208,9 @@ char *flu_strdup(char *s)
 {
   int l = strlen(s);
   char *r = calloc(l + 1, sizeof(char));
-  strcpy(r, s);
+
+  //strcpy(r, s);
+  memcpy(r, s, strlen(s));
 
   return r;
 }
@@ -1192,5 +1268,11 @@ char *flu_pline(const char *cmd, ...)
   char *lf = strchr(r, '\n'); if (lf) *lf = 0;
 
   return r;
+}
+
+void flu_zero_and_free(char *s, ssize_t n)
+{
+  memset(s, 0, n < 0 ? strlen(s) : n);
+  free(s);
 }
 

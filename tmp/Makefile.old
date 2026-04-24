@@ -1,7 +1,7 @@
 
 CFLAGS=-g -Wall -O3
 LDLIBS=flutil.o
-CC=c99
+CC=clang
 
 SRC=../src
 VPATH=$(SRC)
