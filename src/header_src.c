@@ -205,7 +205,8 @@ char *rdz_rd() { return istty() ? "[0;31m" : ""; }
 char *rdz_gn() { return istty() ? "[0;32m" : ""; }
 char *rdz_yl() { return istty() ? "[0;33m" : ""; }
 char *rdz_cy() { return istty() ? "[0;36m" : ""; }
-char *rdz_gr() { return istty() ? "[1;30m" : ""; }
+//char *rdz_gr() { return istty() ? "[1;30m" : ""; }
+char *rdz_gr() { return istty() ? "[0;90m" : ""; }
 char *rdz_bl() { return istty() ? "[1;34m" : ""; }
 //char *rdz_by() { return istty() ? "[1;33m" : ""; }
 char *rdz_cl() { return istty() ? "[0;0m" : ""; }
