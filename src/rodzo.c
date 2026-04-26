@@ -345,7 +345,7 @@ char *line_s_to_s(line_s *l, int colour)
 
 line_s *split(int comment, char *line)
 {
-  size_t len = strlen(line) + 1;
+  ssize_t len = strlen(line) + 1;
   line_s *l = calloc(1, sizeof(line_s));
   l->indent = 0;
   l->head = NULL;
@@ -356,7 +356,7 @@ line_s *split(int comment, char *line)
   int string = 0;
   int escape = 0;
 
-  for (size_t i = 0, j = 0, k = 0; i < len; ++i)
+  for (ssize_t i = 0, j = 0, k = 0; i < len; ++i)
   {
     char c = line[i]; char c1 = line[i + 1];
 
