@@ -22,7 +22,7 @@ tmp/rodzo.c: src/rodzo.c tmp/header.c
 
 bin/rodzo: tmp/rodzo.c $(OBJS)
 	$(CC) \
-      -std=c11 -Wall -Wextra -O0 -g -fno-omit-frame-pointer \
+      -std=c11 -Wall -Wextra -O3 -g \
       -Isrc \
       $(OBJS) tmp/rodzo.c \
         -o bin/rodzo
