@@ -8,7 +8,8 @@ tmp/pfize
 
 .deep.md
 .chat.md
-.claude.*
+.claude.md
+.klaude.*
 .openai.*
 .deepseek.*
 
