@@ -44,9 +44,9 @@ int rdz_hexdump_on = 0;
   // avoiding strdup and the posix_source requirement...
 char *rdz_strdup(char *s)
 {
-  int l = strlen(s);
-  char *r = calloc(l + 1, sizeof(char));
-  strcpy(r, s);
+  size_t l = strlen(s) + 1;
+  char *r = calloc(l, sizeof(char));
+  strlcpy(r, s, l);
   return r;
 }
 char *rdz_strndup(char *s, size_t n)
@@ -133,9 +133,9 @@ char *rdz_determine_title(rdz_node *n)
   for (size_t ii = i - 1; ; ii--)
   {
     l = strlen(texts[ii]);
-    strncpy(t, texts[ii], l);
+    strlcpy(t, texts[ii], l);
     t = t + l;
-    strcpy(t, " ");
+    strlcpy(t, " ", 1);
     t = t + 1;
     if (ii == 0) break;
   }
@@ -233,10 +233,10 @@ void rdz_duration_to_s(double duration, char *ca)
   char *e = getenv("RDZ_NO_DURATION");
   if (e && (strcmp(e, "1") == 0 || strcmp(e, "true"))) return;
 
-  if (duration < 1000.0) { sprintf(ca, "%fms ", duration); return; }
+  if (duration < 1000.0) { snprintf(ca, 14, "%fms ", duration); return; }
 
   double s = duration / 1000.0;
-  sprintf(ca, "%.6f ", s);
+  snprintf(ca, 14, "%.6f ", s);
   for (size_t i = 0; ; ++i) { if (ca[i] == '.') { ca[i] = 's'; break; } }
 }
 
@@ -567,7 +567,7 @@ void rdz_extract_arguments()
       else
       {
         fn = calloc(l + 9, sizeof(char));
-        strcpy(fn, "../spec/"); strncpy(fn + 8, f, l);
+        strlcpy(fn, "../spec/", 8); strlcpy(fn + 8, f, l);
       }
 
       glob_t gl;
